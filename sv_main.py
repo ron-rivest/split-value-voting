@@ -51,9 +51,12 @@ def do_election():
     election_parameters = {\
         "election_id": "test01",
         "ballot_style":\
-            [("taxes", ("yes", "no")),\
-             ("mayor", ("tom", "rufus", "*******"))],
-        "n_voters": 3,    # voters
+            [("taxes", ("yes", 
+                        "no")),\
+             ("mayor", ("tom", 
+                        "rufus", 
+                        "****************"))],  # 16-char write-ins allowed
+        "n_voters": 11,    # voters
         "n_reps": 4,      # (# of replicas aka 2m)
         "n_fail": 1,      # how many servers may fail
         "n_leak": 1}      # how many servers may leak

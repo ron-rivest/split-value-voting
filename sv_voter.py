@@ -56,15 +56,20 @@ class Voter:
         self.rand_name = "voter:"+voter_id
         sv.init_randomness_source(self.rand_name)
 
-    def cast_votes(self):
-        """ Cast random votes for voter for all races in simulated election.
+def cast_votes(election):
+    """ Cast random votes for all voters for all races in simulated election.
 
-        Of course, in a real election, choices come from voter via tablet.
-        """
+    Of course, in a real election, choices come from voter via tablet.
+    """
 
-        rand_name = self.rand_name
+    election.cast_votes = []
+    for px_int, voter in enumerate(election.voters):
 
-        for race in self.election.races:
+        px = election.p_list[px_int]
+
+        rand_name = voter.rand_name
+
+        for race in election.races:
             race_id = race.race_id
             race_modulus = race.race_modulus
 
@@ -73,14 +78,14 @@ class Voter:
             choice_int = race.choice_str2int(choice_str) # convert to integer
 
             # ballot_id is random hex string of desired length
-            ballot_id_len = self.election.ballot_id_len
+            ballot_id_len = election.ballot_id_len
             ballot_id = sv.bytes2hex(sv.get_random_from_source(rand_name))
             ballot_id = ballot_id[:ballot_id_len]
-            assert len(ballot_id) == self.election.ballot_id_len
+            assert len(ballot_id) == election.ballot_id_len
 
             # secret-share choice
-            n = self.election.server.rows
-            t = self.election.server.threshold
+            n = election.server.rows
+            t = election.server.threshold
             share_list = sv.share(choice_int, n, t, rand_name, race_modulus)
 
             # double-check that shares reconstruct to desired choice
@@ -91,62 +96,43 @@ class Voter:
             share_list = [share[1] for share in share_list]
 
             # save ballots on election cast vote list
-            for i, x in enumerate(share_list):
+            for row, x in enumerate(share_list):
                 (u, v) = sv.get_sv_pair(x, rand_name, race_modulus)
                 ru = sv.bytes2hex(sv.get_random_from_source(rand_name))
                 rv = sv.bytes2hex(sv.get_random_from_source(rand_name))
                 pair = [sv.com(u, ru), sv.com(v, rv)]
-                vote = (race_id, ballot_id, i, x, u, v, ru, rv, pair)
-                self.election.cast_votes.append(vote)
-
-def sort_cast_votes(election):
-    """ sort votes into order by race_id, ballot_id, i, x, ...
-
-    In a real election, this means that cast votes are accumulated
-    somewhere (tally server), then sorted before being distributed
-    to the first column of mix servers
-    """
-    election.cast_votes = sorted(election.cast_votes)
+                i = election.server.row_list[row]
+                vote = (px, race_id, ballot_id, i, x, u, v, ru, rv, pair)
+                election.cast_votes.append(vote)
 
 def distribute_cast_votes(election):
     """ Distribute (sorted) cast votes to server data structure. """
-    for race_id, ballot_id, i, x, u, v, ru, rv, pair in election.cast_votes:
+    for px, race_id, ballot_id, i, x, u, v, ru, rv, pair in election.cast_votes:
         # save these values in our data structures
         # in a non-simulated real election, this would be done by communicating
         # securely from voter (or tablet) to the first column of servers.
         sdbp = election.server.sdb[race_id][i][0]
-        sdbp['ballot_id'].append(ballot_id)
-        sdbp['x'].append(x)
-        sdbp['u'].append(u)
-        sdbp['v'].append(v)
-        sdbp['ru'].append(ru)
-        sdbp['rv'].append(rv)
-        sdbp['cast_votes'].append(pair)
+        sdbp['ballot_id'][px] = ballot_id
+        sdbp['x'][px] = x
+        sdbp['u'][px] = u
+        sdbp['v'][px] = v
+        sdbp['ru'][px] = ru
+        sdbp['rv'][px] = rv
+        sdbp['cast_votes'][px] = pair
 
 def post_cast_votes(election):
     """ Post cast votes onto SBB. """
-    cast_vote_dict = dict()
+    cast_vote_dict = dict()  # indexed by race_id
     for race in election.races:
         race_id = race.race_id
-        cast_vote_dict[race_id] = []
-    last_ballot_id = None
-    pair_list_for_ballot_id = []
-    for race_id, ballot_id, i, x, u, v, ru, rv, pair in election.cast_votes:
-        if last_ballot_id == None:
-            pair_list_for_ballot_id.append(pair)
-            last_ballot_id = ballot_id
-            last_race_id = race_id
-        elif ballot_id == last_ballot_id:
-            pair_list_for_ballot_id.append(pair)
-        else:
-            cast_vote_dict[last_race_id].append({"ballot_id": last_ballot_id,
-                                            "pair_list": pair_list_for_ballot_id})
-            last_race_id = race_id
-            last_ballot_id = ballot_id
-            pair_list_for_ballot_id = [pair]
-    if pair_list_for_ballot_id:
-        cast_vote_dict[last_race_id].append({"ballot_id": last_ballot_id,
-                                             "pair_list": pair_list_for_ballot_id})
+        cast_vote_dict[race_id] = dict() # indexed by px
+        for px in election.p_list:
+            cast_vote_dict[race_id][px] = dict() # indexed by "ballot_id", "pair_dict"
+            cast_vote_dict[race_id][px]["ballot_id"] = None
+            cast_vote_dict[race_id][px]["pair_dict"] = dict()
+    for px, race_id, ballot_id, i, x, u, v, ru, rv, pair in election.cast_votes:
+        cast_vote_dict[race_id][px]["ballot_id"] = ballot_id
+        cast_vote_dict[race_id][px]["pair_dict"][i] = pair
     election.sbb.post("casting:votes",
                       {"cast_vote_dict": cast_vote_dict},
                       time_stamp=False)

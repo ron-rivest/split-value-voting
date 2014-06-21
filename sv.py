@@ -668,3 +668,13 @@ def comsv(svpair, ru, rv):
     u, v = svpair
     return (com(u, ru), com(v, rv))
 
+##############################################################################
+# Creating a list of identifiers, e.g. k_0, k_1, ...
+##############################################################################
+
+def identifier_list(s,n):
+    """ Create and return a list of identifers s_0, s_1, upto s_(n-1). """
+    ans = []
+    for i in range(n):
+        ans.append(s+str(i))
+    return ans

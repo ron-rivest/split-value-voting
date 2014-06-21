@@ -177,6 +177,7 @@ def read_races(sbb_dict, db):
         race_id = race_dict["race_id"]
         races[race_id] = race_dict
     db["races"] = races
+    db["race_ids"] = races.keys()
     print("read_races: successful.")
 
 def read_n_voters(sbb_dict, db):
@@ -200,6 +201,10 @@ def read_rows_cols_n_reps_threshold(sbb_dict, db):
     db["cols"] = cols
     db["n_reps"] = n_reps
     db["threshold"] = threshold
+    assert rows < 27
+    db["row_list"] = 'abcdefghijklmnopqrstuvwxyz'[:rows]
+    assert n_reps < 27
+    db["k_list"] = [c for c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:n_reps]]
     print("read_rows_cols_n_reps_threshold: successful.")
 
 def read_cast_votes(sbb_dict, db):
@@ -257,25 +262,23 @@ def read_output_commitments(sbb_dict, db):
     and put results into db.
     """
     coms = sbb_dict["proof:all_output_commitments"]["commitments"]
-    assert isinstance(coms, list)
-    assert len(coms) == \
-        len(db["races"]) * db["n_voters"] * db["n_reps"]
-    for com in coms:
-        assert isinstance(com, dict)
-        assert set(com.keys()) == set(["iy", "k", "pair_list", "race_id"])
-        assert isinstance(com["iy"], int) and \
-            0 <= com["iy"] < db["n_voters"]
-        assert isinstance(com["k"], int) and 0 <= com["k"] < db["n_reps"]
-        assert isinstance(com["pair_list"], list)
-        pair_list = com["pair_list"]
-        assert len(pair_list) == db["rows"]
-        for pair in pair_list:
-            assert isinstance(pair, list)
-            assert len(pair) == 2
-            assert isinstance(pair[0], str)
-            assert isinstance(pair[1], str)        
-        assert isinstance(com["race_id"], str)
-        assert com["race_id"] in db["races"]
+    assert isinstance(coms, dict)
+    assert set(coms.keys()) == set(db["race_ids"])
+    for race_id in db["race_ids"]:
+        kiys = coms[race_id]
+        assert isinstance(kiys, dict)
+        assert set(kiys.keys()) == set(db["k_list"])
+        for k in db["k_list"]:
+            iys = kiys[k]
+            assert isinstance(iys, dict)
+            assert isinstance(com["pair_list"], list)
+            pair_list = com["pair_list"]
+            assert len(pair_list) == db["rows"]
+            for pair in pair_list:
+                assert isinstance(pair, list)
+                assert len(pair) == 2
+                assert isinstance(pair[0], str)
+                assert isinstance(pair[1], str)        
     db["output_commitments"] = coms
     print("read_output_commitments: successful.")
 

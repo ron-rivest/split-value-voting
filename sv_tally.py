@@ -48,19 +48,19 @@ def compute_tally(election):
     election.tally = dict()
     for race in election.races:
         race_id = race.race_id
-        for k in range(election.n_reps):
+        for k in election.k_list:
             choice_int_list = []
             for v in range(election.n_voters):
                 share_list = \
-                    [(i+1, server.sdb[race_id][i][cols-1][k]['y'][v]) \
-                     for i in range(rows)]
+                    [(row+1, server.sdb[race_id][i][cols-1][k]['y'][v]) \
+                     for row, i in enumerate(election.server.row_list)]
                 choice_int = sv.lagrange(share_list, election.n_voters, \
                                          server.threshold, race.race_modulus)
                 choice_int_list.append(choice_int)
             choice_str_list = [race.choice_int2str(choice_int)
                                for choice_int in choice_int_list]
             choice_str_list = sorted(choice_str_list)
-            if k == 0:
+            if k == election.k_list[0]:
                 last_choice_str_list = choice_str_list
             else:
                 assert choice_str_list == last_choice_str_list

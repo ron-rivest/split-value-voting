@@ -85,16 +85,33 @@ class Election:
         # check and save parameters
         assert isinstance(election_id,str) and len(election_id) > 0
         self.election_id = election_id
+
         assert isinstance(ballot_style,list) and len(ballot_style) > 0
         self.ballot_style = ballot_style
+
         assert isinstance(n_voters, int) and n_voters > 0
         self.n_voters = n_voters
-        assert isinstance(n_reps, int) and n_reps > 0 and n_reps % 2 == 0
+        # p-list is list ["p0", "p1", ..., "p(n-1)"]
+        # these name the positions in a list of objects, one per voter.
+        # they are not voter ids, they are really names of positions
+        # used for clarity and greater compatibility with json
+        # keep all the same length (use leading zeros) so that 
+        # json "sort by keys" options works.
+        width = len("%d"%n_voters)
+        i_format = "%0" + str(width) + "d"
+        self.p_list = ["p"+ i_format%i for i in range(n_voters)]
+
+        assert isinstance(n_reps, int) and \
+            0 < n_reps <= 26 and n_reps % 2 == 0
         self.n_reps = n_reps
+        # Each copy will be identified by an upper-case ascii letter
+        self.k_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:n_reps]
+
         assert isinstance(n_fail, int) and n_fail >= 0
         assert isinstance(n_leak, int) and n_leak >= 0
         self.n_fail = n_fail
         self.n_leak = n_leak
+
         assert ballot_id_len > 0
         self.ballot_id_len = ballot_id_len
 
@@ -106,10 +123,11 @@ class Election:
         self.race_ids = [race_id for (race_id, choices) in ballot_style]
         self.setup_races(ballot_style)
         self.voters = []
+        self.voter_ids = []
         self.setup_voters(n_voters)
         # list of cast votes
         # each of form: (race_id, ballot_id, i, x, u, v, ru, rv, pair)
-        self.cast_votes = []
+        self.cast_votes = dict()  # indices are members of p_list
         self.server = sv_server.Server(self, n_fail, n_leak)
         # list of output commitments
         # each of form: (race_id, i, y, u, v, ru, rv, pair)
@@ -121,11 +139,11 @@ class Election:
         """ Run a (simulated) election. """
 
         # Vote !
-        for voter in self.voters:
-            voter.cast_votes()
-        sv_voter.sort_cast_votes(self)
+        sv_voter.cast_votes(self) 
+        # sv_voter.sort_cast_votes(self)
         sv_voter.distribute_cast_votes(self)
         sv_voter.post_cast_votes(self)
+        return
 
         # Mix !
         self.server.mix()
@@ -179,9 +197,11 @@ class Election:
        
         assert isinstance(n_voters, int) and n_voters > 0
 
+        # voter identifier is merely "voter:" + index: voter:0, voter:1, ...
         for i in range(n_voters):
-            voter_id = "voter:" + str(i)
-            self.voters.append(sv_voter.Voter(self,voter_id))
+            vid = "voter:" + str(i)
+            self.voter_ids.append(vid)
+            self.voters.append(sv_voter.Voter(self,vid))
 
         self.sbb.post("setup:voters", 
                       {"n_voters": n_voters},
@@ -190,10 +210,10 @@ class Election:
         if False:
             if n_voters <= 3:
                 self.sbb.post("(setup:voter_ids)", 
-                              {"list": self.voters})
+                              {"list": self.voter_ids})
             else:
                 self.sbb.post("(setup:voter_ids)", 
-                              {"list": (self.voters[0].voter_id, "...", self.voters[-1].voter_id)},
+                              {"list": (self.voter_ids[0], "...", self.voter_ids[-1])},
                               time_stamp=False)
 
     def setup_keys(self):

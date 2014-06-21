@@ -80,9 +80,13 @@ class Server():
         cols = self.cols
         threshold = self.threshold
 
+        # each row has an identifier in "abcd..."
+        assert rows <= 26
+        self.row_list = "abcdefghijklmnopqrstuvwxyz"[:rows]
+
         # The state of the server in row i, col j is represented
         # here in the dictionary P[race_id][i][j] for the given race
-        # where 0 <= i < rows and 0 <= j < cols.
+        # where  i in row_list  and 0 <= j < cols.
 
         # create one top-level dict sdb as database for this main server
         self.sdb = dict()
@@ -92,7 +96,7 @@ class Server():
         for race in election.races:
             race_id = race.race_id
             self.sdb[race_id] = dict()
-            for i in range(rows):
+            for i in self.row_list:
                 self.sdb[race_id][i] = dict()
                 for j in range(cols):
                     self.sdb[race_id][i][j] = dict()
@@ -101,7 +105,7 @@ class Server():
         # in practice, these could be derived from true random seeds input
         # independently to each server
         for race_id in election.race_ids:
-            for i in range(rows):
+            for i in self.row_list:
                 for j in range(cols):
                     rand_name = "server:" + race_id + ":" + \
                                 str(i) + ":" + str(j)
@@ -112,32 +116,32 @@ class Server():
         # storage of cast votes and associated data, including 2m-way replicated
         # lists needed for the 2m mixes (passes) needed.
         for race_id in election.race_ids:
-            for i in range(rows):
+            for i in self.row_list:
                 # first-column lists for storing cast votes and secrets
                 sdbp = self.sdb[race_id][i][0]
-                sdbp['ballot_id'] = []   # ballot_id
-                sdbp['cast_votes'] = []  # (com(u),com(v)) pairs
-                sdbp['x'] = []           # choice x, where x = u+v mod M
-                sdbp['u'] = []           # u
-                sdbp['v'] = []           # v
-                sdbp['ru'] = []          # randomness to open com(u)
-                sdbp['rv'] = []          # randomness to open com(v)
+                sdbp['ballot_id'] = dict()   # ballot_id (indices from p_list)
+                sdbp['cast_votes'] = dict()  # (com(u),com(v)) pairs
+                sdbp['x'] = dict()           # choice x, where x = u+v mod M
+                sdbp['u'] = dict()           # u
+                sdbp['v'] = dict()           # v
+                sdbp['ru'] = dict()          # randomness to open com(u)
+                sdbp['rv'] = dict()          # randomness to open com(v)
                 # for all columns, have 2m-way replicated data structures
                 for j in range(cols):
                     sdbp = self.sdb[race_id][i][j]
-                    for k in range(self.election.n_reps):
+                    for k in election.k_list:
                         sdbp[k] = dict()
-                        sdbp[k]['x'] = []    # inputs on pass k
-                        sdbp[k]['y'] = []    # outputs on pass k
+                        sdbp[k]['x'] = dict()    # inputs on pass k
+                        sdbp[k]['y'] = dict()    # outputs on pass k
                 # last-column lists for storing published lists of commitments
-                for k in range(self.election.n_reps):
+                for k in election.k_list:
                     sdbp = self.sdb[race_id][i][self.cols-1][k]
-                    sdbp['y'] = []
-                    sdbp['u'] = []
-                    sdbp['v'] = []
-                    sdbp['ru'] = []
-                    sdbp['rv'] = []
-                    sdbp['pair'] = []
+                    sdbp['y'] = dict()
+                    sdbp['u'] = dict()
+                    sdbp['v'] = dict()
+                    sdbp['ru'] = dict()
+                    sdbp['rv'] = dict()
+                    sdbp['pair'] = dict()
         # post on log that server array is set up
         election.sbb.post("setup:server-array",
                           {"rows": rows, "cols": cols, 
@@ -147,44 +151,47 @@ class Server():
 
     def mix(self):
         """ Mix votes.  Information flows left to right. """
-        n_voters = self.election.n_voters
-        n_reps = self.election.n_reps
+        election = self.election
+        n_voters = election.n_voters
+        n_reps = election.n_reps
         # replicate input to become first-column x inputs for each race & pass
-        for race_id in self.election.race_ids:
-            for k in range(n_reps):
-                for i in range(self.rows):
-                    x = self.sdb[race_id][i][0]['x']   # list of n x's
+        for race_id in election.race_ids:
+            for k in election.k_list:
+                for i in self.row_list:
+                    x = self.sdb[race_id][i][0]['x']   # dict of n x's
                     self.sdb[race_id][i][0][k]['x'] = x[:]
         # generate permutations (and inverses) used in each column
         # in practice, these could be generated by row 0 server
         # and sent securely to the others in the same column.
-        for race_id in self.election.race_ids:
+        for race_id in election.race_ids:
             for j in range(self.cols):
-                rand_name = self.sdb[race_id][0][j]['rand_name']
-                for k in range(n_reps):
+                rand_name = self.sdb[race_id]['a'][j]['rand_name']
+                for k in election.k_list:
                     pi = sv.random_permutation(n_voters, rand_name)
                     pi_inv = sv.inverse_permutation(pi)
-                    for i in range(self.rows):
+                    for i in self.row_list:
                         self.sdb[race_id][i][j][k]['pi'] = pi
                         self.sdb[race_id][i][j][k]['pi_inv'] = pi_inv
         # generate obfuscation values used in each column
         # in practice, these could be generated by row 0 server
         # and sent securely to the others in the same column.
-        for race in self.election.races:
+        for race in election.races:
             race_id = race.race_id
             for j in range(self.cols):
-                rand_name = self.sdb[race_id][0][j]['rand_name']
-                for k in range(n_reps):
-                    fuzz_list = [[] for i in range(self.rows)]
+                rand_name = self.sdb[race_id]['a'][j]['rand_name']
+                for k in election.k_list:
+                    fuzz_list = dict()
+                    for i in self.row_list:
+                        fuzz_list[i] = []
                     for _ in range(self.election.n_voters):
                         share_list = sv.share(0,
                                               self.rows,
                                               self.threshold,
                                               rand_name,
                                               race.race_modulus)
-                        for i in range(self.rows):
-                            fuzz_list[i].append(share_list[i][1])
-                    for i in range(self.rows):
+                        for row, i in enumerate(self.row_list):
+                            fuzz_list[i].append(share_list[row][1])
+                    for i in self.row_list:
                         # note that fuzz_list[i] has length n
                         self.sdb[race_id][i][j][k]['fuzz_list'] = fuzz_list[i]
         # process columns left-to-right, mixing as you go
@@ -192,8 +199,8 @@ class Server():
             race_id = race.race_id
             race_modulus = race.race_modulus
             for j in range(self.cols):
-                for k in range(n_reps):
-                    for i in range(self.rows):
+                for k in election.k_list:
+                    for i in self.row_list:
                         # shuffle first
                         pi = self.sdb[race_id][i][j][k]['pi'] # length n (and indep of i)
                         x = self.sdb[race_id][i][j][k]['x']   # length n
@@ -217,7 +224,7 @@ class Server():
         for race in election.races:
             race_id = race.race_id
             print("Race: ", race_id)
-            for k in range(election.n_reps):
+            for k in election.k_list:
                 choice_int_list = []
                 for v in range(election.n_voters):
                     share_list = \

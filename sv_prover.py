@@ -73,15 +73,15 @@ def make_full_output(election):
         race_modulus = race.race_modulus
         race_id = race.race_id
         full_output[race_id] = dict()
-        for k in range(election.n_reps):
+        for k in election.k_list:
             full_output[race_id][k] = dict()
-            for iy in range(election.n_voters):
-                full_output[race_id][k][iy] = list()
-                for i in range(election.server.rows):
+            for py in election.p_list:
+                full_output[race_id][k][py] = dict()
+                for i in election.server.row_list:
                     rand_name = \
                         election.server.sdb[race_id][i][cols-1]['rand_name']
                     sdbp = election.server.sdb[race_id][i][cols-1][k]
-                    y = sdbp['y'][iy]
+                    y = sdbp['y'][py]
                     (u, v) = sv.get_sv_pair(y, rand_name, race_modulus)
                     ru = sv.bytes2hex(sv.get_random_from_source(rand_name))
                     rv = sv.bytes2hex(sv.get_random_from_source(rand_name))
@@ -91,8 +91,8 @@ def make_full_output(election):
                     sdbp['ru'].append(ru)
                     sdbp['rv'].append(rv)
                     sdbp['pair'].append(pair)
-                    ballot = (race_id, k, iy, i, y, u, v, ru, rv, pair)
-                    full_output[race_id][k][iy].append(ballot)
+                    ballot = (race_id, k, py, i, y, u, v, ru, rv, pair)
+                    full_output[race_id][k][py].append(ballot)
     election.full_output = full_output
 
 def post_output_commitments(election):
@@ -103,15 +103,14 @@ def post_output_commitments(election):
         race_modulus = race.race_modulus
         race_id = race.race_id
         coms[race_id] = dict()
-        for k in range(election.n_reps):
+        for k in election.k_list:
             coms[race_id][k] = dict()
-            for iy in range(election.n_voters):
-                coms[race_id][k][iy] = list()
-                for i in range(election.server.rows):
-                    for (race_id, k, iy, i, y, u, v, ru, rv, pair)\
-                        in full_output[race_id][k][iy]:
-                        ballot2 = (i, pair)
-                        coms[race_id][k][iy].append(ballot2)
+            for py in election.p_list:
+                coms[race_id][k][py] = list()
+                for (race_id, k, py, i, y, u, v, ru, rv, pair)\
+                    in full_output[race_id][k][py]:
+                    ballot2 = pair
+                    coms[race_id][k][py].append(ballot2)
     election.output_commitments = coms    
     election.sbb.post("proof:all_output_commitments",
                       {"commitments": election.output_commitments},
@@ -141,23 +140,25 @@ def compute_and_post_t_values(election):
     t_values = []
     for race in election.races:
         race_id = race.race_id
-        for k in range(election.n_reps):
-            for i in range(server.rows):
-                for ix in range(election.n_voters):
-                    ux = server.sdb[race_id][i][0]['u'][ix]
-                    vx = server.sdb[race_id][i][0]['v'][ix]
-                    iy = ix
+        for k in election.k_list:
+            for i in election.server.row_list:
+                for px in election.p_list:
+                    ux = server.sdb[race_id][i][0]['u'][px]
+                    vx = server.sdb[race_id][i][0]['v'][px]
+                    py = px
+                    py_int = int(py[1:])
                     for j in range(cols):
                         pi_inv = server.sdb[race_id][i][j][k]['pi_inv']
-                        iy = pi_inv[iy]
-                    uy = server.sdb[race_id][i][cols-1][k]['u'][iy]
-                    vy = server.sdb[race_id][i][cols-1][k]['v'][iy]
+                        py_int = pi_inv[py_int]
+                    py = "p"+str(py_int)
+                    uy = server.sdb[race_id][i][cols-1][k]['u'][py]
+                    vy = server.sdb[race_id][i][cols-1][k]['v'][py]
                     tu = (uy-ux) % race.race_modulus
                     tv = (vy-vx) % race.race_modulus
                     t_values.append({"race_id": race_id,
                                      "k": k,
                                      "i": i,
-                                     "ix": ix,
+                                     "px": px,
                                      "tu": tu,
                                      "tv": tv})
     election.sbb.post("proof:t_values_for_all_output_commitments",
@@ -194,14 +195,16 @@ def make_cut_and_choose_challenges(election, rand_name, challenges):
     Use specified randomness source.
     This icl/opl split will be the same for all races.
     (This can be easily changed if desired.)
-    # icl = subset of [0,1,...,n_reps-1] used for "input comparison"
-    # opl = subset of [0,1,...,n_reps-1] used for "output production"
+    # icl = subset of election.k_list used for "input comparison"
+    # opl = subset of election.k_list used for "output production"
     Save results in challenges dict.
     """
     m = election.n_reps // 2
     pi = sv.random_permutation(2*m, rand_name)
-    icl = sorted(pi[:m]) # indices for input comparison
-    opl = sorted(pi[m:]) # indices for output production
+    # icl = copies for input comparison
+    # opl = copies for output production
+    icl = [election.k_list[i] for i in sorted(pi[:m])]
+    opl = [election.k_list[i] for i in sorted(pi[m:])]
     challenges['icl'] = icl
     challenges['opl'] = opl
 
@@ -241,15 +244,15 @@ def prove_outcome_correct(election, challenges):
     opened_output_commitments = []
     for race in election.races:
         race_id = race.race_id
-        for k in range(election.n_reps):
+        for k in election.k_list:
             if k in opl:
-                for iy in range(election.n_voters):
-                    for race_id, k, iy, i, y, u, v, ru, rv, pair \
-                        in election.full_output[race_id][k][iy]:
+                for py in range(election.p_list):
+                    for race_id, k, py, i, y, u, v, ru, rv, pair \
+                        in election.full_output[race_id][k][py]:
                         opened_output_commitments.append(\
                             {"race_id": race_id,
                              "k": k,
-                             "iy": iy,
+                             "py": py,
                              "i": i,
                              "y": y,
                              "u": u,
@@ -277,7 +280,7 @@ def prove_input_consistent(election, challenges):
         race_id = race.race_id
         leftright = leftright_dict[race_id]
         commitments_in_race = []
-        for i in range(election.server.rows):
+        for i in election.server.row_list:
             input_pair_list = \
                 make_list_of_input_commitment_pairs(election, race, i)
             commitments_in_race.append(\
@@ -295,7 +298,7 @@ def prove_input_consistent(election, challenges):
         race_id = race.race_id
         leftright = leftright_dict[race_id]
         for k in icl:
-            for i in range(election.server.rows):
+            for i in election.server.row_list:
                 output_pair_list = \
                     make_list_of_output_commitment_pairs(election, race, i, k)
                 commitments_to_post.append(\
@@ -345,7 +348,7 @@ def make_list_of_output_commitment_pairs(election, race, i, k):
     """ Make list of output commitment pairs for given race,
         row i, and given copy index (k).
     """
-    assert isinstance(k, int) and 0 <= k < election.n_reps
+    assert k in election.k_list
     # first make list in unpermuted order
     cols = election.server.cols
     race_id = race.race_id
@@ -353,17 +356,17 @@ def make_list_of_output_commitment_pairs(election, race, i, k):
     sdbp = election.server.sdb
     for iy in range(election.n_voters):
         ucom = {"race_id": race_id,
-                "iy": iy,
+                "py": py,
                 "i": i,
-                "u": sdbp[race_id][i][cols-1][k]['u'][iy],
-                "ru": sdbp[race_id][i][cols-1][k]['ru'][iy],
-                "com(u,ru)": sdbp[race_id][i][cols-1][k]['pair'][iy][0]}
+                "u": sdbp[race_id][i][cols-1][k]['u'][py],
+                "ru": sdbp[race_id][i][cols-1][k]['ru'][py],
+                "com(u,ru)": sdbp[race_id][i][cols-1][k]['pair'][py][0]}
         vcom = {"race_id": race_id,
-                "iy": iy,
+                "py": py,
                 "i": i,
-                "v": sdbp[race_id][i][cols-1][k]['v'][iy],
-                "rv": sdbp[race_id][i][cols-1][k]['rv'][iy],
-                "com(v,rv)": sdbp[race_id][i][cols-1][k]['pair'][iy][1]}
+                "v": sdbp[race_id][i][cols-1][k]['v'][py],
+                "rv": sdbp[race_id][i][cols-1][k]['rv'][py],
+                "com(v,rv)": sdbp[race_id][i][cols-1][k]['pair'][py][1]}
         list_of_output_commitment_pairs.append((ucom, vcom))
     # next is to permute it back into same order as input lists
     for j in range(cols-1, -1, -1):
@@ -388,14 +391,16 @@ def compute_and_post_pik_list(election, challenges):
     for race in election.races:
         race_id = race.race_id
         for k in icl:
-            pik = []
-            for iy in range(election.n_voters):
-                ix = iy
+            pik = dict()
+            for py in range(election.p_list):
+                px = py
+                px_int = int(px[1:])
                 for j in range(cols):
-                    pi = server.sdb[race_id][0][j][k]['pi']
-                    ix = pi[ix]
-                pik.append(ix)
-            # now pik maps iy's to their original ix's
+                    pi = server.sdb[race_id]['a'][j][k]['pi']
+                    px_int = pi[px_int]
+                px = "p"+str(px_int)
+                pik[py] = px
+            # now pik maps py's to their original px's
             pik_list.append({"race_id": race_id,
                              "k": k,
                              "pik": pik})

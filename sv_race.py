@@ -43,6 +43,11 @@ import sv
 # import sv_server
 # import sv_sbb
 
+# Standard list of write-in candidates to use (max 13 char)
+WRITE_INS = ["Donald Duck",
+             "Lizard People", 
+             "Mickey Mouse"]
+
 class Race:
     """ Implements a race in a split-value voting method. """
 
@@ -107,9 +112,8 @@ class Race:
         # select write_in from fixed list of alternatives
         # but truncate if needed so it is not longer than list of stars
         max_len_write_in = len(choice)
-        write_ins = ["Margo Mango", "Larry Lizard", "I Dunno", "Justin Case"]
-        index = sv.get_random_from_source(self.rand_name, len(write_ins))
-        choice = write_ins[index][:max_len_write_in]
+        index = sv.get_random_from_source(self.rand_name, len(WRITE_INS))
+        choice = WRITE_INS[index][:max_len_write_in]
         return choice
 
     def is_valid_choice(self, choice):
