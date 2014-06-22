@@ -3,9 +3,9 @@
 # Code for verifier portion of an election
 # This should work for simulated election, or a real election.
 
-""" Usage: python3 sv_verifier.py election_id.output.txt
+""" Usage: python3 sv_verifier.py election_id.sbb.txt
 
-           where election_id.output.txt is the output file giving 
+           where election_id.sbb.txt is the file having
            the contents of the secure bulletin board (json format).
 """
 
