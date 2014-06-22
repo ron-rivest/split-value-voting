@@ -224,16 +224,13 @@ def read_cast_votes(sbb_dict, db):
         assert len(cast_vote_race) == db["n_voters"]
         for p in cast_vote_race.keys():
             cast_vote_race_p = cast_vote_race[p]
-            for i in cast_vote_race_p:
-                vote = cast_vote_race_p[i]
-                assert set(vote.keys()) == set(["ballot_id", "pair"])
-                ballot_id = vote["ballot_id"]
-                assert isinstance(ballot_id, str)
-                ballot_id_dict[race_id].append(ballot_id)
-                ballot_id_list.append(ballot_id)
-
-                assert isinstance(vote["pair"], list)
-                pair = vote["pair"]
+            assert set(cast_vote_race_p.keys()) == set(["ballot_id", "pair_dict"])
+            ballot_id = cast_vote_race_p["ballot_id"]
+            assert isinstance(ballot_id, str)
+            ballot_id_dict[race_id].append(ballot_id)
+            ballot_id_list.append(ballot_id)
+            for i in cast_vote_race_p['pair_dict']:
+                pair = cast_vote_race_p['pair_dict'][i]
                 assert isinstance(pair, list)
                 assert len(pair) == 2
                 assert isinstance(pair[0], str)
