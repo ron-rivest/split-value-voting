@@ -14,6 +14,7 @@ This code simulates an election:
    * posts second part of proof of correct election outcome
 
 Implementation features:
+  * universally verifiable proof of correctness of election outcome
   * open source (MIT) license
   * multiple races
   * write-in votes
