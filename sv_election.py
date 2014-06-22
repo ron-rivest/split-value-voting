@@ -133,7 +133,9 @@ class Election:
                            "Values represented are represented modulo race_modulus.",
                            "'ru' and 'rv' and randomization values for commitments to 'u' and 'v', respectively.",
                            "'pair' gives a pair of commitments (com(u,ru), com(v,rv))(split-value style) to u and v",
-                           "'x' (or 'y') equals u+v (mod race_modulus), and is a share of the vote."
+                           "'x' (or 'y') equals u+v (mod race_modulus), and is a share of the vote.",
+                           "'icl' stands for 'input comparison list', and 'opl' for 'output production list';",
+                           "      these are the 'cut-and-choose' results dividing up the lists into two sub-lists."
                            ]
                        }
 
