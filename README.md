@@ -1,5 +1,8 @@
 Python3 code for Rabin/Rivest end-to-end split-value voting method(s).
 
+This code is UNDER DEVELOPMENT and is currently only about 90% done.
+More work is needed on the proof generator and proof verifier.
+
 The relevant paper: http://people.csail.mit.edu/rivest/pubs.html#RR14a
 
 This code simulates an election:
