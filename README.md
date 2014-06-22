@@ -23,15 +23,15 @@ It does not yet simulate:
   * simulating failure of a server
 
 Modules:
-  sv_main.py            -- top-level module for simulating election
-  sv_verifier.py        -- top-level module for verifying election
-  sv.py                 -- common routines
-  sv_election.py        -- election data structure
-  sv_race.py            -- race data structure
-  sv_voter.py           -- voter data structure and casting votes
-  sv_server.py          -- simulates server array
-  sv_tally.py           -- computes election outcome
-  sv_prover.py          -- produces proof of correctness of outcome
-  sv_sbb.py             -- simulates secure bulletin board  
+  * sv_main.py            -- top-level module for simulating election
+  * sv_verifier.py        -- top-level module for verifying election
+  * sv.py                 -- common routines
+  * sv_election.py        -- election data structure
+  * sv_race.py            -- race data structure
+  * sv_voter.py           -- voter data structure and casting votes
+  * sv_server.py          -- simulates server array
+  * sv_tally.py           -- computes election outcome
+  * sv_prover.py          -- produces proof of correctness of outcome
+  * sv_sbb.py             -- simulates secure bulletin board  
 
 
