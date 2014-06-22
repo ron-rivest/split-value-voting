@@ -132,12 +132,12 @@ def post_cast_vote_commitments(election):
     for race_id in election.race_ids:
         cvcs[race_id] = dict() 
         for px in election.p_list:
-            cvcs[race_id][px] = dict() 
+            cvcs[race_id][px] = dict()
+            cvcs[race_id][px]['pair_dict'] = dict()
             for i in election.server.row_list:
-                cvcs[race_id][px][i] = dict()
-                cvcs[race_id][px][i]['ballot_id'] = \
+                cvcs[race_id][px]['ballot_id'] = \
                     cvs[race_id][px][i]['ballot_id']
-                cvcs[race_id][px][i]['pair'] = \
+                cvcs[race_id][px]['pair_dict'][i] = \
                     cvs[race_id][px][i]['pair']
     election.sbb.post("casting:votes",
                       {"cast_vote_dict": cvcs},

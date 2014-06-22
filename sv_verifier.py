@@ -223,22 +223,22 @@ def read_cast_votes(sbb_dict, db):
         assert isinstance(cast_vote_race, dict)
         assert len(cast_vote_race) == db["n_voters"]
         for p in cast_vote_race.keys():
-            cast_vote = cast_vote_race[p]
-            assert set(cast_vote.keys()) == set(["ballot_id", "pair_dict"])
-            ballot_id = cast_vote["ballot_id"]
-            assert isinstance(ballot_id, str)
-            ballot_id_dict[race_id].append(ballot_id)
-            ballot_id_list.append(ballot_id)
+            cast_vote_race_p = cast_vote_race[p]
+            for i in cast_vote_race_p:
+                vote = cast_vote_race_p[i]
+                assert set(vote.keys()) == set(["ballot_id", "pair"])
+                ballot_id = vote["ballot_id"]
+                assert isinstance(ballot_id, str)
+                ballot_id_dict[race_id].append(ballot_id)
+                ballot_id_list.append(ballot_id)
 
-            assert isinstance(cast_vote["pair_dict"], dict)
-            pair_dict = cast_vote["pair_dict"]
-            assert len(pair_dict) == db["rows"]
-            for i in pair_dict:
-                pair = pair_dict[i]
+                assert isinstance(vote["pair"], list)
+                pair = vote["pair"]
                 assert isinstance(pair, list)
                 assert len(pair) == 2
                 assert isinstance(pair[0], str)
                 assert isinstance(pair[1], str)
+    print("ballot_id_list", ballot_id_list)
     assert len(set(ballot_id_list)) == len(ballot_id_list)   # ballot id's distinct
     db["ballot_id_dict"] = ballot_id_dict
     db["cast_vote_dict"] = cast_vote_dict

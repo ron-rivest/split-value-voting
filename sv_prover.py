@@ -286,7 +286,7 @@ def prove_input_consistent(election, challenges):
         coms_in_race = dict()
         for i in election.server.row_list:
             input_pair_dict = \
-                make_dict_of_input_commitment_pairs(election, race, i)
+                make_dict_of_input_commitment_pairs(election, race_id, i)
             coms_in_race[i] = \
                 half_open_commitments_from_dict(election,
                                                 input_pair_dict,
@@ -320,8 +320,6 @@ def half_open_commitments_from_dict(election, commitments, leftright):
     """
     assert len(commitments) == len(leftright)
     coms_to_post = dict()
-    print(commitments)
-    print(leftright)
     for p in election.p_list:
         com = commitments[p]
         pick = leftright[p]
@@ -329,33 +327,31 @@ def half_open_commitments_from_dict(election, commitments, leftright):
         coms_to_post[p] = com_to_post
     return coms_to_post
 
-def make_dict_of_input_commitment_pairs(election, race, row_i):
-    """ Make dict of input commitment pairs (cast votes) for race and row_i """
-    # note that election.cast_votes is in "canonical" order
-    # (sorted into increasing order by ballot id).
+def make_dict_of_input_commitment_pairs(election, race_id, i):
+    """ Make dict of input commitment pairs (cast votes) for race and row i """
     coms = dict()
-    for race_id in election.race_ids:
-        coms[race_id] = dict()
-        for p in election.p_list:
-            coms[race_id][p] = dict()
-            "TBD"
-    for (px, race_id, ballot_id, i, x, u, v, ru, rv, pair) in \
-        election.cast_votes:
-        if race_id == race.race_id and i == row_i:
-            ucom = {"race_id": race_id,
-                    "ballot_id": ballot_id,
-                    "i": i,
-                    "u": u,
-                    "ru": ru,
-                    "com(u,ru)": pair[0]}
-            vcom = {"race_id": race_id,
-                    "ballot_id": ballot_id,
-                    "i": i,
-                    "v": v,
-                    "rv": rv,
-                    "com(v,rv)": pair[1]}
-            coms.append((ucom, vcom))
-    return dict_of_input_commitment_pairs
+    for p in election.p_list:
+        vote = election.cast_votes[race_id][p][i]
+        ballot_id = vote['ballot_id']
+        u = vote['u']
+        v = vote['v']
+        ru = vote['ru']
+        rv = vote['rv']
+        pair = vote['pair']
+        ucom = {"race_id": race_id,
+                "ballot_id": ballot_id,
+                "i": i,
+                "u": u,
+                "ru": ru,
+                "com(u,ru)": pair[0]}
+        vcom = {"race_id": race_id,
+                "ballot_id": ballot_id,
+                "i": i,
+                "v": v,
+                "rv": rv,
+                "com(v,rv)": pair[1]}
+        coms[p] = (ucom, vcom)
+    return coms
 
 def make_dict_of_output_commitment_pairs(election, race, i, k):
     """ Make dict of output commitment pairs for given race,
