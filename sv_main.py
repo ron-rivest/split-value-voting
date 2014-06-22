@@ -56,11 +56,17 @@ def do_election():
              ("mayor", ("tom", 
                         "rufus", 
                         "****************"))],  # 16-char write-ins allowed
-        "n_voters": 3,    # voters
-        "n_reps": 4,      # (# of replicas aka 2m)
-        "n_fail": 1,      # how many servers may fail
-        "n_leak": 1}      # how many servers may leak
+        "n_voters": 3,       # voters
+        "n_reps": 4,         # (# of replicas aka 2m)
+        "n_fail": 1,         # how many servers may fail
+        "n_leak": 1,         # how many servers may leak
 
+        # optional parameters:
+        # number of hex digits in ballot id (default 32)
+        "ballot_id_len": 32, 
+        # number of spaces per tab in json output (>=0, default 0)
+        "json_indent": 2     
+    }
     print("starting election (simulation).")
     print("election parameters:")
     print("    election id =", election_parameters["election_id"])

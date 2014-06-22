@@ -81,6 +81,7 @@ class Election:
         n_leak = election_parameters["n_leak"]
         # optional parameters (with defaults)
         ballot_id_len = election_parameters.get("ballot_id_len",32)
+        json_indent = election_parameters.get("json_indent",0)
 
         # check and save parameters
         assert isinstance(election_id,str) and len(election_id) > 0
@@ -116,8 +117,11 @@ class Election:
         assert ballot_id_len > 0
         self.ballot_id_len = ballot_id_len
 
+        assert json_indent >= 0
+        self.json_indent = json_indent
+
         # start secure bulletin board
-        self.sbb = sv_sbb.SBB(election_id)
+        self.sbb = sv_sbb.SBB(election_id, json_indent)
         self.sbb.post("setup:start", 
                       {"about": [
                           "Secure Bulletin Board for Split-Value Voting Method Demo.",

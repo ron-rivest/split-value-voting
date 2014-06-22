@@ -48,12 +48,13 @@ class SBB:
     might be posted here that would not be posted in real election.
     """
 
-    def __init__(self, election_id):
+    def __init__(self, election_id, json_indent):
         """ Initialize (simulated) secure bulletin board.
         """
 
         self.board = []               # list of posted messages
         self.closed = False
+        self.json_indent = json_indent
         self.start_time = time.time()
         self.post("sbb:open", {"election_id": election_id})
 
@@ -113,7 +114,8 @@ class SBB:
         if public:
             board = [item for item in board if item[0][0] != "("]
 
-        json.dump(board, sbb_file, sort_keys=True, indent=2)
+        json_indent = self.json_indent
+        json.dump(board, sbb_file, sort_keys=True, indent=json_indent)
         if sbb_file is not sys.stdout:
             print("Secure bulletin board saved on file:", sbb_filename)
 
@@ -125,7 +127,8 @@ class SBB:
         if False:
             if public:
                 board = [item for item in board if item[0][0] != "("]
-        board_str = json.dumps(board, sort_keys=True, indent=2)
+        json_indent = self.json_indent
+        board_str = json.dumps(board, sort_keys=True, indent=json_indent)
         hash_tweak = 2
         return sv.hash(board_str, hash_tweak)
 
