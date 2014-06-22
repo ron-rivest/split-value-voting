@@ -3,24 +3,24 @@ Python3 code for Rabin/Rivest end-to-end split-value voting method(s).
 The relevant paper: http://people.csail.mit.edu/rivest/pubs.html#RR14a
 
 This code simulates an election:
-   -- defines election ballot style
-   -- defines number of simulated voters
-   -- simulates casting of votes
-   -- creates simulated secure bulletin board
-   -- posts cast votes on bulletin baord
-   -- determines election outcome and posts to bulletin baord
-   -- posts commitments to first part of proof of correct election outcome
-   -- simulates random "verifier challenges"
-   -- posts second part of proof of correct election outcome
+   * defines election ballot style
+   * defines number of simulated voters
+   * simulates casting of votes
+   * creates simulated secure bulletin board
+   * posts cast votes on bulletin baord
+   * determines election outcome and posts to bulletin baord
+   * posts commitments to first part of proof of correct election outcome
+   * simulates random "verifier challenges"
+   * posts second part of proof of correct election outcome
 
 Implementation features:
-  -- open source (MIT) license
-  -- multiple races
-  -- write-in votes
+  * open source (MIT) license
+  * multiple races
+  * write-in votes
 
 It does not yet simulate:
-  -- encryption between voter and voting system
-  -- simulating failure of a server
+  * encryption between voter and voting system
+  * simulating failure of a server
 
 Modules:
   sv_main.py            -- top-level module for simulating election
