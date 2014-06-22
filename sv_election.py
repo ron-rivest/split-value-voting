@@ -117,7 +117,27 @@ class Election:
 
         # start secure bulletin board
         self.sbb = sv_sbb.SBB(election_id)
-        self.sbb.post("setup:start", {"election_id": election_id})
+        self.sbb.post("setup:start", 
+                      {"about": [
+                          "Secure Bulletin Board for Split-Value Voting Method Demo.",
+                          "by Michael O. Rabin and Ronald L. Rivest",
+                          "For paper: see http://people.csail.mit.edu/rivest/pubs.html#RR14a",
+                          "For code: see https://github.com/ron-rivest/split-value-voting",
+                          ],
+                       "election_id": election_id,
+                       "legend": [
+                           "Indices between 0 and n_voters-1 indicated by p0, p1, ...",
+                           "Rows of server array indicated by a, b, c, d, ...",
+                           "Copies (n_reps = 2m passes) indicated by A, B, C, D, ...",
+                           "'********' in ballot style indicates a write-in option (of given length)",
+                           "Values represented are represented modulo race_modulus.",
+                           "'ru' and 'rv' and randomization values for commitments to 'u' and 'v', respectively.",
+                           "'pair' gives a pair of commitments (com(u,ru), com(v,rv))(split-value style) to u and v",
+                           "'x' (or 'y') equals u+v (mod race_modulus), and is a share of the vote."
+                           ]
+                       }
+
+        )
 
         self.races = []
         self.race_ids = [race_id for (race_id, choices) in ballot_style]
@@ -143,7 +163,6 @@ class Election:
         # sv_voter.sort_cast_votes(self)
         sv_voter.distribute_cast_votes(self)
         sv_voter.post_cast_votes(self)
-        return
 
         # Mix !
         self.server.mix()
@@ -189,7 +208,7 @@ class Election:
                               "choices": race.choices,
                               "race_modulus": race.race_modulus})
         self.sbb.post("setup:races",
-                      {"race_list": race_list},
+                      {"ballot_style_race_list": race_list},
                       time_stamp=False)
 
     def setup_voters(self, n_voters):

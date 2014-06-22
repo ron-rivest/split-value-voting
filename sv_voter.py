@@ -98,8 +98,9 @@ def cast_votes(election):
             # save ballots on election cast vote list
             for row, x in enumerate(share_list):
                 (u, v) = sv.get_sv_pair(x, rand_name, race_modulus)
-                ru = sv.bytes2hex(sv.get_random_from_source(rand_name))
-                rv = sv.bytes2hex(sv.get_random_from_source(rand_name))
+                ru = sv.bytes2base64(sv.get_random_from_source(rand_name))
+                rv = sv.bytes2base64(sv.get_random_from_source(rand_name))
+                print(len(ru), len(rv))
                 pair = [sv.com(u, ru), sv.com(v, rv)]
                 i = election.server.row_list[row]
                 vote = (px, race_id, ballot_id, i, x, u, v, ru, rv, pair)

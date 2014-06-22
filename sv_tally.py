@@ -50,9 +50,9 @@ def compute_tally(election):
         race_id = race.race_id
         for k in election.k_list:
             choice_int_list = []
-            for v in range(election.n_voters):
+            for p in election.p_list:
                 share_list = \
-                    [(row+1, server.sdb[race_id][i][cols-1][k]['y'][v]) \
+                    [(row+1, server.sdb[race_id][i][cols-1][k]['y'][p]) \
                      for row, i in enumerate(election.server.row_list)]
                 choice_int = sv.lagrange(share_list, election.n_voters, \
                                          server.threshold, race.race_modulus)

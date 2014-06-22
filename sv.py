@@ -37,6 +37,7 @@ THE SOFTWARE.
 # end of standard MIT open-source license
 ##############################################################################
 
+import base64
 import hmac
 import hashlib
 
@@ -47,17 +48,17 @@ import hashlib
 
 # define some security parameters
 
-secparam_symmetric = 256     # size of symmetric encryption key (bits)
+SECPARAM_SYMMETRIC = 256     # size of symmetric encryption key (bits)
                              # (this is also the commitment key length)
-secparam_asymmetric = 3248   # size of asymmetric encryption key (bits)
-secparam_hash_output = 256   # size of hash function output (bits)
-secparam_rand_seed = 256     # size of seed for pseudo-random-generator (bits)
+SECPARAM_ASYMMETRIC = 3248   # size of asymmetric encryption key (bits)
+SECPARAM_HASH_OUTPUT = 256   # size of hash function output (bits)
+SECPARAM_RAND_SEED = 256     # size of seed for pseudo-random-generator (bits)
 
 # security parameters must be integral number of bytes
-assert secparam_symmetric % 8 == 0
-assert secparam_asymmetric % 8 == 0
-assert secparam_hash_output % 8 == 0
-assert secparam_rand_seed == secparam_hash_output
+assert SECPARAM_SYMMETRIC % 8 == 0
+assert SECPARAM_ASYMMETRIC % 8 == 0
+assert SECPARAM_HASH_OUTPUT % 8 == 0
+assert SECPARAM_RAND_SEED == SECPARAM_HASH_OUTPUT
 
 ##############################################################################
 # HASH FUNCTION (SHA256)
@@ -147,11 +148,23 @@ def int2bytes(x, desired_length=None):
     assert not desired_length or len(byte_list) == desired_length
     return bytes(byte_list)
 
+def bytes2base64(x):
+    """ Convert bytes value x to base64 representation as a string. """
+    return base64.b64encode(x).decode()
+
+def base64_2_bytes(x):
+    """ Convert string base64 value x to bytes. """
+    return base64.b64decode(x)
+
 def test_conversions():
     """ Test the above data-type conversion routines. """
     assert bytes2hex(b"abc") == '616263'
     assert bytes2int(bytes([1, 2])) == 513
     assert bytes2int(int2bytes(134827781332)) == 134827781332
+    x = b"012345abcde"
+    assert base64_2_bytes(bytes2base64(x)) == x
+
+test_conversions()
 
 ##############################################################################
 # RANDOMNESS
@@ -164,7 +177,7 @@ In this protype implementation, they are pseudorandomly seeded.
 ** For a secure real implementation, seeds should come 
 ** from a truly random source. 
 Each randomness source has a separate name (a string).
-Each randomness source has a seed (a secparam_rand_seed/8 bytes value)
+Each randomness source has a seed (a SECPARAM_RAND_SEED/8 bytes value)
 """
 randomness_sources = dict()     # maps names to their current state
 
@@ -181,14 +194,14 @@ def init_randomness_source(rand_name, initial_seed=None):
         new_seed = hash(rand_name)
     else:
         assert isinstance(initial_seed, (bytes, bytearray))
-        assert len(initial_seed) == secparam_hash_output / 8
+        assert len(initial_seed) == SECPARAM_HASH_OUTPUT / 8
         new_seed = initial_seed
     randomness_sources[rand_name] = new_seed
 
 def get_random_from_source(rand_name, modulus=None):
     """ Return next random value for given randomness source.
 
-    Returned value is of type bytes, of length secparam_rand_seed/8 bytes,
+    Returned value is of type bytes, of length SECPARAM_RAND_SEED/8 bytes,
     unless modulus is given, in which case an integer modulo the
     given modulus is returned.
     """
@@ -227,55 +240,65 @@ test_random()
 # GENERATE A RANDOM PERMUTATION
 ##############################################################################
 
-def random_permutation(g, rand_name):
+def random_permutation(elts, rand_name):
     """
-    Generate and return a random permutation of [0,1,...,g-1],
-    using random source with name rand_name.
+    Generate and return a random permutation (as a dict) of given set of 
+    elements using random source with name rand_name.  If elts is an integer,
+    it is interpreted as range(elts)
 
     Use Fisher-Yates method.
     """
-    assert isinstance(g, int) and g > 0
+    if isinstance(elts, int):
+        elts = range(elts)
+    elts = list(elts)
+    g = len(elts)
     pi = list(range(g))
     for i in range(1, g):
         j = get_random_from_source(rand_name, i+1)
         temp = pi[i]
         pi[i] = pi[j]
         pi[j] = temp
-    return pi
+    perm = dict()
+    for i in range(g):
+        perm[elts[i]] = elts[pi[i]]
+    return perm
 
-def inverse_permutation(pi):
-    """ Produce inverse of permutation pi (a permutation of range(n)). """
-    n = len(pi)
-    pi_inv = [0] * n
-    for i in range(n):
-        assert 0 <= pi[i] < n
-        pi_inv[pi[i]] = i
-    return pi_inv
+def inverse_permutation(perm):
+    """ Produce inverse of permutation perm (a permutation as a dict). """
+    perm_inv = dict()
+    for elt in perm:
+        perm_inv[perm[elt]] = elt
+    return perm_inv
 
-def apply_permutation(pi, x):
-    """ Apply permutation pi to input vector x.
+def apply_permutation(perm, x):
+    """ Apply permutation perm to input dict x.
 
-    Here pi is a permutation of n = len(x).
+    Here perm is a permutation of x.keys()
     The element starting in position pi[i] ends up in position i.
-    The element starting in position i ends up in position pi_inv[i].
+    The element starting in position elt ends up in position perm_inv[elt].
     """
-    return [x[pi[i]] for i in range(len(x))]
+    y = dict()
+    for elt in x:
+        y[elt] = x[perm[elt]]
+    return y
 
 def test_random_permutation():
     """ Test random_permutation. """
     init_randomness_source("test_random_permutation")
     for i in range(1, 5):
         n = 10
-        pi = random_permutation(n, "test_random_permutation")
-        assert sorted(pi) == list(range(n))
-        pi_inv = inverse_permutation(pi)
-        x = list(range(n))
-        y = apply_permutation(pi, x)
-        z = apply_permutation(pi_inv, y)
+        perm = random_permutation(list(range(n)), "test_random_permutation")
+        assert sorted(perm) == list(range(n))
+        perm_inv = inverse_permutation(perm)
+        x = dict()
+        for i in range(n):
+            x[i] = i
+        y = apply_permutation(perm, x)
+        z = apply_permutation(perm_inv, y)
         assert x == z
-    pi1 = random_permutation(100, "test_random_permutation")
-    pi2 = random_permutation(100, "test_random_permutation")
-    assert pi1 != pi2          # could happen, but with negligible probability
+    perm1 = random_permutation(list(range(100)), "test_random_permutation")
+    perm2 = random_permutation(list(range(100)), "test_random_permutation")
+    assert perm1 != perm2     # could happen, but with negligible probability
 
 test_random_permutation()
 
@@ -525,7 +548,7 @@ test_lagrange()
 def sym_keygen(rand_name):
     """ Generate and return a a symmetric encryption key. """
     sym_key = get_random_from_source(rand_name)
-    assert len(sym_key) == secparam_symmetric / 8
+    assert len(sym_key) == SECPARAM_SYMMETRIC / 8
     return sym_key
 
 def sym_enc(sym_key, msg):
@@ -534,11 +557,13 @@ def sym_enc(sym_key, msg):
         sym_key is key generated by sym_keygen
         msg is an arbitrary-length bytes value.
 
+    UNUSED IN CURRENT VERSION. (TO BE ADDED WHEN SIMULATED
+    TABLET TO SERVER COMMUNICATION ADDED.)
     THIS IS INSECURE "DUMMY" IMPLEMENTATION FOR NOW.
     UPDATE WITH AUTHENTICATED ENCRYPTION MODE LIKE EAX.
     """
     assert isinstance(sym_key, (bytes, bytearray))
-    assert len(sym_key) == secparam_symmetric / 8
+    assert len(sym_key) == SECPARAM_SYMMETRIC / 8
     assert isinstance(msg, (bytes, bytearray))
 
     # In this dummy implementation encryption just concatenates
@@ -556,7 +581,7 @@ def sym_dec(sym_key, ct):
     UPDATE WITH AUTHENTICATED ENCRYPTION MODE LIKE EAX.
     """
     assert isinstance(sym_key, (bytes, bytearray))
-    assert len(sym_key) == secparam_symmetric / 8
+    assert len(sym_key) == SECPARAM_SYMMETRIC / 8
     assert isinstance(ct, (bytes, bytearray))
  
     # in this dummy implementation, just key that ct starts with
@@ -617,17 +642,18 @@ test_pk_enc()
 # BASIC COMMITMENT FUNCTION com
 ##############################################################################
 
-def com(v, r_hex):
+def com(v, r_b64):
     """ Produce a commitment to v using randomness r.
 
     Here v  = an arbitrary-length string or bytes or bytearray or int
               (the value being committed to)
-         r_hex  = a randomness parameter (or key)
-                  which is of type string (hexadecimal)
-                  of length secparam_symmetric / 4  hex digits
+         r_b64  = a randomness parameter (or key)
+                  which is of type string (base64)
+                  of length SECPARAM_SYMMETRIC // 6 + 2 base64 digits
+
     The output produced is of type string giving the commitment in
-    hexadecimal (for ease of output) of length
-    secparam_hash_output / 4 (bytes).
+    base64 (for ease of output) of length
+    SECPARAM_HASH_OUTPUT // 6 + 2 (bytes) (approximately).
     """
     # make sure v has type bytes (by converting from string to bytes if nec.)
     if isinstance(v, str):
@@ -636,26 +662,25 @@ def com(v, r_hex):
         v = int2bytes(v)
     assert isinstance(v, (bytes, bytearray)),\
         "com error: value v must be of type str, int, bytes, or bytearray."
-    # check that r_hex is of right type (str) and length
-    assert isinstance(r_hex, str)
-    assert len(r_hex) == secparam_symmetric / 4,\
-        "com error: value r_hex must be secparam_symmetric/4 hex digits."
-    # return commitment (of length secparam_hash_output bits)
-    # note that if you change secparam_hash_output to something other
+    # check that r_b64 is of right type (str) and length
+    assert isinstance(r_b64, str)
+    assert len(r_b64) == (SECPARAM_SYMMETRIC // 6) + 2,\
+       "com error: value r_b64 must be SECPARAM_SYMMETRIC//6+2 b64 digits."
+    # return commitment (of length SECPARAM_HASH_OUTPUT bits)
+    # note that if you change SECPARAM_HASH_OUTPUT to something other
     # than 256, then the choice of hash function has to be changed here.
     # (We can't just use "hash" here, as it isn't compatible with hmac.)
-    assert secparam_hash_output == 256
+    assert SECPARAM_HASH_OUTPUT == 256
     h = hashlib.sha256
-    r_bytes = bytes.fromhex(r_hex)
-    return bytes2hex(hmac.HMAC(r_bytes, v, h).digest())
+    r_bytes = base64_2_bytes(r_b64)
+    return bytes2base64(hmac.HMAC(r_bytes, v, h).digest())
 
 def test_com():
     """ Test commitment function com. """
-    # print(com("abc",
-    #   "0000111122223333444455556666777788889999aaaabbbbccccddddeeeeffff"))
-    assert com("abc", 
-               "0000111122223333444455556666777788889999aaaabbbbccccddddeeeeffff") == \
-        "cb4edf5be0ea2132337706a3bb45050625f53b4aeab3925512e2acd5c05d465b"
+    r = 'aaaabbbbccccddddeeeeffffgggghhhhiiiijjjjkkkk'
+    # print(com("abc",r))
+    assert com("abc", r) == \
+        "jolywuOC0afkCY/rmY3YITd08E+79sB+ZFXFpRUYuFU="
 
 test_com()
 
@@ -668,13 +693,3 @@ def comsv(svpair, ru, rv):
     u, v = svpair
     return (com(u, ru), com(v, rv))
 
-##############################################################################
-# Creating a list of identifiers, e.g. k_0, k_1, ...
-##############################################################################
-
-def identifier_list(s,n):
-    """ Create and return a list of identifers s_0, s_1, upto s_(n-1). """
-    ans = []
-    for i in range(n):
-        ans.append(s+str(i))
-    return ans

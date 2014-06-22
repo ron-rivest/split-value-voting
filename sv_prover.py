@@ -48,6 +48,7 @@ def make_proof(election):
     # part 1 of proof production
     prove_outcome_correct(election, challenges)
 
+    return
     # part 2 of proof production
     # make proof of consistency of icl copies with input
     prove_input_consistent(election, challenges)
@@ -83,22 +84,23 @@ def make_full_output(election):
                     sdbp = election.server.sdb[race_id][i][cols-1][k]
                     y = sdbp['y'][py]
                     (u, v) = sv.get_sv_pair(y, rand_name, race_modulus)
-                    ru = sv.bytes2hex(sv.get_random_from_source(rand_name))
-                    rv = sv.bytes2hex(sv.get_random_from_source(rand_name))
+                    ru = sv.bytes2base64(sv.get_random_from_source(rand_name))
+                    rv = sv.bytes2base64(sv.get_random_from_source(rand_name))
                     pair = (sv.com(u, ru), sv.com(v, rv))
-                    sdbp['u'].append(u)
-                    sdbp['v'].append(v)
-                    sdbp['ru'].append(ru)
-                    sdbp['rv'].append(rv)
-                    sdbp['pair'].append(pair)
-                    ballot = (race_id, k, py, i, y, u, v, ru, rv, pair)
-                    full_output[race_id][k][py].append(ballot)
+                    sdbp['u'][py] = u
+                    sdbp['v'][py] = v
+                    sdbp['ru'][py] = ru
+                    sdbp['rv'][py] = rv
+                    sdbp['pair'][py] = pair
+                    ballot = {'y': y, 'u': u, 'v': v, 'ru': ru, 'rv': rv, 'pair': pair}
+                    full_output[race_id][k][py][i] = ballot
     election.full_output = full_output
 
 def post_output_commitments(election):
     """ Post output votes onto SBB. """
     full_output = election.full_output
     coms = dict()
+    # same as full_output, but only giving non-secret values (i.e. pairs)
     for race in election.races:
         race_modulus = race.race_modulus
         race_id = race.race_id
@@ -106,14 +108,13 @@ def post_output_commitments(election):
         for k in election.k_list:
             coms[race_id][k] = dict()
             for py in election.p_list:
-                coms[race_id][k][py] = list()
-                for (race_id, k, py, i, y, u, v, ru, rv, pair)\
-                    in full_output[race_id][k][py]:
-                    ballot2 = pair
-                    coms[race_id][k][py].append(ballot2)
+                coms[race_id][k][py] = dict()
+                for i in election.server.row_list:
+                    coms[race_id][k][py][i] = \
+                        { 'pair': full_output[race_id][k][py][i]['pair'] }
     election.output_commitments = coms    
     election.sbb.post("proof:all_output_commitments",
-                      {"commitments": election.output_commitments},
+                      {"commitments": coms},
                       time_stamp=False)
 
 def compute_and_post_t_values(election):
@@ -137,32 +138,30 @@ def compute_and_post_t_values(election):
     """
     server = election.server
     cols = server.cols
-    t_values = []
+    t_values = dict()
     for race in election.races:
         race_id = race.race_id
+        t_values[race_id] = dict()
         for k in election.k_list:
+            t_values[race_id][k] = dict()
             for i in election.server.row_list:
+                t_values[race_id][k][i] = dict()
                 for px in election.p_list:
+                    t_values[race_id][k][i][px] = dict()
                     ux = server.sdb[race_id][i][0]['u'][px]
                     vx = server.sdb[race_id][i][0]['v'][px]
                     py = px
-                    py_int = int(py[1:])
                     for j in range(cols):
                         pi_inv = server.sdb[race_id][i][j][k]['pi_inv']
-                        py_int = pi_inv[py_int]
-                    py = "p"+str(py_int)
+                        py = pi_inv[py]
                     uy = server.sdb[race_id][i][cols-1][k]['u'][py]
                     vy = server.sdb[race_id][i][cols-1][k]['v'][py]
                     tu = (uy-ux) % race.race_modulus
                     tv = (vy-vx) % race.race_modulus
-                    t_values.append({"race_id": race_id,
-                                     "k": k,
-                                     "i": i,
-                                     "px": px,
-                                     "tu": tu,
-                                     "tv": tv})
+                    t_values[race_id][k][i][px]["tu"] = tu
+                    t_values[race_id][k][i][px]["tv"] = tv
     election.sbb.post("proof:t_values_for_all_output_commitments",
-                      {"list": t_values},
+                      {"t_values": t_values},
                       time_stamp=False)
 
 ##############################################################################
@@ -201,12 +200,12 @@ def make_cut_and_choose_challenges(election, rand_name, challenges):
     """
     m = election.n_reps // 2
     pi = sv.random_permutation(2*m, rand_name)
+    pi = [pi[i] for i in range(2*m)]
     # icl = copies for input comparison
     # opl = copies for output production
     icl = [election.k_list[i] for i in sorted(pi[:m])]
     opl = [election.k_list[i] for i in sorted(pi[m:])]
-    challenges['icl'] = icl
-    challenges['opl'] = opl
+    challenges['cut'] = {'icl': icl, 'opl': opl}
 
 def make_left_right_challenges(election, rand_name, challenges):
     """ make dict with a list of n_voters left/right challenges for each race.
@@ -240,28 +239,32 @@ def prove_outcome_correct(election, challenges):
     This routine just releases all information needed for output comparisons
     and proof verification.
     """
-    opl = challenges['opl']
-    opened_output_commitments = []
+    opl = challenges['cut']['opl']
+    opened = dict()
+    cols = election.server.cols
     for race in election.races:
         race_id = race.race_id
-        for k in election.k_list:
-            if k in opl:
-                for py in range(election.p_list):
-                    for race_id, k, py, i, y, u, v, ru, rv, pair \
-                        in election.full_output[race_id][k][py]:
-                        opened_output_commitments.append(\
-                            {"race_id": race_id,
-                             "k": k,
-                             "py": py,
-                             "i": i,
-                             "y": y,
-                             "u": u,
-                             "v": v,
-                             "ru": ru,
-                             "rv": rv,
-                             "pair": pair})
+        opened[race_id] = dict()
+        for k in opl:
+            opened[race_id][k] = dict()
+            for py in election.p_list:
+                opened[race_id][k][py] = dict()
+                for i in election.server.row_list:
+                    y = election.server.sdb[race_id][i][cols-1][k]['y'][py]
+                    u = election.server.sdb[race_id][i][cols-1][k]['u'][py]
+                    v = election.server.sdb[race_id][i][cols-1][k]['v'][py]
+                    ru = election.server.sdb[race_id][i][cols-1][k]['ru'][py]
+                    rv = election.server.sdb[race_id][i][cols-1][k]['rv'][py]
+                    pair = election.server.sdb[race_id][i][cols-1][k]['pair'][py]
+                    opened[race_id][k][py][i] = \
+                        {"y": y,
+                         "u": u,
+                         "v": v,
+                         "ru": ru,
+                         "rv": rv,
+                         "pair": pair}
     election.sbb.post("proof:outcome_check:opened_output_commitments",
-                      {"opened_commitments": opened_output_commitments},
+                      {"opened_commitments": opened},
                       time_stamp=False)
 
 ##############################################################################
@@ -272,7 +275,7 @@ def prove_input_consistent(election, challenges):
     """ Produce proof sufficient to prove cast votes consistent
         with output lists with indices in challenges['icl'].
     """
-    icl = challenges['icl']
+    icl = challenges['cut']['icl']
     leftright_dict = challenges['leftright']
 
     commitments = dict()
@@ -384,7 +387,7 @@ def compute_and_post_pik_list(election, challenges):
     for those k in icl.  Also note that there is no dependence on the row (i),
     so we don't need to loop on i.
     """
-    icl = challenges['icl']
+    icl = challenges['cut']['icl']
     server = election.server
     cols = server.cols
     pik_list = []
