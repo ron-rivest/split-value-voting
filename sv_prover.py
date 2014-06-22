@@ -48,7 +48,6 @@ def make_proof(election):
     # part 1 of proof production
     prove_outcome_correct(election, challenges)
 
-    return
     # part 2 of proof production
     # make proof of consistency of icl copies with input
     prove_input_consistent(election, challenges)
@@ -217,10 +216,12 @@ def make_left_right_challenges(election, rand_name, challenges):
     # sorting needed in next line else result depends on enumeration order
     # (sorting is also done is sv_verifier.py)
     for race_id in sorted(election.race_ids):
-        leftright = ["left"\
-                     if bool(sv.get_random_from_source(rand_name, modulus=2))\
-                     else "right"\
-                     for i in range(election.n_voters)]
+        leftright = dict()
+        for p in sorted(election.p_list):
+            leftright[p] = "left"\
+                           if bool(sv.get_random_from_source(rand_name, 
+                                                             modulus=2))\
+                           else "right"
         leftright_dict[race_id] = leftright
     challenges['leftright'] = leftright_dict
 
@@ -284,11 +285,11 @@ def prove_input_consistent(election, challenges):
         leftright = leftright_dict[race_id]
         commitments_in_race = []
         for i in election.server.row_list:
-            input_pair_list = \
-                make_list_of_input_commitment_pairs(election, race, i)
+            input_pair_dict = \
+                make_dict_of_input_commitment_pairs(election, race, i)
             commitments_in_race.append(\
-                half_open_commitments_from_list(election,
-                                                input_pair_list,
+                half_open_commitments_from_dict(election,
+                                                input_pair_dict,
                                                 leftright))
         commitments[race_id] = commitments_in_race  # list of length rows
     election.sbb.post("proof:input_check:input_openings",
@@ -302,17 +303,17 @@ def prove_input_consistent(election, challenges):
         leftright = leftright_dict[race_id]
         for k in icl:
             for i in election.server.row_list:
-                output_pair_list = \
-                    make_list_of_output_commitment_pairs(election, race, i, k)
+                output_pair_dict = \
+                    make_dict_of_output_commitment_pairs(election, race, i, k)
                 commitments_to_post.append(\
-                    half_open_commitments_from_list(\
-                        election, output_pair_list, leftright))
+                    half_open_commitments_from_dict(\
+                        election, output_pair_dict, leftright))
     election.sbb.post("proof:input_check:output_openings",
                       {"opened_commitments": commitments_to_post},
                       time_stamp=False)
 
-def half_open_commitments_from_list(election, commitments, leftright):
-    """ Open 1/2 of the commitments in the given list of pairs
+def half_open_commitments_from_dict(election, commitments, leftright):
+    """ Open 1/2 of the commitments in the given dict of pairs
         of commitments.
         leftright is a list of "left"/"right" of the same length.
         This is used for both input and output commitments
@@ -324,12 +325,12 @@ def half_open_commitments_from_list(election, commitments, leftright):
         commitments_to_post.append(com_to_post)
     return commitments_to_post
 
-def make_list_of_input_commitment_pairs(election, race, row_i):
+def make_dict_of_input_commitment_pairs(election, race, row_i):
     """ Make list of input commitment pairs (cast votes) for race and row_i """
     # note that election.cast_votes is in "canonical" order
     # (sorted into increasing order by ballot id).
     list_of_input_commitment_pairs = []
-    for (race_id, ballot_id, i, x, u, v, ru, rv, pair) in \
+    for (px, race_id, ballot_id, i, x, u, v, ru, rv, pair) in \
         election.cast_votes:
         if race_id == race.race_id and i == row_i:
             ucom = {"race_id": race_id,
@@ -347,17 +348,17 @@ def make_list_of_input_commitment_pairs(election, race, row_i):
             list_of_input_commitment_pairs.append((ucom, vcom))
     return list_of_input_commitment_pairs
 
-def make_list_of_output_commitment_pairs(election, race, i, k):
-    """ Make list of output commitment pairs for given race,
-        row i, and given copy index (k).
+def make_dict_of_output_commitment_pairs(election, race, i, k):
+    """ Make dict of output commitment pairs for given race,
+        row i, and given copy/pass index (k), indexed by p_list elements.
     """
     assert k in election.k_list
-    # first make list in unpermuted order
+    # first make dict in unpermuted order
     cols = election.server.cols
     race_id = race.race_id
-    list_of_output_commitment_pairs = []
+    dict_of_output_commitment_pairs = dict()
     sdbp = election.server.sdb
-    for iy in range(election.n_voters):
+    for py in election.p_list:
         ucom = {"race_id": race_id,
                 "py": py,
                 "i": i,
@@ -370,13 +371,13 @@ def make_list_of_output_commitment_pairs(election, race, i, k):
                 "v": sdbp[race_id][i][cols-1][k]['v'][py],
                 "rv": sdbp[race_id][i][cols-1][k]['rv'][py],
                 "com(v,rv)": sdbp[race_id][i][cols-1][k]['pair'][py][1]}
-        list_of_output_commitment_pairs.append((ucom, vcom))
+        dict_of_output_commitment_pairs[py] = (ucom, vcom)
     # next is to permute it back into same order as input lists
     for j in range(cols-1, -1, -1):
         pi_inv = sdbp[race_id][i][j][k]['pi_inv']
         list_of_output_commitment_pairs = \
-            sv.apply_permutation(pi_inv, list_of_output_commitment_pairs)
-    return list_of_output_commitment_pairs
+            sv.apply_permutation(pi_inv, dict_of_output_commitment_pairs)
+    return dict_of_output_commitment_pairs
 
 def compute_and_post_pik_list(election, challenges):
     """ Compute a permutation pi for each race and ballot in that race, post it.
@@ -395,13 +396,11 @@ def compute_and_post_pik_list(election, challenges):
         race_id = race.race_id
         for k in icl:
             pik = dict()
-            for py in range(election.p_list):
+            for py in election.p_list:
                 px = py
-                px_int = int(px[1:])
                 for j in range(cols):
                     pi = server.sdb[race_id]['a'][j][k]['pi']
-                    px_int = pi[px_int]
-                px = "p"+str(px_int)
+                    px = pi[px]
                 pik[py] = px
             # now pik maps py's to their original px's
             pik_list.append({"race_id": race_id,

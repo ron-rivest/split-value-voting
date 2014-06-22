@@ -176,7 +176,8 @@ class Election:
         sv_prover.make_proof(self)
 
         # Stop election and close sbb
-        self.sbb.post("election:done.")
+        self.sbb.post("election:done.",
+                      {"election_id": self.election_id})
         self.sbb.close()
 
     def setup_races(self, ballot_style):

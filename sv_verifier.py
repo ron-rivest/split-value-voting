@@ -64,21 +64,21 @@ HEADER_LIST = ['sbb:open',
 
 # attributes expected for each header
 ATTRIBUTES = {'sbb:open': ["election_id", "time_iso8601"],
-              'setup:start': ["election_id", "time_iso8601"],
-              'setup:races': ["race_list"], 
+              'setup:start': ["election_id", "time_iso8601", "about", "legend"],
+              'setup:races': ["ballot_style_race_list"], 
               'setup:voters': ["n_voters"], 
               'setup:server-array': ["cols", "rows", "n_reps", "threshold"],
               'setup:finished': ["time_iso8601"],
               'casting:votes': ["cast_vote_dict"],
               'tally:results': ["election_id", "tally", "time_iso8601"],
               'proof:all_output_commitments': ["commitments"],
-              'proof:t_values_for_all_output_commitments': ["list"],
+              'proof:t_values_for_all_output_commitments': ["t_values"],
               'proof:verifier_challenges': ["challenges", "sbb_hash"],
               'proof:outcome_check:opened_output_commitments': ["opened_commitments"],
               'proof:input_check:input_openings': ["opened_commitments"],
               'proof:input_check:output_openings': ["opened_commitments"],
               'proof:input_check:pik_for_k_in_icl': ["list"], 
-              'election:done.': ["time_iso8601"],
+              'election:done.': ["time_iso8601", "election_id"],
               'sbb:close': ["time_iso8601"]
 }
 
@@ -140,7 +140,8 @@ def check_attributes(sbb_dict):
     """ Check that each item in sbb has precisely expected attributes. """
     for item_header in sbb_dict.keys():
         item_dict = sbb_dict[item_header]
-        assert set(ATTRIBUTES[item_header]) == set(item_dict.keys())
+        assert set(ATTRIBUTES[item_header]) == set(item_dict.keys()),\
+            item_header
     print("check_attributes: passed.")
 
 def check_monotonic_time(sbb):
@@ -171,7 +172,7 @@ def check_consistent_election_ids(sbb):
 def read_races(sbb_dict, db):
     """ Read races item and gather info into db """
     races = dict()     # maps race_id's to dicts
-    for race_dict in sbb_dict["setup:races"]["race_list"]:
+    for race_dict in sbb_dict["setup:races"]["ballot_style_race_list"]:
         assert set(race_dict.keys()) == \
             set(["choices", "race_id", "race_modulus"])
         race_id = race_dict["race_id"]
@@ -219,27 +220,26 @@ def read_cast_votes(sbb_dict, db):
     for race_id in db["races"].keys():
         ballot_id_dict[race_id] = []
         cast_vote_race = cast_vote_dict[race_id]
-        assert isinstance(cast_vote_race, list)
+        assert isinstance(cast_vote_race, dict)
         assert len(cast_vote_race) == db["n_voters"]
-        for cast_vote in cast_vote_race:
-            assert set(cast_vote.keys()) == set(["ballot_id", "pair_list"])
+        for p in cast_vote_race.keys():
+            cast_vote = cast_vote_race[p]
+            assert set(cast_vote.keys()) == set(["ballot_id", "pair_dict"])
             ballot_id = cast_vote["ballot_id"]
             assert isinstance(ballot_id, str)
             ballot_id_dict[race_id].append(ballot_id)
             ballot_id_list.append(ballot_id)
 
-            assert isinstance(cast_vote["pair_list"], list)
-            pair_list = cast_vote["pair_list"]
-            assert len(pair_list) == db["rows"]
-            for pair in pair_list:
+            assert isinstance(cast_vote["pair_dict"], dict)
+            pair_dict = cast_vote["pair_dict"]
+            assert len(pair_dict) == db["rows"]
+            for i in pair_dict:
+                pair = pair_dict[i]
                 assert isinstance(pair, list)
                 assert len(pair) == 2
                 assert isinstance(pair[0], str)
                 assert isinstance(pair[1], str)
     assert len(set(ballot_id_list)) == len(ballot_id_list)   # ballot id's distinct
-    for race_id in db["races"].keys():
-        ballot_ids = ballot_id_dict[race_id]
-        assert ballot_ids == sorted(ballot_ids) # should be sorted by ballot_id
     db["ballot_id_dict"] = ballot_id_dict
     db["cast_vote_dict"] = cast_vote_dict
     print("read_cast_votes: successful.")
