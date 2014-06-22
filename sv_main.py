@@ -48,11 +48,11 @@ import sv_verifier
 def do_election():
     """ Do (simulate) an election. """
 
-    election_parameters = {\
+    election_parameters = {
         "election_id": "test01",
         "ballot_style":\
             [("taxes", ("yes", 
-                        "no")),\
+                        "no")),
              ("mayor", ("tom", 
                         "rufus", 
                         "****************"))],  # 16-char write-ins allowed
@@ -65,7 +65,9 @@ def do_election():
         # number of hex digits in ballot id (default 32)
         "ballot_id_len": 32, 
         # number of spaces per tab in json output (>=0, default 0)
-        "json_indent": 2     
+        # setting this to 0 reduces readability of SBB output, but
+        # also reduces SBB size by roughly 25%
+        "json_indent": 1
     }
     print("starting election (simulation).")
     print("election parameters:")
