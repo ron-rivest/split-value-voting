@@ -99,6 +99,7 @@ class Election:
         # json "sort by keys" options works.
         width = len("%d"%n_voters)
         i_format = "%0" + str(width) + "d"
+        # the following list is in sorted order!
         self.p_list = ["p"+ i_format%i for i in range(n_voters)]
 
         assert isinstance(n_reps, int) and \
@@ -147,13 +148,9 @@ class Election:
         self.voters = []
         self.voter_ids = []
         self.setup_voters(n_voters)
-        # list of cast votes
-        # each of form: (race_id, ballot_id, i, x, u, v, ru, rv, pair)
-        self.cast_votes = dict()  # indices are members of p_list
+        self.cast_votes = dict()
         self.server = sv_server.Server(self, n_fail, n_leak)
-        # list of output commitments
-        # each of form: (race_id, i, y, u, v, ru, rv, pair)
-        self.output_commitments = []
+        self.output_commitments = dict()
         self.setup_keys()
         self.sbb.post("setup:finished")
 
@@ -164,7 +161,7 @@ class Election:
         sv_voter.cast_votes(self) 
         # sv_voter.sort_cast_votes(self)
         sv_voter.distribute_cast_votes(self)
-        sv_voter.post_cast_votes(self)
+        sv_voter.post_cast_vote_commitments(self)
 
         # Mix !
         self.server.mix()

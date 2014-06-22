@@ -217,7 +217,7 @@ def make_left_right_challenges(election, rand_name, challenges):
     # (sorting is also done is sv_verifier.py)
     for race_id in sorted(election.race_ids):
         leftright = dict()
-        for p in sorted(election.p_list):
+        for p in election.p_list:   # note: p_list is already sorted
             leftright[p] = "left"\
                            if bool(sv.get_random_from_source(rand_name, 
                                                              modulus=2))\
@@ -279,21 +279,21 @@ def prove_input_consistent(election, challenges):
     icl = challenges['cut']['icl']
     leftright_dict = challenges['leftright']
 
-    commitments = dict()
+    coms = dict()
     for race in election.races:
         race_id = race.race_id
         leftright = leftright_dict[race_id]
-        commitments_in_race = []
+        coms_in_race = dict()
         for i in election.server.row_list:
             input_pair_dict = \
                 make_dict_of_input_commitment_pairs(election, race, i)
-            commitments_in_race.append(\
+            coms_in_race[i] = \
                 half_open_commitments_from_dict(election,
                                                 input_pair_dict,
-                                                leftright))
-        commitments[race_id] = commitments_in_race  # list of length rows
+                                                leftright)
+        coms[race_id] = coms_in_race  # dict of length rows
     election.sbb.post("proof:input_check:input_openings",
-                      {"opened_commitments": commitments},
+                      {"opened_commitments": coms},
                       time_stamp=False)
 
     # half-open corresponding outputs
@@ -319,17 +319,26 @@ def half_open_commitments_from_dict(election, commitments, leftright):
         This is used for both input and output commitments
     """
     assert len(commitments) == len(leftright)
-    commitments_to_post = []
-    for com, pick in zip(commitments, leftright):
+    coms_to_post = dict()
+    print(commitments)
+    print(leftright)
+    for p in election.p_list:
+        com = commitments[p]
+        pick = leftright[p]
         com_to_post = com[0] if pick == "left" else com[1]
-        commitments_to_post.append(com_to_post)
-    return commitments_to_post
+        coms_to_post[p] = com_to_post
+    return coms_to_post
 
 def make_dict_of_input_commitment_pairs(election, race, row_i):
-    """ Make list of input commitment pairs (cast votes) for race and row_i """
+    """ Make dict of input commitment pairs (cast votes) for race and row_i """
     # note that election.cast_votes is in "canonical" order
     # (sorted into increasing order by ballot id).
-    list_of_input_commitment_pairs = []
+    coms = dict()
+    for race_id in election.race_ids:
+        coms[race_id] = dict()
+        for p in election.p_list:
+            coms[race_id][p] = dict()
+            "TBD"
     for (px, race_id, ballot_id, i, x, u, v, ru, rv, pair) in \
         election.cast_votes:
         if race_id == race.race_id and i == row_i:
@@ -345,8 +354,8 @@ def make_dict_of_input_commitment_pairs(election, race, row_i):
                     "v": v,
                     "rv": rv,
                     "com(v,rv)": pair[1]}
-            list_of_input_commitment_pairs.append((ucom, vcom))
-    return list_of_input_commitment_pairs
+            coms.append((ucom, vcom))
+    return dict_of_input_commitment_pairs
 
 def make_dict_of_output_commitment_pairs(election, race, i, k):
     """ Make dict of output commitment pairs for given race,
