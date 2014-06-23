@@ -297,19 +297,21 @@ def prove_input_consistent(election, challenges):
                       time_stamp=False)
 
     # half-open corresponding outputs
-    commitments_to_post = []
+    coms = dict()
     for race in election.races:
         race_id = race.race_id
-        leftright = leftright_dict[race_id]
+        leftright = leftright_dict[race_id] # maps p to left/right
+        coms[race_id] = dict()
         for k in icl:
+            coms[race_id][k] = dict()
             for i in election.server.row_list:
                 output_pair_dict = \
                     make_dict_of_output_commitment_pairs(election, race, i, k)
-                commitments_to_post.append(\
+                coms[race_id][k][i] = \
                     half_open_commitments_from_dict(\
-                        election, output_pair_dict, leftright))
+                        election, output_pair_dict, leftright)
     election.sbb.post("proof:input_check:output_openings",
-                      {"opened_commitments": commitments_to_post},
+                      {"opened_commitments": coms},
                       time_stamp=False)
 
 def half_open_commitments_from_dict(election, commitments, leftright):
