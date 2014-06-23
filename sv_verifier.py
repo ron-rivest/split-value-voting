@@ -41,13 +41,13 @@ THE SOFTWARE.
 
 import json
 import sv
-import sys
+# import sys
 
 # headers, in ordered expected in SBB file.
 HEADER_LIST = ['sbb:open',
                'setup:start',
-               'setup:races', 
-               'setup:voters', 
+               'setup:races',
+               'setup:voters',
                'setup:server-array',
                'setup:finished',
                'casting:votes',
@@ -65,26 +65,28 @@ HEADER_LIST = ['sbb:open',
 # attributes expected for each header
 ATTRIBUTES = {'sbb:open': ['election_id', 'time_iso8601'],
               'setup:start': ['election_id', 'time_iso8601', 'about', 'legend'],
-              'setup:races': ['ballot_style_race_list'], 
-              'setup:voters': ['n_voters', 'ballot_id_len'], 
-              'setup:server-array': ['cols', 'rows', 'n_reps', 'threshold', 'json_indent'],
+              'setup:races': ['ballot_style_race_list'],
+              'setup:voters': ['n_voters', 'ballot_id_len'],
+              'setup:server-array':
+                  ['cols', 'rows', 'n_reps', 'threshold', 'json_indent'],
               'setup:finished': ['time_iso8601'],
               'casting:votes': ['cast_vote_dict'],
               'tally:results': ['election_id', 'tally', 'time_iso8601'],
               'proof:all_output_commitments': ['commitments'],
               'proof:t_values_for_all_output_commitments': ['t_values'],
               'proof:verifier_challenges': ['challenges', 'sbb_hash'],
-              'proof:outcome_check:opened_output_commitments': ['opened_commitments'],
+              'proof:outcome_check:opened_output_commitments':
+                  ['opened_commitments'],
               'proof:input_check:input_openings': ['opened_commitments'],
               'proof:input_check:output_openings': ['opened_commitments'],
-              'proof:input_check:pik_for_k_in_icl': ['pik_dict'], 
+              'proof:input_check:pik_for_k_in_icl': ['pik_dict'],
               'election:done.': ['time_iso8601', 'election_id'],
               'sbb:close': ['time_iso8601']
-}
+             }
 
 def has_keys(d, keys):
-    """ Return True if dict d has given set of keys. 
-    
+    """ Return True if dict d has given set of keys.
+
     Here keys could be a list or a set.
     """
     if not isinstance(keys, set):
@@ -92,8 +94,8 @@ def has_keys(d, keys):
     return set(d.keys()) == keys
 
 def isdict(d, keys=None):
-    """ Return True if d is a dict (optionally with right set of keys) 
-    
+    """ Return True if d is a dict (optionally with right set of keys)
+
     Here keys could be a list or a set.
     """
     if not isinstance(d, dict):
@@ -102,10 +104,10 @@ def isdict(d, keys=None):
 
 def verify(sbb_filename):
     """ Perform all possible verifications on the given file. """
-    
-    assert isinstance(sbb_filename,str) and len(sbb_filename) > 0
-    
-    sbb_file = open(sbb_filename,'r')
+
+    assert isinstance(sbb_filename, str) and len(sbb_filename) > 0
+
+    sbb_file = open(sbb_filename, 'r')
     sbb = json.load(sbb_file)
 
     db = dict()          # master database for storing stuff
@@ -127,7 +129,7 @@ def verify(sbb_filename):
     check_opened_output_commitments(sbb_dict, db)
     check_opened_output_commitment_tallies(sbb_dict, db)
     print('all verifications (as implemented so far) passed!!')
-    
+
 def check_headers(sbb):
     """ Check that expected headers are present, and return sbb_dict
         mapping headers to dict's.
@@ -234,7 +236,7 @@ def read_rows_cols_n_reps_threshold_indent(sbb_dict, db):
     print('read_rows_cols_n_reps_threshold: successful.')
 
 def read_cast_votes(sbb_dict, db):
-    """ Read casting:votes for cast votes and extract them into db. 
+    """ Read casting:votes for cast votes and extract them into db.
 
         Assumes that every voter votes in every race (could be weakened).
     """
@@ -260,7 +262,8 @@ def read_cast_votes(sbb_dict, db):
                 assert len(pair) == 2
                 assert isinstance(pair[0], str)
                 assert isinstance(pair[1], str)
-    assert len(set(ballot_id_list)) == len(ballot_id_list)   # ballot id's distinct
+    # next line checks that ballot id's are distinct
+    assert len(set(ballot_id_list)) == len(ballot_id_list)
     db['ballot_id_dict'] = ballot_id_dict
     db['cast_vote_dict'] = cast_vote_dict
     print('read_cast_votes: successful.')
@@ -286,7 +289,7 @@ def read_output_commitments(sbb_dict, db):
     for race_id in db['race_ids']:
         assert isdict(coms[race_id], db['k_list'])
         for k in db['k_list']:
-            assert isdict(coms[race_id][k],db['p_list'])
+            assert isdict(coms[race_id][k], db['p_list'])
             for p in db['p_list']:
                 assert isdict(coms[race_id][k][p], db['row_list'])
                 for i in db['row_list']:
@@ -295,7 +298,7 @@ def read_output_commitments(sbb_dict, db):
                     assert isinstance(pair, list)
                     assert len(pair) == 2
                     assert isinstance(pair[0], str)
-                    assert isinstance(pair[1], str)        
+                    assert isinstance(pair[1], str)
     db['output_commitments'] = coms
     print('read_output_commitments: successful.')
 
@@ -316,14 +319,15 @@ def read_t_values(sbb_dict, db):
                     tu = ts[race_id][k][p][i]['tu']
                     tv = ts[race_id][k][p][i]['tv']
                     assert isinstance(tu, int)
-                    assert isinstance(tv, int)        
+                    assert isinstance(tv, int)
                     assert 0 <= tu < db['races'][race_id]['race_modulus']
                     assert 0 <= tv < db['races'][race_id]['race_modulus']
     db['t_values'] = ts
     print('read_t_values: successful.')
 
 def read_verifier_challenges(sbb_dict, sbb, db):
-    """ Read verifier challenges from proof:verifier_challenges and save into db. """
+    """ Read verifier challenges from proof:verifier_challenges; save into db.
+    """
     chs = sbb_dict['proof:verifier_challenges']['challenges']
     assert isdict(chs, ['cut', 'leftright'])
     assert isdict(chs['cut'], ['icl', 'opl'])
@@ -352,7 +356,9 @@ def read_verifier_challenges(sbb_dict, sbb, db):
     rand_name = 'verifier_challenges'
     sbb_hash = sbb_dict['proof:verifier_challenges']['sbb_hash']
     stop_before_header = 'proof:verifier_challenges'
-    sbb_hash2 = sv.bytes2hex(hash_sbb(sbb, stop_before_header, db['json_indent']))
+    sbb_hash2 = sv.bytes2hex(hash_sbb(sbb,
+                                      stop_before_header,
+                                      db['json_indent']))
     assert sbb_hash2 == sbb_hash
     sv.init_randomness_source(rand_name, sv.hex2bytes(sbb_hash))
     pi = sv.random_permutation(db['n_reps'], rand_name)
@@ -369,7 +375,7 @@ def read_verifier_challenges(sbb_dict, sbb, db):
 def make_left_right_challenges(rand_name, db):
     """ make dict with a list of n_voters left/right challenges for each race.
 
-    Result per race is a list of True/False values of length n_voters (True = left).
+    Result per race is a list of left/right values of length n_voters.
     (This routine copied from sv_prover.py.)
     This is recomputed here to check consistency with hash of sbb.
     """
@@ -380,7 +386,7 @@ def make_left_right_challenges(rand_name, db):
         leftright = dict()
         for p in db['p_list']:
             leftright[p] = 'left'\
-                           if bool(sv.get_random_from_source(rand_name, 
+                           if bool(sv.get_random_from_source(rand_name,
                                                              modulus=2))\
                            else 'right'
         leftright_dict[race_id] = leftright
@@ -389,9 +395,7 @@ def make_left_right_challenges(rand_name, db):
 def hash_sbb(sbb, stop_before_header, json_indent):
     """ Return a (tweaked) hash of the sbb contents, including
         all items up to (but not including) the item with header
-        equal to stop_before_header.
-        
-        (Copied from sv_prover.py)
+        equal to stop_before_header. (Copied from sv_prover.py)
     """
     sbb_trunc = []
     for item in sbb:
@@ -408,7 +412,8 @@ def check_opened_output_commitments(sbb_dict, db):
         and with claimed output tally.
     """
     coms = \
-        sbb_dict['proof:outcome_check:opened_output_commitments']['opened_commitments']
+        sbb_dict['proof:outcome_check:opened_output_commitments']\
+                ['opened_commitments']
     assert isdict(coms, db['race_ids'])
     for race_id in db['race_ids']:
         assert isdict(coms[race_id], db['opl'])
@@ -417,7 +422,8 @@ def check_opened_output_commitments(sbb_dict, db):
             for p in db['p_list']:
                 assert isdict(coms[race_id][k][p], db['row_list'])
                 for i in db['row_list']:
-                    assert isdict(coms[race_id][k][p][i], ['pair', 'ru', 'rv', 'u', 'v', 'y'])
+                    assert isdict(coms[race_id][k][p][i],
+                                  ['pair', 'ru', 'rv', 'u', 'v', 'y'])
                     pair = coms[race_id][k][p][i]['pair']
                     assert len(pair) == 2
                     assert isinstance(pair[0], str)
@@ -427,11 +433,14 @@ def check_opened_output_commitments(sbb_dict, db):
                     rv = coms[race_id][k][p][i]['rv']
                     assert isinstance(rv, str)
                     u = coms[race_id][k][p][i]['u']
-                    assert isinstance(u, int) and 0 <= u < db['races'][race_id]['race_modulus']
+                    assert isinstance(u, int) and \
+                        0 <= u < db['races'][race_id]['race_modulus']
                     v = coms[race_id][k][p][i]['v']
-                    assert isinstance(v, int) and 0 <= v < db['races'][race_id]['race_modulus']
+                    assert isinstance(v, int) and \
+                        0 <= v < db['races'][race_id]['race_modulus']
                     y = coms[race_id][k][p][i]['y']
-                    assert isinstance(y, int) and 0 <= y < db['races'][race_id]['race_modulus']
+                    assert isinstance(y, int) and \
+                        0 <= y < db['races'][race_id]['race_modulus']
                     assert y == (u+v) % db['races'][race_id]['race_modulus']
                     assert pair[0] == sv.com(u, ru)
                     assert pair[1] == sv.com(v, rv)
@@ -442,7 +451,8 @@ def check_opened_output_commitment_tallies(sbb_dict, db):
         and tally to values given in tally.
     """
     opened_coms = \
-        sbb_dict['proof:outcome_check:opened_output_commitments']['opened_commitments']
+        sbb_dict['proof:outcome_check:opened_output_commitments']\
+                ['opened_commitments']
     for k in db['opl']:
         # verify tally for this pass/copy k
         tally_k = dict()
@@ -452,8 +462,8 @@ def check_opened_output_commitment_tallies(sbb_dict, db):
                 share_list = []
                 for i_int, i in enumerate(db['row_list']):
                     y = opened_coms[race_id][k][p][i]['y']
-                    share_list.append((i_int+1,y))
-                w = sv.lagrange(share_list, 
+                    share_list.append((i_int+1, y))
+                w = sv.lagrange(share_list,
                                 db['rows'],
                                 db['threshold'],
                                 db['races'][race_id]['race_modulus'])
@@ -463,7 +473,7 @@ def check_opened_output_commitment_tallies(sbb_dict, db):
                 choice_str = choice_bytes.decode()
                 # assert self.is_valid_choice(choice_str)
                 # print(race_id, k, iy, choice_str)
-                cnt = tally_k[race_id].get(choice_str,0)
+                cnt = tally_k[race_id].get(choice_str, 0)
                 tally_k[race_id][choice_str] = cnt + 1
         # print(tally_k)
         assert tally_k == db['tally']
@@ -493,11 +503,11 @@ def check_inputs_pik(sbb_dict, db):
     print('check_inputs_pik: passed.')
 
 def check_inputs_outputs_openings(sbb_dict, db):
-    """ Check input openings used for testing consistency with output openings. """
+    """ Check input openings for testing consistency with output openings. """
     coms = sbb_dict['proof:input_check:input_openings']['opened_commitments']
     for race_id in db['race_ids']:
         for k in db['icl']:
-            # check correspondence 
+            # check correspondence
             pass
             "TBD"
 
@@ -505,7 +515,7 @@ def check_inputs_output_openings(sbb_dict, db):
     """ Check output openings used for consistency with input openings. """
 
 def check_inputs_t_value(sbb_dict, db):
-    # now check that t-values are correct for halfs that are opened.
+    """ Check that t-values are correct for halfs that are opened. """
     for race_id in db['races']:
         leftright = sbb_dict['proof:verifier_challenges']\
                     ['challenges']['leftright'][race_id] # same for all i
