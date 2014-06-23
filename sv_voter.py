@@ -102,7 +102,7 @@ def cast_votes(election):
                 rv = sv.bytes2base64(sv.get_random_from_source(rand_name))
                 pair = [sv.com(u, ru), sv.com(v, rv)]
                 i = election.server.row_list[row]
-                vote = {"ballot_id": ballot_id, "x": x, "u": u, "v": v, 
+                vote = {"ballot_id": ballot_id, "x": x, "u": u, "v": v,
                         "ru": ru, "rv": rv, "pair": pair}
                 cvs[race_id][px][i] = vote
     election.cast_votes = cvs
@@ -114,8 +114,9 @@ def distribute_cast_votes(election):
             for i in election.server.row_list:
                 vote = election.cast_votes[race_id][px][i]
                 # save these values in our data structures
-                # in a non-simulated real election, this would be done by communicating
-                # securely from voter (or tablet) to the first column of servers.
+                # in a non-simulated real election, this would be done
+                # by communicating securely from voter (or tablet) to the
+                # first column of servers.
                 sdbp = election.server.sdb[race_id][i][0]
                 sdbp['ballot_id'][px] = vote['ballot_id']
                 sdbp['x'][px] = vote['x']
@@ -128,9 +129,9 @@ def distribute_cast_votes(election):
 def post_cast_vote_commitments(election):
     """ Post cast vote commitments onto SBB. """
     cvs = election.cast_votes
-    cvcs = dict()  
+    cvcs = dict()
     for race_id in election.race_ids:
-        cvcs[race_id] = dict() 
+        cvcs[race_id] = dict()
         for px in election.p_list:
             cvcs[race_id][px] = dict()
             cvcs[race_id][px]['pair_dict'] = dict()
