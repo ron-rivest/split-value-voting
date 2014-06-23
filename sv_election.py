@@ -32,7 +32,7 @@ THE SOFTWARE.
 # end of standard MIT open-source license
 ##############################################################################
 
-# import sv
+import sv
 import sv_prover
 import sv_server
 import sv_race
@@ -101,7 +101,7 @@ class Election:
         width = len("%d"%n_voters)
         i_format = "%0" + str(width) + "d"
         # the following list is in sorted order!
-        self.p_list = ["p"+ i_format%i for i in range(n_voters)]
+        self.p_list = sv.p_list(n_voters)
 
         assert isinstance(n_reps, int) and \
             0 < n_reps <= 26 and n_reps % 2 == 0
@@ -151,7 +151,7 @@ class Election:
         self.setup_races(ballot_style)
         self.voters = []
         self.voter_ids = []
-        self.setup_voters(n_voters)
+        self.setup_voters(self, n_voters)
         self.cast_votes = dict()
         self.server = sv_server.Server(self, n_fail, n_leak)
         self.output_commitments = dict()
@@ -215,7 +215,7 @@ class Election:
                       {"ballot_style_race_list": race_list},
                       time_stamp=False)
 
-    def setup_voters(self, n_voters):
+    def setup_voters(self, election, n_voters):
         """ Set up election to have n_voters voters in this simulation. """
        
         assert isinstance(n_voters, int) and n_voters > 0
@@ -227,7 +227,8 @@ class Election:
             self.voters.append(sv_voter.Voter(self,vid))
 
         self.sbb.post("setup:voters", 
-                      {"n_voters": n_voters},
+                      {"n_voters": n_voters,
+                       'ballot_id_len': election.ballot_id_len},
                       time_stamp=False)
                     
         if False:

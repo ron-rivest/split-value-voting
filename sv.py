@@ -693,3 +693,41 @@ def comsv(svpair, ru, rv):
     u, v = svpair
     return (com(u, ru), com(v, rv))
 
+##############################################################################
+# MAKE P-LIST OF INDEX NAMES FOR VOTERS
+##############################################################################
+
+def p_list(n_voters):
+    """ Return list of length n_voters: p0, p1, .... 
+
+    (Widths of integers adjusted to be uniform.)
+    Note that this list is in increasing order.
+    """
+    width = len("%d"%n_voters)
+    x_format = "%0" + str(width) + "d"
+    ps = ["p"+ x_format%x for x in range(n_voters)]
+    return ps
+
+##############################################################################
+# MAKE ROW-LIST OF INDEX NAMES FOR ROWS
+##############################################################################
+
+def row_list(rows):
+    """ Return list of length rows: 'a', 'b', 'c', ...
+
+    Note that this list is in increasing order.
+    """
+    i_list = "abcdefghijklmnopqrstuvwxyz"[:rows]
+    return i_list
+
+##############################################################################
+# MAKE K-LIST OF INDEX NAMES FOR PASSES (COPIES)
+##############################################################################
+
+def k_list(n_reps):
+    """ Return list of length n_reps: 'A', 'B', 'C', ...
+
+    Note that this list is in increasing order.
+    """
+    ks = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:n_reps]
+    return ks

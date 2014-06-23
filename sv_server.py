@@ -82,7 +82,7 @@ class Server():
 
         # each row has an identifier in "abcd..."
         assert rows <= 26
-        self.row_list = "abcdefghijklmnopqrstuvwxyz"[:rows]
+        self.row_list = sv.row_list(rows)
 
         # The state of the server in row i, col j is represented
         # here in the dictionary P[race_id][i][j] for the given race
@@ -146,7 +146,8 @@ class Server():
         election.sbb.post("setup:server-array",
                           {"rows": rows, "cols": cols, 
                            "n_reps": election.n_reps,
-                           "threshold": threshold},
+                           "threshold": threshold,
+                           'json_indent': election.json_indent},
                           time_stamp=False)
 
     def mix(self):

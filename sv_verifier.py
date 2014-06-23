@@ -63,23 +63,23 @@ HEADER_LIST = ['sbb:open',
                'sbb:close']
 
 # attributes expected for each header
-ATTRIBUTES = {'sbb:open': ["election_id", "time_iso8601"],
-              'setup:start': ["election_id", "time_iso8601", "about", "legend"],
-              'setup:races': ["ballot_style_race_list"], 
-              'setup:voters': ["n_voters"], 
-              'setup:server-array': ["cols", "rows", "n_reps", "threshold"],
-              'setup:finished': ["time_iso8601"],
-              'casting:votes': ["cast_vote_dict"],
-              'tally:results': ["election_id", "tally", "time_iso8601"],
-              'proof:all_output_commitments': ["commitments"],
-              'proof:t_values_for_all_output_commitments': ["t_values"],
-              'proof:verifier_challenges': ["challenges", "sbb_hash"],
-              'proof:outcome_check:opened_output_commitments': ["opened_commitments"],
-              'proof:input_check:input_openings': ["opened_commitments"],
-              'proof:input_check:output_openings': ["opened_commitments"],
-              'proof:input_check:pik_for_k_in_icl': ["list"], 
-              'election:done.': ["time_iso8601", "election_id"],
-              'sbb:close': ["time_iso8601"]
+ATTRIBUTES = {'sbb:open': ['election_id', 'time_iso8601'],
+              'setup:start': ['election_id', 'time_iso8601', 'about', 'legend'],
+              'setup:races': ['ballot_style_race_list'], 
+              'setup:voters': ['n_voters', 'ballot_id_len'], 
+              'setup:server-array': ['cols', 'rows', 'n_reps', 'threshold', 'json_indent'],
+              'setup:finished': ['time_iso8601'],
+              'casting:votes': ['cast_vote_dict'],
+              'tally:results': ['election_id', 'tally', 'time_iso8601'],
+              'proof:all_output_commitments': ['commitments'],
+              'proof:t_values_for_all_output_commitments': ['t_values'],
+              'proof:verifier_challenges': ['challenges', 'sbb_hash'],
+              'proof:outcome_check:opened_output_commitments': ['opened_commitments'],
+              'proof:input_check:input_openings': ['opened_commitments'],
+              'proof:input_check:output_openings': ['opened_commitments'],
+              'proof:input_check:pik_for_k_in_icl': ['list'], 
+              'election:done.': ['time_iso8601', 'election_id'],
+              'sbb:close': ['time_iso8601']
 }
 
 def verify(sbb_filename):
@@ -99,7 +99,7 @@ def verify(sbb_filename):
     check_consistent_election_ids(sbb)
     read_races(sbb_dict, db)
     read_n_voters(sbb_dict, db)
-    read_rows_cols_n_reps_threshold(sbb_dict, db)
+    read_rows_cols_n_reps_threshold_indent(sbb_dict, db)
     read_cast_votes(sbb_dict, db)
     read_tally(sbb_dict, db)
     read_output_commitments(sbb_dict, db)
@@ -183,29 +183,38 @@ def read_races(sbb_dict, db):
 
 def read_n_voters(sbb_dict, db):
     """ Read setup:voters item and save n_voters into db. """
-    n_voters = sbb_dict["setup:voters"]["n_voters"]
+    n_voters = sbb_dict['setup:voters']['n_voters']
     assert isinstance(n_voters, int) and n_voters > 0
-    db["n_voters"] = n_voters
+    db['n_voters'] = n_voters
+    db['p_list'] = sv.p_list(n_voters)
+    ballot_id_len = sbb_dict['setup:voters']['ballot_id_len']
+    assert isinstance(ballot_id_len, int)
+    assert ballot_id_len > 0
     print("read_n_voters: successful.")
 
-def read_rows_cols_n_reps_threshold(sbb_dict, db):
+def read_rows_cols_n_reps_threshold_indent(sbb_dict, db):
     """ Read setup:server-array to extract rows/cols/n_reps into db. """
-    rows = sbb_dict["setup:server-array"]["rows"]
-    cols = sbb_dict["setup:server-array"]["cols"]
-    n_reps = sbb_dict["setup:server-array"]["n_reps"]
-    threshold = sbb_dict["setup:server-array"]["threshold"]
+    sbbd = sbb_dict['setup:server-array']
+    rows = sbbd['rows']
+    cols = sbbd['cols']
+    n_reps = sbbd['n_reps']
+    threshold = sbbd['threshold']
+    json_indent = sbbd['json_indent']
     assert isinstance(rows, int) and rows > 0
     assert isinstance(cols, int) and cols > 0
     assert isinstance(n_reps, int) and n_reps > 0
     assert isinstance(threshold, int) and threshold > 0
-    db["rows"] = rows
-    db["cols"] = cols
-    db["n_reps"] = n_reps
-    db["threshold"] = threshold
+    db['rows'] = rows
     assert rows < 27
-    db["row_list"] = 'abcdefghijklmnopqrstuvwxyz'[:rows]
+    db['row_list'] = sv.row_list(rows)
+    db['cols'] = cols
+    db['n_reps'] = n_reps
+    db['threshold'] = threshold
     assert n_reps < 27
-    db["k_list"] = [c for c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:n_reps]]
+    db["k_list"] = sv.k_list(n_reps)
+    assert isinstance(json_indent, int)
+    assert json_indent >= 0
+    db['json_indent'] = json_indent
     print("read_rows_cols_n_reps_threshold: successful.")
 
 def read_cast_votes(sbb_dict, db):
@@ -235,7 +244,6 @@ def read_cast_votes(sbb_dict, db):
                 assert len(pair) == 2
                 assert isinstance(pair[0], str)
                 assert isinstance(pair[1], str)
-    print("ballot_id_list", ballot_id_list)
     assert len(set(ballot_id_list)) == len(ballot_id_list)   # ballot id's distinct
     db["ballot_id_dict"] = ballot_id_dict
     db["cast_vote_dict"] = cast_vote_dict
@@ -260,22 +268,24 @@ def read_output_commitments(sbb_dict, db):
     """
     coms = sbb_dict["proof:all_output_commitments"]["commitments"]
     assert isinstance(coms, dict)
-    assert set(coms.keys()) == set(db["race_ids"])
+    assert set(coms.keys()) == set(db['race_ids'])
     for race_id in db["race_ids"]:
-        kiys = coms[race_id]
-        assert isinstance(kiys, dict)
-        assert set(kiys.keys()) == set(db["k_list"])
+        assert isinstance(coms[race_id], dict)
+        assert set(coms[race_id].keys()) == set(db['k_list'])
         for k in db["k_list"]:
-            iys = kiys[k]
-            assert isinstance(iys, dict)
-            assert isinstance(com["pair_list"], list)
-            pair_list = com["pair_list"]
-            assert len(pair_list) == db["rows"]
-            for pair in pair_list:
-                assert isinstance(pair, list)
-                assert len(pair) == 2
-                assert isinstance(pair[0], str)
-                assert isinstance(pair[1], str)        
+            assert isinstance(coms[race_id][k], dict)
+            assert set(coms[race_id][k].keys()) == set(db['p_list'])
+            for p in db['p_list']:
+                assert isinstance(coms[race_id][k][p], dict)
+                assert set(coms[race_id][k][p].keys()) == set(list(db['row_list']))
+                for i in db['row_list']:
+                    assert isinstance(coms[race_id][k][p][i], dict)
+                    assert set(coms[race_id][k][p][i].keys()) == set(['pair'])
+                    pair = coms[race_id][k][p][i]['pair']
+                    assert isinstance(pair, list)
+                    assert len(pair) == 2
+                    assert isinstance(pair[0], str)
+                    assert isinstance(pair[1], str)        
     db["output_commitments"] = coms
     print("read_output_commitments: successful.")
 
@@ -283,62 +293,71 @@ def read_t_values(sbb_dict, db):
     """ Read t values from proof:t_values_for_all_output_commitments, and
         save them in db.
     """
-    t_values = sbb_dict["proof:t_values_for_all_output_commitments"]["list"]
-    assert len(t_values) == len(db["output_commitments"]) * db["rows"]
-    for t_value in t_values:
-        assert isinstance(t_value, dict)
-        assert set(t_value.keys()) == set(["i", "ix", "k", "race_id", "tu", "tv"])
-        i = t_value["i"]
-        assert isinstance(i, int) and 0 <= i < db["rows"]
-        ix = t_value["ix"]
-        assert isinstance(ix, int) and 0 <= ix < db["n_voters"]
-        k = t_value["k"]
-        assert isinstance(k, int) and 0 <= k < db["n_reps"]
-        race_id = t_value["race_id"]
-        assert isinstance(race_id, str) and race_id in db["races"]
-        tu = t_value["tu"]
-        assert isinstance(tu, int) and 0 <= tu < db["races"][race_id]["race_modulus"]
-        tv = t_value["tv"]
-        assert isinstance(tv, int) and 0 <= tv < db["races"][race_id]["race_modulus"]
-    db["t_values"] = t_values
+    ts = sbb_dict["proof:t_values_for_all_output_commitments"]["t_values"]
+    assert isinstance(ts, dict)
+    assert set(ts.keys()) == set(db['race_ids'])
+    for race_id in db["race_ids"]:
+        assert isinstance(ts[race_id], dict)
+        assert set(ts[race_id].keys()) == set(db['k_list'])
+        for k in db["k_list"]:
+            assert isinstance(ts[race_id][k], dict)
+            assert set(ts[race_id][k].keys()) == set(db['p_list'])
+            for p in db['p_list']:
+                assert isinstance(ts[race_id][k][p], dict)
+                assert set(ts[race_id][k][p].keys()) == set(list(db['row_list']))
+                for i in db['row_list']:
+                    assert isinstance(ts[race_id][k][p][i], dict)
+                    assert set(ts[race_id][k][p][i].keys()) == set(['tu', 'tv'])
+                    tu = ts[race_id][k][p][i]['tu']
+                    tv = ts[race_id][k][p][i]['tv']
+                    assert isinstance(tu, int)
+                    assert isinstance(tv, int)        
+                    assert 0 <= tu < db["races"][race_id]["race_modulus"]
+                    assert 0 <= tv < db["races"][race_id]["race_modulus"]
+    db["t_values"] = ts
     print("read_t_values: successful.")
 
 def read_verifier_challenges(sbb_dict, sbb, db):
     """ Read verifier challenges from proof:verifier_challenges and save into db. """
-    challenges = sbb_dict['proof:verifier_challenges']['challenges']
-    assert isinstance(challenges, dict)
-    assert set(challenges.keys()) == set(["icl", "leftright", "opl"])
-    icl = challenges["icl"]
+    chs = sbb_dict['proof:verifier_challenges']['challenges']
+    assert isinstance(chs, dict)
+    assert set(chs.keys()) == set(['cut', 'leftright'])
+    assert isinstance(chs['cut'], dict)
+    assert set(chs['cut'].keys()) == set(['icl', 'opl'])
+    icl = chs['cut']['icl']
     assert isinstance(icl, list)
     assert len(icl) == db["n_reps"] // 2
-    assert set(icl).issubset(range(db["n_reps"]))
-    opl = challenges["opl"]
+    assert set(icl).issubset(db['k_list'])
+    opl = chs['cut']['opl']
     assert isinstance(opl, list)
     assert len(opl) == db["n_reps"] // 2
-    assert set(opl).issubset(range(db["n_reps"]))
+    assert set(opl).issubset(db["k_list"])
     assert set(icl).isdisjoint(set(opl))
-    db["icl"] = icl
-    db["opl"] = opl
-    leftright = challenges["leftright"]
+    db['icl'] = icl
+    db['opl'] = opl
+    leftright = chs['leftright']
     assert isinstance(leftright, dict)
     assert leftright.keys() == db["races"].keys()
     for race_id in leftright.keys():
-        lr_list = leftright[race_id]
-        assert len(lr_list) == db["n_voters"]
-        for lr in lr_list:
+        lr_dict = leftright[race_id]
+        assert set(lr_dict.keys()) == set(db['p_list'])
+        for p in db['p_list']:
+            lr = lr_dict[p]
             assert lr == "left" or lr == "right"
-    db["leftright"] = leftright
+    db['leftright'] = leftright
     # now check that icl, opl, and leftright are consistent with sbb_hash
     # see make_verifier_challenges in sv_prover.py
-    rand_name = "verifier_challenges"
-    sbb_hash = sbb_dict["proof:verifier_challenges"]["sbb_hash"]
-    stop_before_header = "proof:verifier_challenges"
-    sbb_hash2 = sv.bytes2hex(hash_sbb(sbb, stop_before_header))
+    rand_name = 'verifier_challenges'
+    sbb_hash = sbb_dict['proof:verifier_challenges']['sbb_hash']
+    stop_before_header = 'proof:verifier_challenges'
+    sbb_hash2 = sv.bytes2hex(hash_sbb(sbb, stop_before_header, db['json_indent']))
     assert sbb_hash2 == sbb_hash
     sv.init_randomness_source(rand_name, sv.hex2bytes(sbb_hash))
-    pi = sv.random_permutation(db["n_reps"], rand_name)
-    icl2 = sorted(pi[:db["n_reps"]//2])
-    opl2 = sorted(pi[db["n_reps"]//2:])
+    pi = sv.random_permutation(db['n_reps'], rand_name)
+    m = db['n_reps'] // 2
+    pi = [pi[i] for i in range(2*m)]
+    icl2 = [db['k_list'][i] for i in sorted(pi[:m])]
+    opl2 = [db['k_list'][i] for i in sorted(pi[m:])]
     assert icl2 == icl
     assert opl2 == opl
     leftright2 = make_left_right_challenges(rand_name, db)
@@ -356,13 +375,16 @@ def make_left_right_challenges(rand_name, db):
     # sorting needed in next line else result depends on enumeration order
     # (sorting is also done is sv_prover.py)
     for race_id in sorted(db["races"]):
-        leftright = ["left" if bool(sv.get_random_from_source(rand_name, modulus=2))\
-                     else "right"\
-                     for i in range(db["n_voters"])]
+        leftright = dict()
+        for p in db['p_list']:
+            leftright[p] = "left"\
+                           if bool(sv.get_random_from_source(rand_name, 
+                                                             modulus=2))\
+                           else "right"
         leftright_dict[race_id] = leftright
     return leftright_dict
 
-def hash_sbb(sbb, stop_before_header):
+def hash_sbb(sbb, stop_before_header, json_indent):
     """ Return a (tweaked) hash of the sbb contents, including
         all items up to (but not including) the item with header
         equal to stop_before_header.
@@ -375,7 +397,7 @@ def hash_sbb(sbb, stop_before_header):
             break
         else:
             sbb_trunc.append(item)
-    sbb_trunc_str = json.dumps(sbb_trunc, sort_keys=True, indent=2)
+    sbb_trunc_str = json.dumps(sbb_trunc, sort_keys=True, indent=json_indent)
     hash_tweak = 2
     return sv.hash(sbb_trunc_str, hash_tweak)
 

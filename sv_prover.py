@@ -137,16 +137,16 @@ def compute_and_post_t_values(election):
     """
     server = election.server
     cols = server.cols
-    t_values = dict()
+    ts = dict()
     for race in election.races:
         race_id = race.race_id
-        t_values[race_id] = dict()
+        ts[race_id] = dict()
         for k in election.k_list:
-            t_values[race_id][k] = dict()
-            for i in election.server.row_list:
-                t_values[race_id][k][i] = dict()
-                for px in election.p_list:
-                    t_values[race_id][k][i][px] = dict()
+            ts[race_id][k] = dict()
+            for px in election.p_list:
+                ts[race_id][k][px] = dict()
+                for i in election.server.row_list:
+                    ts[race_id][k][px][i] = dict()
                     ux = server.sdb[race_id][i][0]['u'][px]
                     vx = server.sdb[race_id][i][0]['v'][px]
                     py = px
@@ -157,10 +157,10 @@ def compute_and_post_t_values(election):
                     vy = server.sdb[race_id][i][cols-1][k]['v'][py]
                     tu = (uy-ux) % race.race_modulus
                     tv = (vy-vx) % race.race_modulus
-                    t_values[race_id][k][i][px]["tu"] = tu
-                    t_values[race_id][k][i][px]["tv"] = tv
+                    ts[race_id][k][px][i]["tu"] = tu
+                    ts[race_id][k][px][i]["tv"] = tv
     election.sbb.post("proof:t_values_for_all_output_commitments",
-                      {"t_values": t_values},
+                      {"t_values": ts},
                       time_stamp=False)
 
 ##############################################################################
