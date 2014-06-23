@@ -80,14 +80,14 @@ class Election:
         n_fail = election_parameters["n_fail"]
         n_leak = election_parameters["n_leak"]
         # optional parameters (with defaults)
-        ballot_id_len = election_parameters.get("ballot_id_len",32)
-        json_indent = election_parameters.get("json_indent",0)
+        ballot_id_len = election_parameters.get("ballot_id_len", 32)
+        json_indent = election_parameters.get("json_indent", 0)
 
         # check and save parameters
-        assert isinstance(election_id,str) and len(election_id) > 0
+        assert isinstance(election_id, str) and len(election_id) > 0
         self.election_id = election_id
 
-        assert isinstance(ballot_style,list) and len(ballot_style) > 0
+        assert isinstance(ballot_style, list) and len(ballot_style) > 0
         self.ballot_style = ballot_style
 
         assert isinstance(n_voters, int) and n_voters > 0
@@ -96,10 +96,8 @@ class Election:
         # these name the positions in a list of objects, one per voter.
         # they are not voter ids, they are really names of positions
         # used for clarity and greater compatibility with json
-        # keep all the same length (use leading zeros) so that 
+        # keep all the same length (use leading zeros) so that
         # json "sort by keys" options works.
-        width = len("%d"%n_voters)
-        i_format = "%0" + str(width) + "d"
         # the following list is in sorted order!
         self.p_list = sv.p_list(n_voters)
 
@@ -122,7 +120,7 @@ class Election:
 
         # start secure bulletin board
         self.sbb = sv_sbb.SBB(election_id, json_indent)
-        self.sbb.post("setup:start", 
+        self.sbb.post("setup:start",
                       {"about": [
                           "Secure Bulletin Board for Split-Value Voting Method Demo.",
                           "by Michael O. Rabin and Ronald L. Rivest",
@@ -162,7 +160,7 @@ class Election:
         """ Run a (simulated) election. """
 
         # Vote !
-        sv_voter.cast_votes(self) 
+        sv_voter.cast_votes(self)
         # sv_voter.sort_cast_votes(self)
         sv_voter.distribute_cast_votes(self)
         sv_voter.post_cast_vote_commitments(self)
@@ -170,7 +168,7 @@ class Election:
         # Mix !
         self.server.mix()
 
-        # Tally! 
+        # Tally!
         sv_tally.compute_tally(self)
         sv_tally.post_tally(self)
         sv_tally.print_tally(self)
@@ -208,7 +206,7 @@ class Election:
 
         race_list = []
         for race in self.races:
-            race_list.append({"race_id": race.race_id, 
+            race_list.append({"race_id": race.race_id,
                               "choices": race.choices,
                               "race_modulus": race.race_modulus})
         self.sbb.post("setup:races",
@@ -217,26 +215,26 @@ class Election:
 
     def setup_voters(self, election, n_voters):
         """ Set up election to have n_voters voters in this simulation. """
-       
+
         assert isinstance(n_voters, int) and n_voters > 0
 
         # voter identifier is merely "voter:" + index: voter:0, voter:1, ...
         for i in range(n_voters):
             vid = "voter:" + str(i)
             self.voter_ids.append(vid)
-            self.voters.append(sv_voter.Voter(self,vid))
+            self.voters.append(sv_voter.Voter(self, vid))
 
-        self.sbb.post("setup:voters", 
+        self.sbb.post("setup:voters",
                       {"n_voters": n_voters,
                        'ballot_id_len': election.ballot_id_len},
                       time_stamp=False)
-                    
+
         if False:
             if n_voters <= 3:
-                self.sbb.post("(setup:voter_ids)", 
+                self.sbb.post("(setup:voter_ids)",
                               {"list": self.voter_ids})
             else:
-                self.sbb.post("(setup:voter_ids)", 
+                self.sbb.post("(setup:voter_ids)",
                               {"list": (self.voter_ids[0], "...", self.voter_ids[-1])},
                               time_stamp=False)
 

@@ -12,6 +12,7 @@
 ##############################################################################
 # standard MIT open-source license
 ##############################################################################
+MIT_license = \
 """
 The MIT License
 
@@ -64,7 +65,7 @@ HEADER_LIST = ['sbb:open',
 
 # attributes expected for each header
 ATTRIBUTES = {'sbb:open': ['election_id', 'time_iso8601'],
-              'setup:start': ['election_id', 'time_iso8601', 
+              'setup:start': ['election_id', 'time_iso8601',
                               'about', 'legend'],
               'setup:races': ['ballot_style_race_list'],
               'setup:voters': ['n_voters', 'ballot_id_len'],
@@ -520,7 +521,7 @@ def check_inputs_t_value(sbb_dict, db):
     for race_id in db['races']:
         leftright = sbb_dict['proof:verifier_challenges']\
                     ['challenges']['leftright'][race_id] # same for all i
-        pik_list['proof:pik_for_k_in_icl']['list']
+        pik_list = sbb_dict['proof:pik_for_k_in_icl']['list']
         for k in db['icl']:
             pik = None
             for item in pik_list:
