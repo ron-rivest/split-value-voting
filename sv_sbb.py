@@ -69,8 +69,8 @@ class SBB:
         Here msg_type is a string, used as a header, and
         msg_dict is a dict with fields for that message.
 
-        TODO: add digital signature here as an option.
-              (signature is on all previous contents of sbb.)
+        Add digital signature here as an option.
+        (sign all previous contents of sbb.)
         """
 
         assert not self.closed
