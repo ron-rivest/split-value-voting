@@ -64,7 +64,8 @@ HEADER_LIST = ['sbb:open',
 
 # attributes expected for each header
 ATTRIBUTES = {'sbb:open': ['election_id', 'time_iso8601'],
-              'setup:start': ['election_id', 'time_iso8601', 'about', 'legend'],
+              'setup:start': ['election_id', 'time_iso8601', 
+                              'about', 'legend'],
               'setup:races': ['ballot_style_race_list'],
               'setup:voters': ['n_voters', 'ballot_id_len'],
               'setup:server-array':
