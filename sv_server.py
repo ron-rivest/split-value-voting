@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 import sv
 # import sv_sbb
-import sv_election
+# import sv_election
 
 class Server():
 
@@ -60,7 +60,6 @@ class Server():
         n_leak = number of servers that my leak information
         """
 
-        assert isinstance(election, sv_election.Election)
         assert isinstance(n_fail, int) and n_fail >= 0
         assert isinstance(n_leak, int) and n_leak >= 0
 

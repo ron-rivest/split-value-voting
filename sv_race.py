@@ -37,7 +37,7 @@ THE SOFTWARE.
 # end of standard MIT open-source license
 ##############################################################################
 
-import sv_election
+# import sv_election
 import sv
 # import sv_voter
 # import sv_server
@@ -67,8 +67,6 @@ class Race:
                  for this race the voter may vote for Smith, for Jones, or
                  may cast a write-in vote of length at most 8 characters.
         """
-
-        assert isinstance(election, sv_election.Election)
 
         assert isinstance(race_id, str) and len(race_id) > 0
 

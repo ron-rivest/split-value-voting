@@ -38,7 +38,7 @@ THE SOFTWARE.
 ##############################################################################
 
 import sv
-import sv_election
+# import sv_election
 
 class Voter:
     """ Implement a voter. """
@@ -46,7 +46,6 @@ class Voter:
     def __init__(self, election, voter_id):
         """ Initialize voter object for this election. """
 
-        assert isinstance(election, sv_election.Election)
         self.election = election
 
         assert isinstance(voter_id, str)

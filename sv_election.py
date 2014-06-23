@@ -64,7 +64,8 @@ class Election:
                 for this race the voter may vote for Smith, for Jones, or
                 may cast a write-in vote of length at most 8 characters.
             "n_voters" is the number of simulated voters
-            "n_reps" is the parameter for the cut-and-choose step (n_reps replicas are made)
+            "n_reps" is the parameter for the cut-and-choose step
+                     (n_reps replicas are made)
                      (in our paper, n_reps is called "2m")
             "n_fail" is the number of servers that may fail
             "n_leak" is the number of servers that may leak
@@ -118,31 +119,40 @@ class Election:
         assert json_indent >= 0
         self.json_indent = json_indent
 
+
+        about_text = \
+        ["Secure Bulletin Board for Split-Value Voting Method Demo.",
+         "by Michael O. Rabin and Ronald L. Rivest",
+         "For paper: see http://people.csail.mit.edu/rivest/pubs.html#RR14a",
+         "For code: see https://github.com/ron-rivest/split-value-voting",
+        ]
+        legend_text = \
+        ["Indices between 0 and n_voters-1 indicated by p0, p1, ...",
+         "Rows of server array indicated by a, b, c, d, ...",
+         "Copies (n_reps = 2m passes) indicated by A, B, C, D, ...",
+         "'********' in ballot style indicates a write-in option",
+         "           (number of stars is max write-in length)",
+         "Values represented are represented modulo race_modulus.",
+         "'ru' and 'rv' are randomization values",
+         "              for commitments to 'u' and 'v', respectively.",
+         "'pair' gives a pair of commitments:",
+         "          (com(u,ru), com(v,rv))",
+         "       (split-value style) to u and v",
+         "'x' (or 'y') equals u+v (mod race_modulus),",
+         "             and is a (Shamir-)share of the vote.",
+         "'icl' stands for 'input comparison list',",
+         "'opl' for 'output production list';",
+         "      these are the 'cut-and-choose' results",
+         "      dividing up the lists into two sub-lists."
+        ]
         # start secure bulletin board
         self.sbb = sv_sbb.SBB(election_id, json_indent)
         self.sbb.post("setup:start",
-                      {"about": [
-                          "Secure Bulletin Board for Split-Value Voting Method Demo.",
-                          "by Michael O. Rabin and Ronald L. Rivest",
-                          "For paper: see http://people.csail.mit.edu/rivest/pubs.html#RR14a",
-                          "For code: see https://github.com/ron-rivest/split-value-voting",
-                          ],
+                      {"about": about_text,
                        "election_id": election_id,
-                       "legend": [
-                           "Indices between 0 and n_voters-1 indicated by p0, p1, ...",
-                           "Rows of server array indicated by a, b, c, d, ...",
-                           "Copies (n_reps = 2m passes) indicated by A, B, C, D, ...",
-                           "'********' in ballot style indicates a write-in option (of given length)",
-                           "Values represented are represented modulo race_modulus.",
-                           "'ru' and 'rv' and randomization values for commitments to 'u' and 'v', respectively.",
-                           "'pair' gives a pair of commitments (com(u,ru), com(v,rv))(split-value style) to u and v",
-                           "'x' (or 'y') equals u+v (mod race_modulus), and is a share of the vote.",
-                           "'icl' stands for 'input comparison list', and 'opl' for 'output production list';",
-                           "      these are the 'cut-and-choose' results dividing up the lists into two sub-lists."
-                           ]
-                       }
-
-        )
+                       "legend": legend_text
+                      }
+                     )
 
         self.races = []
         self.race_ids = [race_id for (race_id, choices) in ballot_style]
@@ -235,7 +245,9 @@ class Election:
                               {"list": self.voter_ids})
             else:
                 self.sbb.post("(setup:voter_ids)",
-                              {"list": (self.voter_ids[0], "...", self.voter_ids[-1])},
+                              {"list": (self.voter_ids[0],
+                                        "...",
+                                        self.voter_ids[-1])},
                               time_stamp=False)
 
     def setup_keys(self):

@@ -511,7 +511,6 @@ def check_inputs_outputs_openings(sbb_dict, db):
         for k in db['icl']:
             # check correspondence
             pass
-            "TBD"
 
 def check_inputs_output_openings(sbb_dict, db):
     """ Check output openings used for consistency with input openings. """
