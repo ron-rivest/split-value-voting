@@ -444,30 +444,19 @@ def check_opened_output_commitments(sbb_dict, db):
 def check_opened_output_commitment_tallies(sbb_dict, db):
     """ Check that for each k, the opened output commitments lagranage
         and tally to values given in tally.
-
-        Note that output_commitments are in sbb in sorted order:
-        by  race_id, k, iy, i, ...
-        (see sv_prover.sort_output_commitments)
     """
     opened_coms = \
         sbb_dict['proof:outcome_check:opened_output_commitments']['opened_commitments']
-    index = dict()
-    for com in opened_coms:
-        race_id = com['race_id']
-        k = com['k']
-        iy = com['iy']
-        i = com['i']
-        index[(race_id, k, iy, i)] = com
     for k in db['opl']:
-        # verify tally for this k
+        # verify tally for this pass/copy k
         tally_k = dict()
-        for race_id in db['races'].keys():
+        for race_id in db['race_ids']:
             tally_k[race_id] = dict()  # choices to counts
-            for iy in range(db['n_voters']):
+            for p in db['p_list']:
                 share_list = []
-                for i in range(db['rows']):
-                    com = index[(race_id, k, iy, i)]
-                    share_list.append((i+1,com['y']))
+                for i_int, i in enumerate(db['row_list']):
+                    y = opened_coms[race_id][k][p][i]['y']
+                    share_list.append((i_int+1,y))
                 w = sv.lagrange(share_list, 
                                 db['rows'],
                                 db['threshold'],
