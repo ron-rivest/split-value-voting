@@ -64,20 +64,19 @@ assert SECPARAM_RAND_SEED == SECPARAM_HASH_OUTPUT
 # HASH FUNCTION (SHA256)
 ##############################################################################
 
-# define our hash function to be compatible with the above
-def hash(x, tweak=0):
+def secure_hash(x, tweak=0):
     """ Return SHA256 hash of (tweaked) x, as bytes value.
     x may be string or bytes.
 
     (Note that python already has a "hash" function, which is not
-    cryptographic, but used for dictionaries.  We are overriding the
-    use of the function name "hash" here to mean sha256.)
+    cryptographic, but used for dictionaries. This is different.)
 
     The value "tweak" (which is in range 0 to 255), allows one to
     "tweak" the (non-empty) input x.
 
     Note: this is not the only place where dependency on choice
     of hash function is evidenced; also see commitment use of hmac.
+    Our hash function is consistent with the above security parameters.
     """
     if isinstance(x, str):
         x = x.encode()
@@ -95,8 +94,8 @@ def hash(x, tweak=0):
 ##############################################################################
 
 def bytes2hex(x):
-    """ Return hexadecimal representation of byte sequence x (as a string) 
-    
+    """ Return hexadecimal representation of byte sequence x (as a string)
+
     Could also use binascii.hexlify(x)
     """
     assert isinstance(x, (bytes, bytearray))
@@ -170,15 +169,14 @@ test_conversions()
 # RANDOMNESS
 ##############################################################################
 
-"""
-Implement a collection of randomness "sources".
-In practice, these must be independent and separately seeded.
-In this protype implementation, they are pseudorandomly seeded.
-** For a secure real implementation, seeds should come 
-** from a truly random source. 
-Each randomness source has a separate name (a string).
-Each randomness source has a seed (a SECPARAM_RAND_SEED/8 bytes value)
-"""
+# Implement a collection of randomness "sources".
+# In practice, these must be independent and separately seeded.
+# In this protype implementation, they are pseudorandomly seeded.
+# ** For a secure real implementation, seeds should come
+# ** from a truly random source.
+# Each randomness source has a separate name (a string).
+# Each randomness source has a seed (a SECPARAM_RAND_SEED/8 bytes value)
+
 randomness_sources = dict()     # maps names to their current state
 
 def init_randomness_source(rand_name, initial_seed=None):
@@ -187,11 +185,10 @@ def init_randomness_source(rand_name, initial_seed=None):
     Doesn't matter if already exists, but will reset seed then though.
     """
     assert isinstance(rand_name, str)
-    num_sources = len(randomness_sources)
     if initial_seed == None:
         # initialize new seed to hash of source name
         # this is not secure!! this is only for prototype use!!
-        new_seed = hash(rand_name)
+        new_seed = secure_hash(rand_name)
     else:
         assert isinstance(initial_seed, (bytes, bytearray))
         assert len(initial_seed) == SECPARAM_HASH_OUTPUT / 8
@@ -207,11 +204,11 @@ def get_random_from_source(rand_name, modulus=None):
     """
     assert rand_name in randomness_sources
     assert not modulus or (isinstance(modulus, int) and modulus > 0)
-    new_seed = hash(randomness_sources[rand_name])
+    new_seed = secure_hash(randomness_sources[rand_name])
     randomness_sources[rand_name] = new_seed
     # use tweaked hash in the following line, so that
     # output-producing hash and next-new-seed hash are different
-    random_output = hash(new_seed, 1)
+    random_output = secure_hash(new_seed, 1)
     if modulus == None:
         return random_output
     return bytes2int(random_output) % modulus
@@ -242,7 +239,7 @@ test_random()
 
 def random_permutation(elts, rand_name):
     """
-    Generate and return a random permutation (as a dict) of given set of 
+    Generate and return a random permutation (as a dict) of given set of
     elements using random source with name rand_name.  If elts is an integer,
     it is interpreted as range(elts)
 
@@ -327,7 +324,7 @@ def miller_rabin(n, s):
     Return True iff n is prime (w.h.p.), with s trials.
     """
     init_randomness_source("Miller_Rabin")
-    for j in range(1, s+1):
+    for _ in range(1, s+1):
         a = get_random_from_source("Miller_Rabin", n-1) + 1
         if witness(a, n):
             return False
@@ -343,7 +340,7 @@ def witness(a, n):
         u = u // 2
         t = t + 1
     x = [pow(a, u, n)]
-    for i in range(1, t+1):
+    for _ in range(1, t+1):
         x.append((x[-1]*x[-1]) % n)
         if x[-1] == 1 and x[-2] != 1 and x[-2] != n-1:
             return True
@@ -583,7 +580,7 @@ def sym_dec(sym_key, ct):
     assert isinstance(sym_key, (bytes, bytearray))
     assert len(sym_key) == SECPARAM_SYMMETRIC / 8
     assert isinstance(ct, (bytes, bytearray))
- 
+
     # in this dummy implementation, just key that ct starts with
     # sym_key, then if OK, strip it off and return msg. Very insecure !!!
     assert sym_key == ct[:len(sym_key)]
@@ -617,13 +614,14 @@ def pk_enc(pk, msg):
     """ Encrypt message msg with given public key pk. """
     # just concatenate public key and messge.  Very insecure !!!
     ct = pk + msg
-    return pk + msg
+    return ct
 
 def pk_dec(pk, sk, ct):
     """ Decrypt ciphertext ct with given secret key sk. """
     # just check prefix is pk for now, then return rest.
     # Very insecure !!!
     assert pk == ct[:len(pk)]
+    assert sk == sk   # to keep pylint happy
     msg = ct[len(pk):]
     return msg
 
@@ -698,7 +696,7 @@ def comsv(svpair, ru, rv):
 ##############################################################################
 
 def p_list(n_voters):
-    """ Return list of length n_voters: p0, p1, .... 
+    """ Return list of length n_voters: p0, p1, ....
 
     (Widths of integers adjusted to be uniform.)
     Note that this list is in increasing order.

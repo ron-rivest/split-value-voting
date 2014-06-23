@@ -405,7 +405,7 @@ def hash_sbb(sbb, stop_before_header, json_indent):
             sbb_trunc.append(item)
     sbb_trunc_str = json.dumps(sbb_trunc, sort_keys=True, indent=json_indent)
     hash_tweak = 2
-    return sv.hash(sbb_trunc_str, hash_tweak)
+    return sv.secure_hash(sbb_trunc_str, hash_tweak)
 
 def check_opened_output_commitments(sbb_dict, db):
     """ Check that opened output commitments are consistent with each other

@@ -130,7 +130,7 @@ class SBB:
         json_indent = self.json_indent
         board_str = json.dumps(board, sort_keys=True, indent=json_indent)
         hash_tweak = 2
-        return sv.hash(board_str, hash_tweak)
+        return sv.secure_hash(board_str, hash_tweak)
 
 
 
