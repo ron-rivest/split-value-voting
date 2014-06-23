@@ -51,10 +51,9 @@ def do_election():
     election_parameters = {
         "election_id": "test01",
         "ballot_style":\
-            [("taxes", ("yes", 
-                        "no")),
-             ("mayor", ("tom", 
-                        "rufus", 
+            [("taxes", ("yes", "no")),
+             ("mayor", ("tom",
+                        "rufus",
                         "****************"))],  # 16-char write-ins allowed
         "n_voters": 3,       # voters
         "n_reps": 4,         # (# of replicas aka 2m)
@@ -71,22 +70,13 @@ def do_election():
     }
     print("starting election (simulation).")
     print("election parameters:")
-    print("    election id =", election_parameters["election_id"])
-    print("    ballot style =", election_parameters["ballot_style"])
-    print("    n_voters =", election_parameters["n_voters"])
-    print("    n_reps =", election_parameters["n_reps"])
-    print("    n_fail =", election_parameters["n_fail"])
-    print("    n_leak =", election_parameters["n_leak"])
-
+    for key in sorted(election_parameters.keys()):
+        print("    ", key, "=", election_parameters[key])
     election = sv_election.Election(election_parameters)
-
     election.run_election()
-
     sbb_filename = election_parameters["election_id"] + ".sbb.txt"
     election.sbb.print_sbb(public=True, sbb_filename=sbb_filename)
-
     print("election finished.")
-
     print()
     print("beginning verification...")
     sv_verifier.verify(sbb_filename)

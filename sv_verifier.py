@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 import json
 import sv
-# import sys
+import sys
 
 # headers, in ordered expected in SBB file.
 HEADER_LIST = ['sbb:open',
@@ -534,3 +534,7 @@ def check_inputs_t_value(sbb_dict, db):
                 icom = db['cast_votes'][ix]
     'TBD'
 
+if __name__ == "__main__":
+    filename = sys.argv[1]
+    print("Verifying election with SBB contents in:", filename)
+    verify(filename)
