@@ -11,6 +11,7 @@ Usage: python3 sv_main.py
 ##############################################################################
 # standard MIT open-source license
 ##############################################################################
+MIT_license = \
 """
 The MIT License
 
@@ -38,7 +39,6 @@ THE SOFTWARE.
 # end of standard MIT open-source license
 ##############################################################################
 
-import cProfile
 import sys
 assert sys.version_info[0] == 3
 
@@ -62,7 +62,7 @@ def do_election():
 
         # optional parameters:
         # number of hex digits in ballot id (default 32)
-        "ballot_id_len": 32, 
+        "ballot_id_len": 32,
         # number of spaces per tab in json output (>=0, default 0)
         # setting this to 0 reduces readability of SBB output, but
         # also reduces SBB size by roughly 25%
@@ -83,5 +83,6 @@ def do_election():
     print("done.")
 
 if __name__ == "__main__":
+    # import cProfile
     # cProfile.run("do_election()")
     do_election()
