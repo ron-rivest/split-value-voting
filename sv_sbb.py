@@ -62,7 +62,6 @@ class SBB:
         """ Close the SBB.  No more posting is allowed. """
         self.post("sbb:close")
         self.closed = True
-        
 
     def post(self, msg_header, msg_dict=None, time_stamp=True):
         """ Append a message to the sbb.
@@ -101,7 +100,7 @@ class SBB:
         if sbb_filename is None:
             sbb_file = sys.stdout
         else:
-            sbb_file = open(sbb_filename,"w")
+            sbb_file = open(sbb_filename, "w")
 
         if sbb_file is not sys.stdout:
             print("Saving contents of secure bulletin board...")
