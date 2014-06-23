@@ -45,14 +45,14 @@ import sv
 
 # Standard list of write-in candidates to use (max 13 char)
 WRITE_INS = ["Donald Duck",
-             "Lizard People", 
+             "Lizard People",
              "Mickey Mouse"]
 
 class Race:
     """ Implements a race in a split-value voting method. """
 
     def __init__(self, election, race_id, choices):
-        """ Initialize race 
+        """ Initialize race
 
             race_id is a string
             choices is list consisting of
@@ -72,11 +72,11 @@ class Race:
 
         assert isinstance(race_id, str) and len(race_id) > 0
 
-        assert isinstance(choices,(list, tuple)) and len(choices) > 0
+        assert isinstance(choices, (list, tuple)) and len(choices) > 0
         # must be more than one choice, except if sole choice is for write-ins
-        assert len(choices) > 1 or choices[0] in "*"*1000   
+        assert len(choices) > 1 or choices[0] in "*"*1000
         # choices must be distinct
-        assert len(choices) == len(set(choices))  
+        assert len(choices) == len(set(choices))
         # choices must be strings
         assert all([isinstance(choice, str) for choice in choices])
 
@@ -84,7 +84,7 @@ class Race:
         self.race_id = race_id
         self.choices = choices
 
-        # set race.race_modulus to be modulus for representing choices in this race.
+        # set race.race_modulus = modulus for representing choices in this race.
         # note that for computation and comparison purposes, choices will
         # be converted to type bytes
         # make race_modulus a prime big enough to encode all possible choices
@@ -104,7 +104,8 @@ class Race:
         a small built-in list of alternatives.
         """
 
-        choice_index = sv.get_random_from_source(self.rand_name, len(self.choices))
+        choice_index = sv.get_random_from_source(self.rand_name,
+                                                 len(self.choices))
         choice = self.choices[choice_index]
         all_stars = all([c == "*" for c in choice])
         if not all_stars:
@@ -137,7 +138,8 @@ class Race:
 
     def choice_int2str(self, choice_int):
         """ Inverse of choice_str2int; convert integer to choice string. """
-        assert isinstance(choice_int, int) and 0 <= choice_int < self.race_modulus
+        assert isinstance(choice_int, int) and \
+            0 <= choice_int < self.race_modulus
         choice_bytes = sv.int2bytes(choice_int)
         choice_str = choice_bytes.decode()
         assert self.is_valid_choice(choice_str)
