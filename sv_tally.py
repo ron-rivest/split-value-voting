@@ -38,12 +38,11 @@ import sv
 
 
 def compute_tally(election):
-    """ Compute tallies for this election. 
-    
+    """ Compute tallies for this election.
+
     Data is from last column of mix servers.
     """
     server = election.server
-    rows = server.rows
     cols = server.cols
     election.tally = dict()
     for race in election.races:
@@ -76,7 +75,7 @@ def compute_tally(election):
         election.tally[race_id] = tally
 
 def print_tally(election, f_out=sys.stdout):
-    """ Print tallies computed for this election to file f_out. 
+    """ Print tallies computed for this election to file f_out.
 
     Uses results compiled by compute_tally, and saved in race.tally fields.
     """
@@ -98,6 +97,3 @@ def post_tally(election):
     election.sbb.post("tally:results",
                       {"election_id": election.election_id,
                        "tally": election.tally})
-
-                      
-
