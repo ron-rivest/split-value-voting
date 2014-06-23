@@ -34,7 +34,7 @@ THE SOFTWARE.
 # end of standard MIT open-source license
 ##############################################################################
 
-import sys
+# import sys
 
 import sv
 # import sv_sbb
@@ -144,7 +144,7 @@ class Server():
                     sdbp['pair'] = dict()
         # post on log that server array is set up
         election.sbb.post("setup:server-array",
-                          {"rows": rows, "cols": cols, 
+                          {"rows": rows, "cols": cols,
                            "n_reps": election.n_reps,
                            "threshold": threshold,
                            'json_indent': election.json_indent},
@@ -153,8 +153,6 @@ class Server():
     def mix(self):
         """ Mix votes.  Information flows left to right. """
         election = self.election
-        n_voters = election.n_voters
-        n_reps = election.n_reps
         # replicate input to become first-column x inputs for each race & pass
         for race_id in election.race_ids:
             for k in election.k_list:
@@ -203,7 +201,8 @@ class Server():
                 for k in election.k_list:
                     for i in self.row_list:
                         # shuffle first
-                        pi = self.sdb[race_id][i][j][k]['pi'] # length n (and indep of i)
+                        pi = self.sdb[race_id][i][j][k]['pi'] # length n
+                        # note that pi is independent of i
                         x = self.sdb[race_id][i][j][k]['x']   # length n
                         xp = sv.apply_permutation(pi, x)      # length n
                         # then obfuscate by adding "fuzz"
