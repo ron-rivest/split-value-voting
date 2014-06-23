@@ -51,7 +51,7 @@ def make_proof(election):
     # part 2 of proof production
     # make proof of consistency of icl copies with input
     prove_input_consistent(election, challenges)
-    compute_and_post_pik_list(election, challenges)
+    compute_and_post_pik_dict(election, challenges)
  
 ##############################################################################
 # output section
@@ -384,7 +384,7 @@ def make_dict_of_output_commitment_pairs(election, race, i, k):
             sv.apply_permutation(pi_inv, dict_of_output_commitment_pairs)
     return dict_of_output_commitment_pairs
 
-def compute_and_post_pik_list(election, challenges):
+def compute_and_post_pik_dict(election, challenges):
     """ Compute a permutation pi for each race and ballot in that race, post it.
 
     In a real implementation, this code requires inter-processor communication.
@@ -396,23 +396,21 @@ def compute_and_post_pik_list(election, challenges):
     icl = challenges['cut']['icl']
     server = election.server
     cols = server.cols
-    pik_list = []
+    pik_dict = dict()
     for race in election.races:
         race_id = race.race_id
+        pik_dict[race_id] = dict()
         for k in icl:
-            pik = dict()
+            pik_dict[race_id][k] = dict()
             for py in election.p_list:
                 px = py
                 for j in range(cols):
                     pi = server.sdb[race_id]['a'][j][k]['pi']
                     px = pi[px]
-                pik[py] = px
+                pik_dict[race_id][k][py] = px
             # now pik maps py's to their original px's
-            pik_list.append({"race_id": race_id,
-                             "k": k,
-                             "pik": pik})
     election.sbb.post("proof:input_check:pik_for_k_in_icl",
-                      {"list": pik_list},
+                      {'pik_dict': pik_dict},
                       time_stamp=False)
 
 

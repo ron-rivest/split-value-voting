@@ -77,7 +77,7 @@ ATTRIBUTES = {'sbb:open': ['election_id', 'time_iso8601'],
               'proof:outcome_check:opened_output_commitments': ['opened_commitments'],
               'proof:input_check:input_openings': ['opened_commitments'],
               'proof:input_check:output_openings': ['opened_commitments'],
-              'proof:input_check:pik_for_k_in_icl': ['list'], 
+              'proof:input_check:pik_for_k_in_icl': ['pik_dict'], 
               'election:done.': ['time_iso8601', 'election_id'],
               'sbb:close': ['time_iso8601']
 }
@@ -491,15 +491,19 @@ def check_inputs(sbb_dict, db):
 
 def check_inputs_pik(sbb_dict, db):
     """ Check that piks look OK. """
-    pik_list = sbb_dict["proof:input_check:pik_for_k_in_icl"]["list"]
-    for item in pik_list:
-        assert isinstance(item, dict)
-        assert set(item.keys()) == set(["race_id", "k", "pik"])
-        assert item["race_id"] in db["races"]
-        k = item["k"]
-        assert isinstance(k, int) and 0 <= k < db["n_reps"]
-        pik = item["pik"]
-        assert sorted(pik) == list(range(db["n_voters"]))
+    pd = sbb_dict['proof:input_check:pik_for_k_in_icl']['pik_dict']
+    assert set(pd.keys()) == set(db['race_ids'])
+    for race_id in db['race_ids']:
+        assert isinstance(pd[race_id], dict)
+        assert set(pd[race_id].keys()) == set(db['icl'])
+        for k in db['icl']:
+            assert isinstance(pd[race_id][k], dict)
+            assert set(pd[race_id][k].keys()) == set(db['p_list'])
+            p_list = set(db['p_list'])
+            for p in db['p_list']:
+                assert pd[race_id][k][p] in p_list
+                p_list.remove(pd[race_id][k][p])
+    print("check_inputs_pik: passed.")
 
 def check_inputs_input_openings(sbb_dict, db):
     """ Check input openings used for testing consistency with output openings. """
