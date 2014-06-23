@@ -52,7 +52,7 @@ def make_proof(election):
     # make proof of consistency of icl copies with input
     prove_input_consistent(election, challenges)
     compute_and_post_pik_dict(election, challenges)
- 
+
 ##############################################################################
 # output section
 ##############################################################################
@@ -66,7 +66,6 @@ def make_full_output(election):
     for each of the n vote shares (call them y)
     output two commitments.
     """
-    rows = election.server.rows
     cols = election.server.cols
     full_output = dict()
     for race in election.races:
@@ -91,7 +90,8 @@ def make_full_output(election):
                     sdbp['ru'][py] = ru
                     sdbp['rv'][py] = rv
                     sdbp['pair'][py] = pair
-                    ballot = {'y': y, 'u': u, 'v': v, 'ru': ru, 'rv': rv, 'pair': pair}
+                    ballot = {'y': y, 'u': u, 'v': v,
+                              'ru': ru, 'rv': rv, 'pair': pair}
                     full_output[race_id][k][py][i] = ballot
     election.full_output = full_output
 
@@ -101,7 +101,6 @@ def post_output_commitments(election):
     coms = dict()
     # same as full_output, but only giving non-secret values (i.e. pairs)
     for race in election.races:
-        race_modulus = race.race_modulus
         race_id = race.race_id
         coms[race_id] = dict()
         for k in election.k_list:
@@ -110,8 +109,8 @@ def post_output_commitments(election):
                 coms[race_id][k][py] = dict()
                 for i in election.server.row_list:
                     coms[race_id][k][py][i] = \
-                        { 'pair': full_output[race_id][k][py][i]['pair'] }
-    election.output_commitments = coms    
+                        {'pair': full_output[race_id][k][py][i]['pair']}
+    election.output_commitments = coms
     election.sbb.post("proof:all_output_commitments",
                       {"commitments": coms},
                       time_stamp=False)
@@ -219,7 +218,7 @@ def make_left_right_challenges(election, rand_name, challenges):
         leftright = dict()
         for p in election.p_list:   # note: p_list is already sorted
             leftright[p] = "left"\
-                           if bool(sv.get_random_from_source(rand_name, 
+                           if bool(sv.get_random_from_source(rand_name,
                                                              modulus=2))\
                            else "right"
         leftright_dict[race_id] = leftright
@@ -256,7 +255,8 @@ def prove_outcome_correct(election, challenges):
                     v = election.server.sdb[race_id][i][cols-1][k]['v'][py]
                     ru = election.server.sdb[race_id][i][cols-1][k]['ru'][py]
                     rv = election.server.sdb[race_id][i][cols-1][k]['rv'][py]
-                    pair = election.server.sdb[race_id][i][cols-1][k]['pair'][py]
+                    pair = election.server.sdb[race_id][i][cols-1][k]\
+                                                       ['pair'][py]
                     opened[race_id][k][py][i] = \
                         {"y": y,
                          "u": u,
@@ -382,7 +382,7 @@ def make_dict_of_output_commitment_pairs(election, race, i, k):
     # next is to permute it back into same order as input lists
     for j in range(cols-1, -1, -1):
         pi_inv = sdbp[race_id][i][j][k]['pi_inv']
-        list_of_output_commitment_pairs = \
+        dict_of_output_commitment_pairs = \
             sv.apply_permutation(pi_inv, dict_of_output_commitment_pairs)
     return dict_of_output_commitment_pairs
 
