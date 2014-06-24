@@ -215,7 +215,7 @@ class Election:
             race_dict[race_id] = {"choices": race.choices,
                                   "race_modulus": race.race_modulus}
         self.sbb.post("setup:races",
-                      {"ballot_style_race_list": race_dict},
+                      {"ballot_style_race_dict": race_dict},
                       time_stamp=False)
 
     def setup_voters(self, election, n_voters):

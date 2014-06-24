@@ -67,7 +67,7 @@ HEADER_LIST = ['sbb:open',
 ATTRIBUTES = {'sbb:open': ['election_id', 'time_iso8601'],
               'setup:start': ['election_id', 'time_iso8601',
                               'about', 'legend'],
-              'setup:races': ['ballot_style_race_list'],
+              'setup:races': ['ballot_style_race_dict'],
               'setup:voters': ['n_voters', 'ballot_id_len'],
               'setup:server-array':
                   ['cols', 'rows', 'n_reps', 'threshold', 'json_indent'],
@@ -192,9 +192,9 @@ def check_consistent_election_ids(sbb):
 
 def read_races(sbb_dict, db):
     """ Read races item and gather info into db """
-    races = sbb_dict['setup:races']['ballot_style_race_list']
-    for race_id in sbb_dict['setup:races']['ballot_style_race_list']:
-        race_dict = sbb_dict['setup:races']['ballot_style_race_list'][race_id]
+    races = sbb_dict['setup:races']['ballot_style_race_dict']
+    for race_id in sbb_dict['setup:races']['ballot_style_race_dict']:
+        race_dict = sbb_dict['setup:races']['ballot_style_race_dict'][race_id]
         assert has_keys(race_dict, ['choices', 'race_modulus'])
     db['races'] = races
     db['race_ids'] = races.keys()
@@ -461,7 +461,7 @@ def check_opened_output_commitment_tallies(sbb_dict, db):
         tally_k = dict()
         for race_id in db['race_ids']:
             tally_k[race_id] = dict()  # choices to counts
-            for choice in sbb_dict['setup:races']['ballot_style_race_list'][race_id]['choices']:
+            for choice in sbb_dict['setup:races']['ballot_style_race_dict'][race_id]['choices']:
                 if choice[0] != '*':
                     tally_k[race_id][choice] = 0
             for p in db['p_list']:
