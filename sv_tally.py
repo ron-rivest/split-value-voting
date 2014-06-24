@@ -53,7 +53,7 @@ def compute_tally(election):
                 share_list = \
                     [(row+1, server.sdb[race_id][i][cols-1][k]['y'][p]) \
                      for row, i in enumerate(election.server.row_list)]
-                choice_int = sv.lagrange(share_list, election.n_voters, \
+                choice_int = sv.lagrange(share_list, server.rows,\
                                          server.threshold, race.race_modulus)
                 choice_int_list.append(choice_int)
             choice_str_list = [race.choice_int2str(choice_int)

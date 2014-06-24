@@ -192,11 +192,10 @@ def check_consistent_election_ids(sbb):
 
 def read_races(sbb_dict, db):
     """ Read races item and gather info into db """
-    races = dict()     # maps race_id's to dicts
-    for race_dict in sbb_dict['setup:races']['ballot_style_race_list']:
-        assert has_keys(race_dict, ['choices', 'race_id', 'race_modulus'])
-        race_id = race_dict['race_id']
-        races[race_id] = race_dict
+    races = sbb_dict['setup:races']['ballot_style_race_list']
+    for race_id in sbb_dict['setup:races']['ballot_style_race_list']:
+        race_dict = sbb_dict['setup:races']['ballot_style_race_list'][race_id]
+        assert has_keys(race_dict, ['choices', 'race_modulus'])
     db['races'] = races
     db['race_ids'] = races.keys()
     print('read_races: successful.')
@@ -462,6 +461,9 @@ def check_opened_output_commitment_tallies(sbb_dict, db):
         tally_k = dict()
         for race_id in db['race_ids']:
             tally_k[race_id] = dict()  # choices to counts
+            for choice in sbb_dict['setup:races']['ballot_style_race_list'][race_id]['choices']:
+                if choice[0] != '*':
+                    tally_k[race_id][choice] = 0
             for p in db['p_list']:
                 share_list = []
                 for i_int, i in enumerate(db['row_list']):
@@ -479,7 +481,6 @@ def check_opened_output_commitment_tallies(sbb_dict, db):
                 # print(race_id, k, iy, choice_str)
                 cnt = tally_k[race_id].get(choice_str, 0)
                 tally_k[race_id][choice_str] = cnt + 1
-        # print(tally_k)
         assert tally_k == db['tally']
     print('check_opened_output_commitment_tallies: passed.')
 

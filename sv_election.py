@@ -208,16 +208,14 @@ class Election:
         race_ids = [race_id for (race_id, choices) in ballot_style]
         assert len(race_ids) == len(set(race_ids))
 
+        race_dict = dict()
         for (race_id, choices) in ballot_style:
-            self.races.append(sv_race.Race(self, race_id, choices))
-
-        race_list = []
-        for race in self.races:
-            race_list.append({"race_id": race.race_id,
-                              "choices": race.choices,
-                              "race_modulus": race.race_modulus})
+            race = sv_race.Race(self, race_id, choices)
+            self.races.append(race)
+            race_dict[race_id] = {"choices": race.choices,
+                                  "race_modulus": race.race_modulus}
         self.sbb.post("setup:races",
-                      {"ballot_style_race_list": race_list},
+                      {"ballot_style_race_list": race_dict},
                       time_stamp=False)
 
     def setup_voters(self, election, n_voters):

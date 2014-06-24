@@ -477,17 +477,9 @@ def share(secret, n, t, rand_name, M):
         for j in range(t-1, -1, -1):
             y = ((y * x) + coefs[j]) % M
         share_list.append((x, y))
+    # test output for reconstructibility
+    assert secret == lagrange(share_list, n, t, M)
     return share_list
-
-def test_share():
-    """ Test secret-sharing on a small example. """
-    init_randomness_source("test_share")
-    M = 11
-    # print(share(3,5,3,"test_share",M))
-    assert share(3, 5, 3, "test_share", M) == \
-        [(1, 1), (2, 9), (3, 5), (4, 0), (5, 5)]
-
-test_share()
 
 def lagrange(share_list, n, t, M):
     """ return secret, given enough shares.
@@ -522,6 +514,16 @@ def lagrange(share_list, n, t, M):
         assert (denominator * denominator_inverse) % M == 1
         secret = (secret + y[i] * numerator * denominator_inverse) % M
     return secret
+
+def test_share():
+    """ Test secret-sharing on a small example. """
+    init_randomness_source("test_share")
+    M = 11
+    # print(share(3,5,3,"test_share",M))
+    assert share(3, 5, 3, "test_share", M) == \
+        [(1, 1), (2, 9), (3, 5), (4, 0), (5, 5)]
+
+test_share()
 
 def test_lagrange():
     """ Test lagrange on a simple example. """
