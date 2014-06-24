@@ -518,22 +518,30 @@ def check_inputs_output_openings(sbb_dict, db):
 def check_inputs_t_value(sbb_dict, db):
     """ Check that t-values are correct for halfs that are opened. """
     for race_id in db['races']:
+        # leftright maps p-list elements to 'left' or 'right'
         leftright = sbb_dict['proof:verifier_challenges']\
                     ['challenges']['leftright'][race_id] # same for all i
-        pik_list = sbb_dict['proof:pik_for_k_in_icl']['list']
+
+        # pik_dict maps k to mapping from p_list elements to p_list elts.
+        # this is py back to px
+        pik_dict = sbb_dict['proof:pik_for_k_in_icl']['pik_dict']
         for k in db['icl']:
-            pik = None
-            for item in pik_list:
-                if item['k'] == k:
-                    pik = item['pik']
-            assert pik is not None
-            for iy in range(db['n_voters']):
-                ix = pik[iy]
-                lr = leftright[ix]        # and not iy
+            pik = pik_dict[k]
+            # icom maps i, p, to 
+            #  {ballot_id,"com(u,ru)","i","race_id","ru","u"} or
+            #  {ballot_id,"com(v,rv)","i","race_id","rv","v"} or
+            icom = sbb_dict['proof:input_check:input_openings']\
+                   ['opened_commitments'][race_id]
+
+            # t_value_dict maps p and i to {"tu":value, "tv":value}
+            t_value_dict = sbb_dict['t_values'][race_id][k]
+            for py in db['p_list']:
+                px = pik[py]
+                lr = leftright[px]        # and not py
                 assert lr == 'left' or lr == 'right'
                 # find input commitment
                 icom = db['cast_votes'][ix]
-    'TBD'
+                
 
 if __name__ == "__main__":
     filename = sys.argv[1]
