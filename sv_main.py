@@ -43,21 +43,21 @@ THE SOFTWARE.
 # end of standard MIT open-source license
 ##############################################################################
 
-import json
 import sys
 assert sys.version_info[0] == 3
 
+import sv
 import sv_election
 import sv_verifier
 
 default_election_parameters = {
-    "election_id": "test01",
+    "election_id": "default_election",
     "ballot_style":\
     [("taxes", ("yes", "no")),
      ("mayor", ("tom",
                 "rufus",
                 "****************"))],  # 16-char write-ins allowed
-    "n_voters": 3,       # voters
+    "n_voters": 1000,    # voters
     "n_reps": 4,         # (# of replicas aka 2m)
     "n_fail": 1,         # how many servers may fail
     "n_leak": 1,         # how many servers may leak
@@ -68,6 +68,8 @@ default_election_parameters = {
     # number of spaces per tab in json output (>=0, default 0)
     # setting this to 0 reduces readability of SBB output, but
     # also reduces SBB size by roughly 25%
+    # Leaving it at None makes output less readable, but even
+    # more compact, and the i/o is faster.
     "json_indent": 1
 }
 
@@ -79,9 +81,7 @@ def get_election_parameters():
     if len(sys.argv) > 1:
         election_id = sys.argv[1]
         election_parameter_filename = election_id + ".parameters.txt"
-        election_parameter_file = open(election_parameter_filename,'r')
-        election_parameters = json.load(election_parameter_file)
-        election_parameter_file.close()
+        election_parameters = sv.load(election_parameter_filename)
     return election_parameters
 
 def do_election():
@@ -93,14 +93,17 @@ def do_election():
     for key in sorted(election_parameters.keys()):
         print("    ", key, "=", election_parameters[key])
     election = sv_election.Election(election_parameters)
+
     election.run_election()
+
     sbb_filename = election_parameters["election_id"] + ".sbb.txt"
     election.sbb.print_sbb(public=True, sbb_filename=sbb_filename)
+
     print("election finished.")
     print()
     print("beginning verification...")
     sv_verifier.verify(sbb_filename)
-    print("done.")
+    print("done. (", election_parameters['election_id'], ")")
 
 if __name__ == "__main__":
     # import cProfile

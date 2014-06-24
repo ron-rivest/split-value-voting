@@ -40,6 +40,7 @@ THE SOFTWARE.
 import base64
 import hmac
 import hashlib
+import sys
 
 ##############################################################################
 # Security parameters (key lengths)
@@ -731,3 +732,69 @@ def k_list(n_reps):
     """
     ks = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:n_reps]
     return ks
+
+##############################################################################
+# SERIALIZER
+##############################################################################
+# provide standard interface here for dump / dumps/ load, so we can experiment
+# with different serializer modules (json, cPickle, marshal, etc...) to see
+# how speed varies.
+
+######
+import json
+json_sort_keys = True
+json_indent = 0
+
+def set_json_sort_keys(new_value):
+    """ Assign new value to json_sort_keys. """
+    global json_sort_keys
+    json_sort_keys = new_value
+
+def set_json_indent(new_value):
+    """ Assign new value to json_indent. """
+    global json_indent
+    json_indent = new_value
+
+######
+import pickle
+pickle_protocol = 3
+
+SERIALIZER = "pickle"
+SERIALIZER = "json"
+
+def dump(x, filename):
+    """ Dump python data structure x to file fp. """
+    if SERIALIZER == "json":
+        if filename == None:
+            fp = sys.stdout
+        else:
+            fp = open(filename, "w")
+        json.dump(x, fp, sort_keys=json_sort_keys, indent=json_indent)
+        fp.close()
+    elif SERIALIZER == "pickle":
+        fp = open(filename, "w")
+        pickle.dump(x, fp, protocol=pickle_protocol)
+        fp.close()
+    else:
+        print("sv.py: no serializer!")
+
+def dumps(x):
+    """ Dump python data structure x to string and return string. """
+    if SERIALIZER == "json":
+        return json.dumps(x, sort_keys=json_sort_keys, indent=json_indent)
+    elif SERIALIZER == "pickle":
+        return pickle.dumps(x, protocol=pickle_protocol)
+    else:
+        print("sv.py: no serializer!")
+
+def load(filename):
+    """ Load the data structures in the file pointed to by fp. """
+    if SERIALIZER == "json":
+        fp = open(filename, "r")
+        return json.load(fp)
+        fp.close()
+    elif SERIALIZER == "pickle":
+        return pickle.load(fp, protocol=pickle_protocol)
+    else:
+        print("sv.py: no serializer!")
+

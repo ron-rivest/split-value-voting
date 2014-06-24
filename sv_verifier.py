@@ -41,6 +41,7 @@ THE SOFTWARE.
 ##############################################################################
 
 import json
+
 import sv
 import sys
 
@@ -109,8 +110,7 @@ def verify(sbb_filename):
 
     assert isinstance(sbb_filename, str) and len(sbb_filename) > 0
 
-    sbb_file = open(sbb_filename, 'r')
-    sbb = json.load(sbb_file)
+    sbb = sv.load(sbb_filename)
 
     db = dict()          # master database for storing stuff
 
@@ -231,9 +231,10 @@ def read_rows_cols_n_reps_threshold_indent(sbb_dict, db):
     db['threshold'] = threshold
     assert n_reps < 27
     db['k_list'] = sv.k_list(n_reps)
-    assert isinstance(json_indent, int)
-    assert json_indent >= 0
+    assert json_indent is None or isinstance(json_indent, int)
+    assert json_indent is None or json_indent >= 0
     db['json_indent'] = json_indent
+    sv.set_json_indent(json_indent)
     print('read_rows_cols_n_reps_threshold: successful.')
 
 def read_cast_votes(sbb_dict, db):
@@ -359,9 +360,7 @@ def read_verifier_challenges(sbb_dict, sbb, db):
     rand_name = 'verifier_challenges'
     sbb_hash = sbb_dict['proof:verifier_challenges']['sbb_hash']
     stop_before_header = 'proof:verifier_challenges'
-    sbb_hash2 = sv.bytes2hex(hash_sbb(sbb,
-                                      stop_before_header,
-                                      db['json_indent']))
+    sbb_hash2 = sv.bytes2hex(hash_sbb(sbb, stop_before_header))
     assert sbb_hash2 == sbb_hash
     sv.init_randomness_source(rand_name, sv.hex2bytes(sbb_hash))
     pi = sv.random_permutation(db['n_reps'], rand_name)
@@ -395,7 +394,7 @@ def make_left_right_challenges(rand_name, db):
         leftright_dict[race_id] = leftright
     return leftright_dict
 
-def hash_sbb(sbb, stop_before_header, json_indent):
+def hash_sbb(sbb, stop_before_header):
     """ Return a (tweaked) hash of the sbb contents, including
         all items up to (but not including) the item with header
         equal to stop_before_header. (Copied from sv_prover.py)
@@ -406,7 +405,7 @@ def hash_sbb(sbb, stop_before_header, json_indent):
             break
         else:
             sbb_trunc.append(item)
-    sbb_trunc_str = json.dumps(sbb_trunc, sort_keys=True, indent=json_indent)
+    sbb_trunc_str = sv.dumps(sbb_trunc)
     hash_tweak = 2
     return sv.secure_hash(sbb_trunc_str, hash_tweak)
 

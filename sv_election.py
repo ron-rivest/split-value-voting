@@ -83,6 +83,8 @@ class Election:
         # optional parameters (with defaults)
         ballot_id_len = election_parameters.get("ballot_id_len", 32)
         json_indent = election_parameters.get("json_indent", 0)
+        self.json_indent = json_indent
+        sv.set_json_indent(json_indent)
 
         # check and save parameters
         assert isinstance(election_id, str) and len(election_id) > 0
@@ -116,10 +118,6 @@ class Election:
         assert ballot_id_len > 0
         self.ballot_id_len = ballot_id_len
 
-        assert json_indent >= 0
-        self.json_indent = json_indent
-
-
         about_text = \
         ["Secure Bulletin Board for Split-Value Voting Method Demo.",
          "by Michael O. Rabin and Ronald L. Rivest",
@@ -143,7 +141,7 @@ class Election:
          "      dividing up the lists into two sub-lists."
         ]
         # start secure bulletin board
-        self.sbb = sv_sbb.SBB(election_id, json_indent)
+        self.sbb = sv_sbb.SBB(election_id)
         self.sbb.post("setup:start",
                       {"about": about_text,
                        "election_id": election_id,

@@ -32,7 +32,6 @@ THE SOFTWARE.
 # end of standard MIT open-source license
 ##############################################################################
 
-import json
 import sys
 import time
 
@@ -48,13 +47,12 @@ class SBB:
     might be posted here that would not be posted in real election.
     """
 
-    def __init__(self, election_id, json_indent):
+    def __init__(self, election_id):
         """ Initialize (simulated) secure bulletin board.
         """
 
         self.board = []               # list of posted messages
         self.closed = False
-        self.json_indent = json_indent
         self.start_time = time.time()
         self.post("sbb:open", {"election_id": election_id})
 
@@ -98,24 +96,22 @@ class SBB:
         """
 
         if sbb_filename is None:
-            sbb_file = sys.stdout
-        else:
-            sbb_file = open(sbb_filename, "w")
-
-        if sbb_file is not sys.stdout:
-            print("Saving contents of secure bulletin board...")
-        else:
             print("Contents of secure bulletin board:")
+        else:
+            print("Saving contents of secure bulletin board...")
 
-        if not public and sbb_file is sys.stdout:
-            print("(lines w/ header in parens are not part of public SBB).")
+        # if not public and sbb_file is sys.stdout:
+        #     print("(lines w/ header in parens are not part of public SBB).")
+
         board = self.board
-        if public:
-            board = [item for item in board if item[0][0] != "("]
 
-        json_indent = self.json_indent
-        json.dump(board, sbb_file, sort_keys=True, indent=json_indent)
-        if sbb_file is not sys.stdout:
+        # following not needed in current code:
+        if False:
+            if public:
+                board = [item for item in board if item[0][0] != "("]
+
+        sv.dump(board, sbb_filename)
+        if sbb_filename is not None:
             print("Secure bulletin board saved on file:", sbb_filename)
 
     def hash_sbb(self, public):
@@ -126,8 +122,7 @@ class SBB:
         if False:
             if public:
                 board = [item for item in board if item[0][0] != "("]
-        json_indent = self.json_indent
-        board_str = json.dumps(board, sort_keys=True, indent=json_indent)
+        board_str = sv.dumps(board)
         hash_tweak = 2
         return sv.secure_hash(board_str, hash_tweak)
 
