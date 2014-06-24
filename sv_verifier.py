@@ -253,17 +253,20 @@ def read_cast_votes(sbb_dict, db):
         assert len(cast_vote_race) == db['n_voters']
         for p in cast_vote_race.keys():
             cast_vote_race_p = cast_vote_race[p]
-            assert isdict(cast_vote_race_p, ['ballot_id', 'pair_dict'])
-            ballot_id = cast_vote_race_p['ballot_id']
-            assert isinstance(ballot_id, str)
-            ballot_id_dict[race_id].append(ballot_id)
-            ballot_id_list.append(ballot_id)
-            for i in cast_vote_race_p['pair_dict']:
-                pair = cast_vote_race_p['pair_dict'][i]
-                assert isinstance(pair, list)
-                assert len(pair) == 2
-                assert isinstance(pair[0], str)
-                assert isinstance(pair[1], str)
+            assert isdict(cast_vote_race_p, db['row_list'])
+            for i in db['row_list']:
+                assert isdict(cast_vote_race_p[i], ['ballot_id', 'cu', 'cv'])
+                if i == db['row_list'][0]:
+                    ballot_id = cast_vote_race_p[i]['ballot_id']
+                    assert isinstance(ballot_id, str)
+                    ballot_id_dict[race_id].append(ballot_id)
+                    ballot_id_list.append(ballot_id)
+                else:
+                    assert ballot_id == cast_vote_race_p[i]['ballot_id']
+                cu = cast_vote_race_p[i]['cu']
+                assert isinstance(cu, str)
+                cv = cast_vote_race_p[i]['cv']
+                assert isinstance(cv, str)
     # next line checks that ballot id's are distinct
     assert len(set(ballot_id_list)) == len(ballot_id_list)
     db['ballot_id_dict'] = ballot_id_dict
@@ -295,12 +298,11 @@ def read_output_commitments(sbb_dict, db):
             for p in db['p_list']:
                 assert isdict(coms[race_id][k][p], db['row_list'])
                 for i in db['row_list']:
-                    assert isdict(coms[race_id][k][p][i], ['pair'])
-                    pair = coms[race_id][k][p][i]['pair']
-                    assert isinstance(pair, list)
-                    assert len(pair) == 2
-                    assert isinstance(pair[0], str)
-                    assert isinstance(pair[1], str)
+                    assert isdict(coms[race_id][k][p][i], ['cu', 'cv'])
+                    cu = coms[race_id][k][p][i]['cu']
+                    cv = coms[race_id][k][p][i]['cv']
+                    assert isinstance(cu, str)
+                    assert isinstance(cv, str)
     db['output_commitments'] = coms
     print('read_output_commitments: successful.')
 
@@ -425,11 +427,11 @@ def check_opened_output_commitments(sbb_dict, db):
                 assert isdict(coms[race_id][k][p], db['row_list'])
                 for i in db['row_list']:
                     assert isdict(coms[race_id][k][p][i],
-                                  ['pair', 'ru', 'rv', 'u', 'v', 'y'])
-                    pair = coms[race_id][k][p][i]['pair']
-                    assert len(pair) == 2
-                    assert isinstance(pair[0], str)
-                    assert isinstance(pair[1], str)
+                                  ['cu', 'cv', 'ru', 'rv', 'u', 'v', 'y'])
+                    cu = coms[race_id][k][p][i]['cu']
+                    cv = coms[race_id][k][p][i]['cv']
+                    assert isinstance(cu, str)
+                    assert isinstance(cv, str)
                     ru = coms[race_id][k][p][i]['ru']
                     assert isinstance(ru, str)
                     rv = coms[race_id][k][p][i]['rv']
@@ -444,8 +446,8 @@ def check_opened_output_commitments(sbb_dict, db):
                     assert isinstance(y, int) and \
                         0 <= y < db['races'][race_id]['race_modulus']
                     assert y == (u+v) % db['races'][race_id]['race_modulus']
-                    assert pair[0] == sv.com(u, ru)
-                    assert pair[1] == sv.com(v, rv)
+                    assert cu == sv.com(u, ru)
+                    assert cv == sv.com(v, rv)
     print('check_opened_output_commitments: passed.')
 
 def check_opened_output_commitment_tallies(sbb_dict, db):

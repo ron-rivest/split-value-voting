@@ -84,14 +84,16 @@ def make_full_output(election):
                     (u, v) = sv.get_sv_pair(y, rand_name, race_modulus)
                     ru = sv.bytes2base64(sv.get_random_from_source(rand_name))
                     rv = sv.bytes2base64(sv.get_random_from_source(rand_name))
-                    pair = (sv.com(u, ru), sv.com(v, rv))
+                    cu = sv.com(u, ru)
+                    cv = sv.com(v, rv)
                     sdbp['u'][py] = u
                     sdbp['v'][py] = v
                     sdbp['ru'][py] = ru
                     sdbp['rv'][py] = rv
-                    sdbp['pair'][py] = pair
+                    sdbp['cu'][py] = cu
+                    sdbp['cv'][py] = cv
                     ballot = {'y': y, 'u': u, 'v': v,
-                              'ru': ru, 'rv': rv, 'pair': pair}
+                              'ru': ru, 'rv': rv, 'cu': cu, 'cv': cv}
                     full_output[race_id][k][py][i] = ballot
     election.full_output = full_output
 
@@ -99,7 +101,7 @@ def post_output_commitments(election):
     """ Post output votes onto SBB. """
     full_output = election.full_output
     coms = dict()
-    # same as full_output, but only giving non-secret values (i.e. pairs)
+    # same as full_output, but only giving non-secret values (i.e. cu, cv)
     for race in election.races:
         race_id = race.race_id
         coms[race_id] = dict()
@@ -109,7 +111,8 @@ def post_output_commitments(election):
                 coms[race_id][k][py] = dict()
                 for i in election.server.row_list:
                     coms[race_id][k][py][i] = \
-                        {'pair': full_output[race_id][k][py][i]['pair']}
+                        {'cu': full_output[race_id][k][py][i]['cu'],
+                         'cv': full_output[race_id][k][py][i]['cv']}
     election.output_commitments = coms
     election.sbb.post("proof:all_output_commitments",
                       {"commitments": coms},
@@ -255,15 +258,16 @@ def prove_outcome_correct(election, challenges):
                     v = election.server.sdb[race_id][i][cols-1][k]['v'][py]
                     ru = election.server.sdb[race_id][i][cols-1][k]['ru'][py]
                     rv = election.server.sdb[race_id][i][cols-1][k]['rv'][py]
-                    pair = election.server.sdb[race_id][i][cols-1][k]\
-                                                       ['pair'][py]
+                    cu = election.server.sdb[race_id][i][cols-1][k]['cu'][py]
+                    cv = election.server.sdb[race_id][i][cols-1][k]['cv'][py]
                     opened[race_id][k][py][i] = \
                         {"y": y,
                          "u": u,
                          "v": v,
                          "ru": ru,
                          "rv": rv,
-                         "pair": pair}
+                         "cu": cu,
+                         "cv": cv}
     election.sbb.post("proof:outcome_check:opened_output_commitments",
                       {"opened_commitments": opened},
                       time_stamp=False)
@@ -339,19 +343,20 @@ def make_dict_of_input_commitment_pairs(election, race_id, i):
         v = vote['v']
         ru = vote['ru']
         rv = vote['rv']
-        pair = vote['pair']
+        cu = vote['cu']
+        cv = vote['cv']
         ucom = {"race_id": race_id,
                 "ballot_id": ballot_id,
                 "i": i,
                 "u": u,
                 "ru": ru,
-                "com(u,ru)": pair[0]}
+                "cu": cu}
         vcom = {"race_id": race_id,
                 "ballot_id": ballot_id,
                 "i": i,
                 "v": v,
                 "rv": rv,
-                "com(v,rv)": pair[1]}
+                "cv": cv}
         coms[p] = (ucom, vcom)
     return coms
 
@@ -371,13 +376,13 @@ def make_dict_of_output_commitment_pairs(election, race, i, k):
                 "i": i,
                 "u": sdbp[race_id][i][cols-1][k]['u'][py],
                 "ru": sdbp[race_id][i][cols-1][k]['ru'][py],
-                "com(u,ru)": sdbp[race_id][i][cols-1][k]['pair'][py][0]}
+                "cu": sdbp[race_id][i][cols-1][k]['cu'][py]}
         vcom = {"race_id": race_id,
                 "py": py,
                 "i": i,
                 "v": sdbp[race_id][i][cols-1][k]['v'][py],
                 "rv": sdbp[race_id][i][cols-1][k]['rv'][py],
-                "com(v,rv)": sdbp[race_id][i][cols-1][k]['pair'][py][1]}
+                "cv": sdbp[race_id][i][cols-1][k]['cv'][py]}
         dict_of_output_commitment_pairs[py] = (ucom, vcom)
     # next is to permute it back into same order as input lists
     for j in range(cols-1, -1, -1):

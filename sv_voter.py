@@ -99,10 +99,11 @@ def cast_votes(election):
                 (u, v) = sv.get_sv_pair(x, rand_name, race_modulus)
                 ru = sv.bytes2base64(sv.get_random_from_source(rand_name))
                 rv = sv.bytes2base64(sv.get_random_from_source(rand_name))
-                pair = [sv.com(u, ru), sv.com(v, rv)]
+                cu = sv.com(u, ru)
+                cv = sv.com(v, rv)
                 i = election.server.row_list[row]
                 vote = {"ballot_id": ballot_id, "x": x, "u": u, "v": v,
-                        "ru": ru, "rv": rv, "pair": pair}
+                        "ru": ru, "rv": rv, "cu": cu, "cv": cv}
                 cvs[race_id][px][i] = vote
     election.cast_votes = cvs
 
@@ -123,7 +124,8 @@ def distribute_cast_votes(election):
                 sdbp['v'][px] = vote['v']
                 sdbp['ru'][px] = vote['ru']
                 sdbp['rv'][px] = vote['rv']
-                sdbp['cast_votes'][px] = vote['pair']
+                sdbp['cu'][px] = vote['cu']
+                sdbp['cv'][px] = vote['cv']
 
 def post_cast_vote_commitments(election):
     """ Post cast vote commitments onto SBB. """
@@ -133,12 +135,14 @@ def post_cast_vote_commitments(election):
         cvcs[race_id] = dict()
         for px in election.p_list:
             cvcs[race_id][px] = dict()
-            cvcs[race_id][px]['pair_dict'] = dict()
             for i in election.server.row_list:
-                cvcs[race_id][px]['ballot_id'] = \
+                cvcs[race_id][px][i] = dict()
+                cvcs[race_id][px][i]['ballot_id'] = \
                     cvs[race_id][px][i]['ballot_id']
-                cvcs[race_id][px]['pair_dict'][i] = \
-                    cvs[race_id][px][i]['pair']
+                cvcs[race_id][px][i]['cu'] = \
+                    cvs[race_id][px][i]['cu']
+                cvcs[race_id][px][i]['cv'] = \
+                    cvs[race_id][px][i]['cv']
     election.sbb.post("casting:votes",
                       {"cast_vote_dict": cvcs},
                       time_stamp=False)

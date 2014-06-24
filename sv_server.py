@@ -119,7 +119,8 @@ class Server():
                 # first-column lists for storing cast votes and secrets
                 sdbp = self.sdb[race_id][i][0]
                 sdbp['ballot_id'] = dict()   # ballot_id (indices from p_list)
-                sdbp['cast_votes'] = dict()  # (com(u),com(v)) pairs
+                sdbp['cu'] = dict()          # commitments to u
+                sdbp['cv'] = dict()          # commitments to v
                 sdbp['x'] = dict()           # choice x, where x = u+v mod M
                 sdbp['u'] = dict()           # u
                 sdbp['v'] = dict()           # v
@@ -140,7 +141,8 @@ class Server():
                     sdbp['v'] = dict()
                     sdbp['ru'] = dict()
                     sdbp['rv'] = dict()
-                    sdbp['pair'] = dict()
+                    sdbp['cu'] = dict()
+                    sdbp['cv'] = dict()
         # post on log that server array is set up
         election.sbb.post("setup:server-array",
                           {"rows": rows, "cols": cols,
