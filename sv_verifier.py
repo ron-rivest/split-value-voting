@@ -442,10 +442,10 @@ def check_opened_output_commitments(sbb_dict, db):
                     assert isinstance(y, int) and \
                         0 <= y < db['races'][race_id]['race_modulus']
                     assert y == (u+v) % db['races'][race_id]['race_modulus']
-                    cu = sbb_dict['proof:all_output_commitments']['commitments']\
-                         [race_id][k][p][i]['cu']
-                    cv = sbb_dict['proof:all_output_commitments']['commitments']\
-                         [race_id][k][p][i]['cv']
+                    cu = sbb_dict['proof:all_output_commitments']\
+                         ['commitments'][race_id][k][p][i]['cu']
+                    cv = sbb_dict['proof:all_output_commitments']\
+                         ['commitments'][race_id][k][p][i]['cv']
                     assert cu == sv.com(u, ru)
                     assert cv == sv.com(v, rv)
     print('check_opened_output_commitments: passed.')
@@ -508,6 +508,7 @@ def check_inputs_pik(sbb_dict, db):
 
 def check_inputs_outputs_openings(sbb_dict, db):
     """ Check input openings for testing consistency with output openings. """
+
     coms = sbb_dict['proof:input_check:input_openings']['opened_commitments']
     for race_id in db['race_ids']:
         for k in db['icl']:

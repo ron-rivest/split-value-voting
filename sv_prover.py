@@ -339,25 +339,14 @@ def make_dict_of_input_commitment_pairs(election, race_id, i):
     coms = dict()
     for p in election.p_list:
         vote = election.cast_votes[race_id][p][i]
-        ballot_id = vote['ballot_id']
         u = vote['u']
         v = vote['v']
         ru = vote['ru']
         rv = vote['rv']
-        cu = vote['cu']
-        cv = vote['cv']
-        ucom = {"race_id": race_id,
-                "ballot_id": ballot_id,
-                "i": i,
-                "u": u,
-                "ru": ru,
-                "cu": cu}
-        vcom = {"race_id": race_id,
-                "ballot_id": ballot_id,
-                "i": i,
-                "v": v,
-                "rv": rv,
-                "cv": cv}
+        ucom = {"u": u,
+                "ru": ru}
+        vcom = {"v": v,
+                "rv": rv}
         coms[p] = (ucom, vcom)
     return coms
 
@@ -372,18 +361,10 @@ def make_dict_of_output_commitment_pairs(election, race, i, k):
     dict_of_output_commitment_pairs = dict()
     sdbp = election.server.sdb
     for py in election.p_list:
-        ucom = {"race_id": race_id,
-                "py": py,
-                "i": i,
-                "u": sdbp[race_id][i][cols-1][k]['u'][py],
-                "ru": sdbp[race_id][i][cols-1][k]['ru'][py],
-                "cu": sdbp[race_id][i][cols-1][k]['cu'][py]}
-        vcom = {"race_id": race_id,
-                "py": py,
-                "i": i,
-                "v": sdbp[race_id][i][cols-1][k]['v'][py],
-                "rv": sdbp[race_id][i][cols-1][k]['rv'][py],
-                "cv": sdbp[race_id][i][cols-1][k]['cv'][py]}
+        ucom = {"u": sdbp[race_id][i][cols-1][k]['u'][py],
+                "ru": sdbp[race_id][i][cols-1][k]['ru'][py]}
+        vcom = {"v": sdbp[race_id][i][cols-1][k]['v'][py],
+                "rv": sdbp[race_id][i][cols-1][k]['rv'][py]}
         dict_of_output_commitment_pairs[py] = (ucom, vcom)
     # next is to permute it back into same order as input lists
     for j in range(cols-1, -1, -1):
