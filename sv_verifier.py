@@ -427,11 +427,7 @@ def check_opened_output_commitments(sbb_dict, db):
                 assert isdict(coms[race_id][k][p], db['row_list'])
                 for i in db['row_list']:
                     assert isdict(coms[race_id][k][p][i],
-                                  ['cu', 'cv', 'ru', 'rv', 'u', 'v', 'y'])
-                    cu = coms[race_id][k][p][i]['cu']
-                    cv = coms[race_id][k][p][i]['cv']
-                    assert isinstance(cu, str)
-                    assert isinstance(cv, str)
+                                  ['ru', 'rv', 'u', 'v', 'y'])
                     ru = coms[race_id][k][p][i]['ru']
                     assert isinstance(ru, str)
                     rv = coms[race_id][k][p][i]['rv']
@@ -446,6 +442,10 @@ def check_opened_output_commitments(sbb_dict, db):
                     assert isinstance(y, int) and \
                         0 <= y < db['races'][race_id]['race_modulus']
                     assert y == (u+v) % db['races'][race_id]['race_modulus']
+                    cu = sbb_dict['proof:all_output_commitments']['commitments']\
+                         [race_id][k][p][i]['cu']
+                    cv = sbb_dict['proof:all_output_commitments']['commitments']\
+                         [race_id][k][p][i]['cv']
                     assert cu == sv.com(u, ru)
                     assert cv == sv.com(v, rv)
     print('check_opened_output_commitments: passed.')
@@ -529,7 +529,7 @@ def check_inputs_t_value(sbb_dict, db):
         pik_dict = sbb_dict['proof:pik_for_k_in_icl']['pik_dict']
         for k in db['icl']:
             pik = pik_dict[k]
-            # icom maps i, p, to 
+            # icom maps i, p, to
             #  {ballot_id,"com(u,ru)","i","race_id","ru","u"} or
             #  {ballot_id,"com(v,rv)","i","race_id","rv","v"} or
             icom = sbb_dict['proof:input_check:input_openings']\
@@ -543,7 +543,7 @@ def check_inputs_t_value(sbb_dict, db):
                 assert lr == 'left' or lr == 'right'
                 # find input commitment
                 icom = db['cast_votes'][ix]
-                
+
 
 if __name__ == "__main__":
     filename = sys.argv[1]

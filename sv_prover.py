@@ -258,16 +258,17 @@ def prove_outcome_correct(election, challenges):
                     v = election.server.sdb[race_id][i][cols-1][k]['v'][py]
                     ru = election.server.sdb[race_id][i][cols-1][k]['ru'][py]
                     rv = election.server.sdb[race_id][i][cols-1][k]['rv'][py]
-                    cu = election.server.sdb[race_id][i][cols-1][k]['cu'][py]
-                    cv = election.server.sdb[race_id][i][cols-1][k]['cv'][py]
+                    # cu, cv already given in output commitments
+                    # so we only need to supply opening values here
+                    # cu = election.server.sdb[race_id][i][cols-1][k]['cu'][py]
+                    # cv = election.server.sdb[race_id][i][cols-1][k]['cv'][py]
                     opened[race_id][k][py][i] = \
                         {"y": y,
                          "u": u,
                          "v": v,
                          "ru": ru,
-                         "rv": rv,
-                         "cu": cu,
-                         "cv": cv}
+                         "rv": rv
+                        }
     election.sbb.post("proof:outcome_check:opened_output_commitments",
                       {"opened_commitments": opened},
                       time_stamp=False)
