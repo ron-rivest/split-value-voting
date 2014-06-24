@@ -56,7 +56,7 @@ HEADER_LIST = ['sbb:open',
                'proof:all_output_commitments',
                'proof:t_values_for_all_output_commitments',
                'proof:verifier_challenges',
-               'proof:outcome_check:opened_output_commitments',
+               'proof:outcome_check',
                'proof:input_check:input_openings',
                'proof:input_check:output_openings',
                'proof:input_check:pik_for_k_in_icl',
@@ -77,8 +77,8 @@ ATTRIBUTES = {'sbb:open': ['election_id', 'time_iso8601'],
               'proof:all_output_commitments': ['commitments'],
               'proof:t_values_for_all_output_commitments': ['t_values'],
               'proof:verifier_challenges': ['challenges', 'sbb_hash'],
-              'proof:outcome_check:opened_output_commitments':
-                  ['opened_commitments'],
+              'proof:outcome_check':
+                  ['opened_output_commitments'],
               'proof:input_check:input_openings': ['opened_commitments'],
               'proof:input_check:output_openings': ['opened_commitments'],
               'proof:input_check:pik_for_k_in_icl': ['pik_dict'],
@@ -416,8 +416,8 @@ def check_opened_output_commitments(sbb_dict, db):
           that are posted.
     """
     coms = \
-        sbb_dict['proof:outcome_check:opened_output_commitments']\
-                ['opened_commitments']
+        sbb_dict['proof:outcome_check']\
+                ['opened_output_commitments']
     assert isdict(coms, db['race_ids'])
     for race_id in db['race_ids']:
         assert isdict(coms[race_id], db['opl'])
@@ -455,8 +455,8 @@ def check_opened_output_commitment_tallies(sbb_dict, db):
         and tally to values given in tally.
     """
     opened_coms = \
-        sbb_dict['proof:outcome_check:opened_output_commitments']\
-                ['opened_commitments']
+        sbb_dict['proof:outcome_check']\
+                ['opened_output_commitments']
     for k in db['opl']:
         # verify tally for this pass/copy k
         tally_k = dict()

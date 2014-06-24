@@ -269,8 +269,8 @@ def prove_outcome_correct(election, challenges):
                          "ru": ru,
                          "rv": rv
                         }
-    election.sbb.post("proof:outcome_check:opened_output_commitments",
-                      {"opened_commitments": opened},
+    election.sbb.post("proof:outcome_check",
+                      {"opened_output_commitments": opened},
                       time_stamp=False)
 
 ##############################################################################

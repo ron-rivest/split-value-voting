@@ -51,7 +51,7 @@ def do_election():
     election_parameters = {
         "election_id": "test01",
         "ballot_style":\
-            [("taxes", ("yes", "no")),
+            [# ("taxes", ("yes", "no")),
              ("mayor", ("tom",
                         "rufus",
                         "****************"))],  # 16-char write-ins allowed
