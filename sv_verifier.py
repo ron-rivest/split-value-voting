@@ -411,8 +411,9 @@ def hash_sbb(sbb, stop_before_header, json_indent):
     return sv.secure_hash(sbb_trunc_str, hash_tweak)
 
 def check_opened_output_commitments(sbb_dict, db):
-    """ Check that opened output commitments are consistent with each other
-        and with claimed output tally.
+    """ Check that opened output commitments open correctly.
+    TODO: ensure that all such necessary checks are done, not just for ones
+          that are posted.
     """
     coms = \
         sbb_dict['proof:outcome_check:opened_output_commitments']\
@@ -461,7 +462,8 @@ def check_opened_output_commitment_tallies(sbb_dict, db):
         tally_k = dict()
         for race_id in db['race_ids']:
             tally_k[race_id] = dict()  # choices to counts
-            for choice in sbb_dict['setup:races']['ballot_style_race_dict'][race_id]['choices']:
+            for choice in sbb_dict['setup:races']\
+                ['ballot_style_race_dict'][race_id]['choices']:
                 if choice[0] != '*':
                     tally_k[race_id][choice] = 0
             for p in db['p_list']:
