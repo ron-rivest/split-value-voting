@@ -1,0 +1,1970 @@
+[
+ [
+  "sbb:open",
+  {
+   "election_id": "default_election",
+   "time": "2014-06-25T00:15:38-0400"
+  }
+ ],
+ [
+  "setup:start",
+  {
+   "about": [
+    "Secure Bulletin Board for Split-Value Voting Method Demo.",
+    "by Michael O. Rabin and Ronald L. Rivest",
+    "For paper: see http://people.csail.mit.edu/rivest/pubs.html#RR14a",
+    "For code: see https://github.com/ron-rivest/split-value-voting"
+   ],
+   "election_id": "default_election",
+   "legend": [
+    "Indices between 0 and n_voters-1 indicated by p0, p1, ...",
+    "Rows of server array indicated by a, b, c, d, ...",
+    "Copies (n_reps = 2m passes) indicated by A, B, C, D, ...",
+    "'********' in ballot style indicates a write-in option",
+    "           (number of stars is max write-in length)",
+    "Values represented are represented modulo race_modulus.",
+    "'x' (or 'y') equals u+v (mod race_modulus),",
+    "             and is a (Shamir-)share of the vote.",
+    "'cu' and 'cv' are commitments to u and v, respectively.",
+    "'ru' and 'rv' are randomization values for cu and cv.",
+    "'icl' stands for 'input comparison list',",
+    "'opl' for 'output production list';",
+    "      these are the 'cut-and-choose' results",
+    "      dividing up the lists into two sub-lists.",
+    "'time' is time in ISO 8601 format."
+   ],
+   "time": "2014-06-25T00:15:38-0400"
+  }
+ ],
+ [
+  "setup:races",
+  {
+   "ballot_style_race_dict": {
+    "mayor": {
+     "choices": [
+      "tom",
+      "rufus",
+      "****************"
+     ],
+     "race_modulus": 340282366920938463463374607431768211507
+    },
+    "taxes": {
+     "choices": [
+      "yes",
+      "no"
+     ],
+     "race_modulus": 16777259
+    }
+   }
+  }
+ ],
+ [
+  "setup:voters",
+  {
+   "ballot_id_len": 32,
+   "n_voters": 3
+  }
+ ],
+ [
+  "setup:server-array",
+  {
+   "cols": 2,
+   "json_indent": 1,
+   "n_reps": 4,
+   "rows": 4,
+   "threshold": 3
+  }
+ ],
+ [
+  "setup:finished",
+  {
+   "time": "2014-06-25T00:15:38-0400"
+  }
+ ],
+ [
+  "casting:votes",
+  {
+   "cast_vote_dict": {
+    "mayor": {
+     "p0": {
+      "a": {
+       "ballot_id": "4bd6eff18fa17e8d38032ac4cfd8f15a",
+       "cu": "rB2WTAVu+K+R6YV+i5hw2CX6cUylRGbf11Y7Tux+4C8=",
+       "cv": "7ikNw3DIFbJ2kJylGaWaeDECogFSumQyGm8j1+yRNw0="
+      },
+      "b": {
+       "ballot_id": "4bd6eff18fa17e8d38032ac4cfd8f15a",
+       "cu": "/4Tg32w8r8qv2LQX+elJ2R5Mhdi7Y7KOmQD2M7euBQ4=",
+       "cv": "nozqEICAUEoITQYZDiu+fSHra6kD+LTSF6aepB/wcIY="
+      },
+      "c": {
+       "ballot_id": "4bd6eff18fa17e8d38032ac4cfd8f15a",
+       "cu": "nbp574XW46CPdQLnD8lVhCDpBDQFCZppvmoy9PoRncc=",
+       "cv": "OYKs/xv+wLBKhvDVRMXo0gxW9EzhjKUO7P2orW5DPQM="
+      },
+      "d": {
+       "ballot_id": "4bd6eff18fa17e8d38032ac4cfd8f15a",
+       "cu": "DdQKLk2YXrSpH7MgbnkI9ziNKfl4Oq4Jm/yRdJ5HC1I=",
+       "cv": "yFBZt4UktL2jv03MfWqKlwjiAniQykYj8NZesWSVGRQ="
+      }
+     },
+     "p1": {
+      "a": {
+       "ballot_id": "958fa1a4160c11c0e2db8c24df1036b3",
+       "cu": "GGxOdUGap0qlB4FlpVkioR/+82RVLrN90c76BhP91Nw=",
+       "cv": "FHWcOLLnQ0U/5r8UF3U0WSZp5K4iUupP6qN8hmPsprI="
+      },
+      "b": {
+       "ballot_id": "958fa1a4160c11c0e2db8c24df1036b3",
+       "cu": "atEXseWAnQ9rLC4BicVbvpsWdGOHImZEHbdcv4YYbp4=",
+       "cv": "JdcqYcyxONhm7KLAw4QHd6B8GLbpYSEYZrI5l0HqWp4="
+      },
+      "c": {
+       "ballot_id": "958fa1a4160c11c0e2db8c24df1036b3",
+       "cu": "57PTZPKXXCxQhDf0SlMro+ZAVpEqbIUbaQpl59bj8gk=",
+       "cv": "U9CUTUZrsygTMG+vabjKIgKktlFQFs0ScLm264h5LuE="
+      },
+      "d": {
+       "ballot_id": "958fa1a4160c11c0e2db8c24df1036b3",
+       "cu": "xAeqM791WUFmVyw3VHY8IIz/IqZ0cOzjA/K9wLfN6EQ=",
+       "cv": "6bhpaBHvZfZmzH4BcHhocxrBpcI0uzkp40WpSdUh8Zk="
+      }
+     },
+     "p2": {
+      "a": {
+       "ballot_id": "2e00b36937b2be89c9ac649934327783",
+       "cu": "2YHugRFyhBoI+54tSG9F3ifHqZDrx7PG42ZLlIFyxqo=",
+       "cv": "wn6ohs5kYeJAHcGLg4ywm9cHWwM+QKZlrgTzjCHF8m8="
+      },
+      "b": {
+       "ballot_id": "2e00b36937b2be89c9ac649934327783",
+       "cu": "DWa3I/zbx074ZhiHrlQDr7GeKpOnXIVXCN4P6eOF5V0=",
+       "cv": "KYlXibxAfd4miUGZmEwpM/+Mme598Egz3891PDslTA8="
+      },
+      "c": {
+       "ballot_id": "2e00b36937b2be89c9ac649934327783",
+       "cu": "3dJyYF50QFH2QT6DKux9QXjMPQVIcrz/dYlfL8CXDDw=",
+       "cv": "muUYWOscELj4WXx+LSZKoHrETYmUs5q0giMdGW8Nz34="
+      },
+      "d": {
+       "ballot_id": "2e00b36937b2be89c9ac649934327783",
+       "cu": "VzA6/3oD5SKQUNtVMS21pLoUwKkOSiCgwNai555oVwA=",
+       "cv": "fHS7gpANaJY1vSQbcB4qGHnHgmIDD2a1UmLI8R2nqdU="
+      }
+     }
+    },
+    "taxes": {
+     "p0": {
+      "a": {
+       "ballot_id": "1c0aefcfd67ed98d776c05ed6e521607",
+       "cu": "rLnkKVgGRNgd8Psp8A/2v5+Ou0XbyxorJCw7ecCPCT8=",
+       "cv": "0jB8YL4pjk5TpxCo/M47Cakyknk/lpzuHQCkG15SN2Q="
+      },
+      "b": {
+       "ballot_id": "1c0aefcfd67ed98d776c05ed6e521607",
+       "cu": "Q2LG6ZXRzpsdvchryGdSraRNHclCEApF7J6DFY/bt0g=",
+       "cv": "dx1TiX0PFhZl9qDWXPFQpn2eBsWXMk/nxYCuY/4B4Hc="
+      },
+      "c": {
+       "ballot_id": "1c0aefcfd67ed98d776c05ed6e521607",
+       "cu": "TSXJjsG/Ep0GhAPNENQvT/sTuLQP1Cb/0iGLo5bzknE=",
+       "cv": "ONId6l4Ul7dVizXcd3a/agy4JvkO9PqZCQkgN3Y6H6g="
+      },
+      "d": {
+       "ballot_id": "1c0aefcfd67ed98d776c05ed6e521607",
+       "cu": "IVu9TFYklm0DQb8UfCZEoP7T2dq5rFV7MLrbuIdaDfA=",
+       "cv": "fVN/Xd/89ZP1HWo8E4gVMYSPfssyOkbHMJgjjkAo9aE="
+      }
+     },
+     "p1": {
+      "a": {
+       "ballot_id": "710befc1d22b20c858f30e63aeaed9cb",
+       "cu": "/uRvGoHNneDmDaaOasrUQP/9A4F+mdWa569eOpuYows=",
+       "cv": "8dF1FgErHgwFa2w0MSIcUNSzt+NYXHGu7gvPX1YiGiM="
+      },
+      "b": {
+       "ballot_id": "710befc1d22b20c858f30e63aeaed9cb",
+       "cu": "pYSErCkIgNHtlLSwcAg2zQg6/ksxroEew5Gva4pizHc=",
+       "cv": "ECZAZncGD5pK5fNdlfEOe91VRBkayBK+4at7JGfGOFQ="
+      },
+      "c": {
+       "ballot_id": "710befc1d22b20c858f30e63aeaed9cb",
+       "cu": "HGPXoIkyCoLDh6jM1Iv1eHSzMS5t4A1ecuXf8ojCWt0=",
+       "cv": "ei6mtAF4sJbi3eyUZ9c/9LuOxxeK94tJRs5kNgRQG3Q="
+      },
+      "d": {
+       "ballot_id": "710befc1d22b20c858f30e63aeaed9cb",
+       "cu": "HyAErBuIGBfJYnzCED5olyJnMjGJzAKoxo1EKuj158s=",
+       "cv": "nQUf00jHnryQmjbh90k8QbxgbpYAwg5VPN7kbkGbSQ4="
+      }
+     },
+     "p2": {
+      "a": {
+       "ballot_id": "51d9fada2fe22c36c7034cadf9c0db98",
+       "cu": "PE101bSHeiG6RPcmX9QIlDnA7XsZHxaSJ0wMXjhVvlA=",
+       "cv": "LYPMD7hsz1DmjtdFfKYHOJgcPxC90cRrPrrseA13nf8="
+      },
+      "b": {
+       "ballot_id": "51d9fada2fe22c36c7034cadf9c0db98",
+       "cu": "pS3S/43PJzD60lBURZpLCkovYoxr39J4aX4eLjYoP+U=",
+       "cv": "y0pauD5pylZmSx29JPoLUuxpD5MLpMQRUXlaYq1wMA0="
+      },
+      "c": {
+       "ballot_id": "51d9fada2fe22c36c7034cadf9c0db98",
+       "cu": "QDH1vTityezrNah9vQO50B6dfflkygtrdqMfH8tsozE=",
+       "cv": "ennyBGNRlLx8nsuuCJi8kJIyPiY4+17rRmR5WsfjPzg="
+      },
+      "d": {
+       "ballot_id": "51d9fada2fe22c36c7034cadf9c0db98",
+       "cu": "uDa5vy6iNyN3Q8mVwSUSgNwC/cfVtirSKk3h3AFc+s0=",
+       "cv": "pZVG6X0kzd87W4SouWTXLA5ZwLENubGyOs1YmVqvOkg="
+      }
+     }
+    }
+   }
+  }
+ ],
+ [
+  "tally:results",
+  {
+   "election_id": "default_election",
+   "tally": {
+    "mayor": {
+     "Donald Duck": 1,
+     "rufus": 1,
+     "tom": 1
+    },
+    "taxes": {
+     "no": 2,
+     "yes": 1
+    }
+   },
+   "time": "2014-06-25T00:15:38-0400"
+  }
+ ],
+ [
+  "proof:output_commitments",
+  {
+   "commitments": {
+    "mayor": {
+     "A": {
+      "p0": {
+       "a": {
+        "cu": "4chlSCcz09DTFfbpVLHJ4Fb2YOZWN6WHkAioVkDkIBs=",
+        "cv": "fSAWs0RiQjUqaskXVaB6InQzXimpxA89E7RyK3xPcbQ="
+       },
+       "b": {
+        "cu": "giUDW4+Abn/dFRphyLRFpuue/4iC0zTQ+WsQ7p4/uI0=",
+        "cv": "gswDdIWWMG1Wr7TGuysmMLRJCAWdAVqbZzI8YYO6Xyw="
+       },
+       "c": {
+        "cu": "wWwWbCwgolyZSAtUzRvl72zrHfEKIxEirJxj/GcVGMs=",
+        "cv": "DIY3tLeXdy1ap92UCXgTlvCTuaTmPKCEWV2FMQ8zFrY="
+       },
+       "d": {
+        "cu": "GveyVKArKN+ipU48nNNJht/dXrx4CMLfHTkBDUcGkDU=",
+        "cv": "GzRMhZiSj+dak+jj+HC9Pb3einuBHk9GZIlusL+qfI8="
+       }
+      },
+      "p1": {
+       "a": {
+        "cu": "Ot05jN9uptVhLuzD9jt/OjsHxG4waFSOBmmqPxfOyzc=",
+        "cv": "lMQC8QQNMtNXCKYm6GTbCZwIssE5fD4jFnN24T5LIOE="
+       },
+       "b": {
+        "cu": "zSKxnvCr8FMTwBhGAhaJI33Nz8i+eFEgII5xEb0MtZY=",
+        "cv": "EFw0V6FEhvXDangt55imIyR567hJqZP2CASYgO0f/+M="
+       },
+       "c": {
+        "cu": "AK4bjSMAVxOwOlrRFZ1YgYdMq9c3Guf1qg7nI+DFE8o=",
+        "cv": "7q1iTYRTf9fFlurugdpn9yBe0lw+8eKOGtEQmCBbwIc="
+       },
+       "d": {
+        "cu": "w8G5G/trKtTW983Cm/DUX+CA5ZQwtJLGbdQAYxSvIwQ=",
+        "cv": "DG5Wb4gD6f8UcoWDWrzA17AweG7nrjljBbcFDTHqVrk="
+       }
+      },
+      "p2": {
+       "a": {
+        "cu": "7rfmRuK2USV5g01ZiOZC1SVIxK5lAaJGzPwOBe8a7ng=",
+        "cv": "NZRDtMmdO39bXmvkPlQCVdj3/U8/QaCyrr6SYJvjZgQ="
+       },
+       "b": {
+        "cu": "KDpKN6E0fhQHwro/QZwFjPxd6GP2DVh66pm1ZyqqqOk=",
+        "cv": "Zf7JuPQhROoFB1ZIRRJE/5IHD3yxqluifvjEJMpsMDQ="
+       },
+       "c": {
+        "cu": "+61zr4wrI1TZjzeJZBar+FVkr1jPM3XZModO3UkTfEw=",
+        "cv": "IlPTbOS6vl4edSJojFkIpAPCudq4W2/UjFf21M8z2X4="
+       },
+       "d": {
+        "cu": "dlHcpW4I8WN/cduoE+nrU1QdoT8OBV2YQUoEr/YJK5s=",
+        "cv": "mYOJRqBY5GR1hqTrgYTT8lxzN44L50uHOQtEUdS1dAA="
+       }
+      }
+     },
+     "B": {
+      "p0": {
+       "a": {
+        "cu": "DW3NNUJzcWYiw50MKqksH6PUdNwPWTgIMhN6q/I8Hm0=",
+        "cv": "5waWI4dP13l1fF8WdUSAPW9eEc2WGoFBqKvm5r6QRXQ="
+       },
+       "b": {
+        "cu": "TevAUlwETDNHy1L6l2I7Q1z8XwAxSXX8naGCW73qMeY=",
+        "cv": "Z5ojNqMhRigL30uw3Ee723Yx/wlyJWjEigUN0RJjvm4="
+       },
+       "c": {
+        "cu": "RJqa5FBfYk5MuTEzYwtNRAZoZbffzjJKyMX1GSdsF+k=",
+        "cv": "IUukoOlngSBrLJniV6uzYWgY01FUkgY0Lh93r5jC5bg="
+       },
+       "d": {
+        "cu": "r3pWJ2IcWdKM8pwNDrqHAwmdvLWSckF/2M3esaDHGxo=",
+        "cv": "DgygCIyi+7skhXXPwudd1XuC5CYHLzT6kK7hsOXCqBI="
+       }
+      },
+      "p1": {
+       "a": {
+        "cu": "JwGQnrK+/UGXZDwLWuN1wiUw/f1NLK5kI7w7Cc580uI=",
+        "cv": "f81XDJsBMBhpznaGhazbvelsz6eTSxMaely+o/BVXpw="
+       },
+       "b": {
+        "cu": "UyolAcqeLvafrMLV9+sJsHf8XOHLX8BFyQJYVBEM5Bk=",
+        "cv": "nU56j2RJWWQsBzUXxEX0+zXX4MBBDCgdaxObx4SYkZE="
+       },
+       "c": {
+        "cu": "mTaY8uMq6oLCxjme4zhcOTNS9pBFrdZTMDo5QBb4aS8=",
+        "cv": "0AXOImqEwqw8wmGqducDQ9MOCdri/3E8lSsz0rQM/zs="
+       },
+       "d": {
+        "cu": "7w9AcFcMIEHmM4avU8jbFSqCAs8QK3PMM0Jvj+H1wpI=",
+        "cv": "5PVkBp4n90DvDPLOMiT1Vl4/DqACMziLYsEBvjOA2oo="
+       }
+      },
+      "p2": {
+       "a": {
+        "cu": "nSRa1J5tPzMQZJ5UX5IGi9+4UURXMB5Tw3IL/P8M4+E=",
+        "cv": "dQHW5Qh2K6D34q18CZqEu75uTvIRBtZXVEFkxubLPJ4="
+       },
+       "b": {
+        "cu": "iFkGJeH/+RwBx7B/sHbl82wKWN3fNqU2KuQFufWcL08=",
+        "cv": "e5ZEFbmci8mLvs+kHk8AfggpXPMoMEjxDE52KgPfUo8="
+       },
+       "c": {
+        "cu": "BhN+YR2EkKpRUBeGSiI03A3zs5LYi1x4Q4AULPlwY1s=",
+        "cv": "sKUODA3WqH4tJ8EMuCBTAQ3OTx7BSmH4AAucCn8IgKU="
+       },
+       "d": {
+        "cu": "x0cT061Q7c2KpjUakZrrOQEJctimA8SD/2PrdWVvHVo=",
+        "cv": "6Z1ayhF4xLpiY8fz6tA3Z9xnHH7T9AwLBUNMxXFzrNE="
+       }
+      }
+     },
+     "C": {
+      "p0": {
+       "a": {
+        "cu": "BC0rZPNjk0v0Qo4U1mdxN7RSl6A7ZJ0U+FaXXwdCHbs=",
+        "cv": "cXWsGtot3m8r5PcsibZMF2qJ9R/MKHJBLBYFaNpbj2g="
+       },
+       "b": {
+        "cu": "KLBPFEvMmU3HNq0nc7IL+3iz2549bV036JPOEDogadI=",
+        "cv": "fnQoJ1GWuLUrBZYEm8POREnCD2UBVnSw3COT1o5sCjM="
+       },
+       "c": {
+        "cu": "aqT1mHz6E7WhrnoIq0v1JKm4byU6muFkI0SY/3yydx4=",
+        "cv": "uCULuLqnHewIMnb0XiV63z+kJWeuN0WbqxSFPyxGVLA="
+       },
+       "d": {
+        "cu": "IHldLOyZuZ3kXIzH+YVJLY5UGs0jAoa5zG1M04Zq2Ss=",
+        "cv": "MlGOFD5VHpO9Ooxa8DStoGsAC8APARoXs2UaHBosqNI="
+       }
+      },
+      "p1": {
+       "a": {
+        "cu": "7iiQ+lTQaQ/4W2n3XdAo0glkgDHuck5qZ4f3VQ6nNbs=",
+        "cv": "qQjJu0+/H+oxvfF2EKJUNt/2HI7p42fK63Ev5LRJyOc="
+       },
+       "b": {
+        "cu": "PsF/2bN6agxrpgtnzGKHp/Ci3dA9lZFE3E3E0mEXgyc=",
+        "cv": "knZGG8PIdYs3ngW8znhtpI+r6YRpaeiPz9iw5uif6lE="
+       },
+       "c": {
+        "cu": "/aOqadJTPlgDXbJtPuanithp7h2d06iUXN2xHhy+G+4=",
+        "cv": "U3LIu+MeQYLNo/D/m23JRTATDVNBN67zpQVCuR9/w1w="
+       },
+       "d": {
+        "cu": "OH4xOLwdblYLJs0vlVAXjWsHFUYrHTEmwJnxhtxoAX0=",
+        "cv": "/E0W9y/spaBqi3+7Wzw+CE7CHP1bDnqzNuQREKhIDiM="
+       }
+      },
+      "p2": {
+       "a": {
+        "cu": "FKjdzq/gwdHyhW5tPyYtFxVOay1OJkLE0DpUXc8b4RU=",
+        "cv": "HrIje8RyB9N5+lrKMHoWNJAJDfn5tedVeLM2mmG27Ww="
+       },
+       "b": {
+        "cu": "E2+krAiazT4/nyVQLUx4ntvR0CXITcPD8F6QE34IZKw=",
+        "cv": "GX3ODT6tyRpBkvsCIvSpiQZYN/y6qxjUHsl/NJw11Tc="
+       },
+       "c": {
+        "cu": "AFQijxUQfUuVGoA0Xgf77igkWQLa2/HMx21Em6Rd6YU=",
+        "cv": "CjFpENxqZsqTsp9UNykMqeg91n31riZwVrz6AsnZf64="
+       },
+       "d": {
+        "cu": "TzoIdW+NFK5+hy7+/O0+bceOtREyvjer8+YgpfMHNeE=",
+        "cv": "CswZSSVnhymcxL/isTWitV2UVGgWTPre0F/1HjWCPhs="
+       }
+      }
+     },
+     "D": {
+      "p0": {
+       "a": {
+        "cu": "TmqmkXbKAwkfTaANzGPEsd/qBdL2mtIrDmBkx+SP39w=",
+        "cv": "uJtIxj/qXecrj3v8f+MgbMu5vA4O5hyhC2u32QobFsE="
+       },
+       "b": {
+        "cu": "1yiHwud8Oh0vilZ3UdTksaK4PC7ZOmZbymDYd66pzZ8=",
+        "cv": "j5mlff3Qrix1fa0Jh15uN6ZkFyDHaJ/zze4SboOJQ8A="
+       },
+       "c": {
+        "cu": "RORSGijwSufeYzl1Op1M2SB+ajX709cC8gYX/tOuIFQ=",
+        "cv": "oTUFn66dSTNMKf6ah6/YeFkhSyLEEWApoafji7dvMMk="
+       },
+       "d": {
+        "cu": "5YpDXUTqLKJW+YG5Gl6+tKsIiQsgV0NiNSrVDYFISlo=",
+        "cv": "9GGbRhrKSt8UhjrlsZnTI8xRtWTTj21/dRXarcicwr4="
+       }
+      },
+      "p1": {
+       "a": {
+        "cu": "5RBvqMUGOeP2DT315/54QRAcDqZkBr5sd33acmgwVHs=",
+        "cv": "TPFgbXuM63z/tHEbFvQjBtd/b2dNuTFcB7kli/mPLdQ="
+       },
+       "b": {
+        "cu": "InHBH85DHsVhmPERxbiDhWPHanS6yLLn8yIcsP9LXyU=",
+        "cv": "NRlaUk7egxbsswoeN6PmBiLM5jHOgQsxToGJkutO9vI="
+       },
+       "c": {
+        "cu": "OcRWYYxjkg6aElXEO0zWHd2gXh4YTAUFNlefvgMDmsQ=",
+        "cv": "d0S5lTq4oCyNXF6kjYbqNzfjqA7gN2YsF0QpkxH1AYk="
+       },
+       "d": {
+        "cu": "k/qCSyvSzH15soCQXBAJApnb544q6OZS9FcNI9g60ik=",
+        "cv": "U2CSzF+xXCutPbA+DTp7sZQdpcDKkgZRqxFooN0ULRw="
+       }
+      },
+      "p2": {
+       "a": {
+        "cu": "lSeuvcmJNJtw30HJasZ33FaAe5elTMKj4op6023r73U=",
+        "cv": "cL7TOLViXbu1utnAK/zPO+m/Chp0UDcyoEVV6NKB/w8="
+       },
+       "b": {
+        "cu": "8ROosIaCEmb2cVlNRvojlFHkuaPLs/BjJ1RdtDiyaWo=",
+        "cv": "93aidAW4ncbDUEJaFpxA45pPpD93vgD5Dm57CIAfX2I="
+       },
+       "c": {
+        "cu": "JjHd89ZH98SUDsCDPkveNxNcgB0hXyYf220L2G2Ib4M=",
+        "cv": "MTYVNeXYJLeCt9aodE2LjX4CKxbGfio5Ig6XtjF89GE="
+       },
+       "d": {
+        "cu": "rzyT42YeSPWjxJ+KHZv9HKd7IcX5PE1tj3vz6n6rbbk=",
+        "cv": "jnB1eYRppbHjfSahdYkJtg3JIyqdfjxY+pN+/r1BFR0="
+       }
+      }
+     }
+    },
+    "taxes": {
+     "A": {
+      "p0": {
+       "a": {
+        "cu": "SRXGA7WlSTI7/55IP01gHcjzB0IFDY5HAMSsdRXBHSM=",
+        "cv": "kSyekAi8K5A/fRRoABULMXRYzWGa7C5DHYUVdAVa+IU="
+       },
+       "b": {
+        "cu": "YSwxx4KlI9/H426SevjCBLqbDIcvG38ZP2VxLcMakMw=",
+        "cv": "/DyayYMyRu0TFpvjqLfCRbqjxF/h7RMvqqq86Fw7cKc="
+       },
+       "c": {
+        "cu": "2Kp/Jm8Suh9+knS/DR9cDAI4xFXiyzfRtumU0d5UnNg=",
+        "cv": "3gznAw1bApBz+QOi3edFnCow3NP+3egQRWy5n+px1ds="
+       },
+       "d": {
+        "cu": "HRx1CgbBMYKXCmW4pwLWNKZLi4FmMT1CCx3bTpvkqTU=",
+        "cv": "rgH5LLcHEBDmw7znyf+Uvk4D731sl7XpKJs77SmQH8o="
+       }
+      },
+      "p1": {
+       "a": {
+        "cu": "HJLpUzDMgNd+y08WI3Q82FFp1txBZd9qA4roiEzNLk8=",
+        "cv": "Ak5T4pnE4sgZ/OATkGnMnEGgE2JjoPTsm1cc5PWu+Q8="
+       },
+       "b": {
+        "cu": "ZVmvaXnnollRVlQ9DrIegBw12b/0M+HtN2ZbRyKj2vU=",
+        "cv": "d6ESKcHsu3fzA/e5znWLNrxyVLD4eAh2wXxb6/IHP1w="
+       },
+       "c": {
+        "cu": "oEtQV4QRyC0rN20LkD+M4dSLIchYoC76m95RNhsWAhs=",
+        "cv": "j3H4ujB/zKkBcIH3SOM0/luQn+mlKL7pkpAPWRjTxCA="
+       },
+       "d": {
+        "cu": "3lyqQFu9/olD+2XMSxA5u9PHFq9b1ugTrwBk8eHhWM4=",
+        "cv": "sMIKu9YgIY+mBewZrUhKnQuxy037lTlAyfcUkFHg428="
+       }
+      },
+      "p2": {
+       "a": {
+        "cu": "sO346ynOzMglM0U8KKusREC3uk++GnsfWqIW+v7Id/8=",
+        "cv": "jaPOpvGq7OAifX6UUgk3NHVKadg9rb0QLoeB/5I/0SI="
+       },
+       "b": {
+        "cu": "jYK3PZlMFmJRaN6TqZ1BbyB0IKjhTSYgGbJImklEaQI=",
+        "cv": "dsqxe9MVDBjYy/M93wlSfhgCJ7XRnMNEVc0eQgB9h2g="
+       },
+       "c": {
+        "cu": "MlSZ6tcLZmf8b/D59tv0O+yei87CiHswKx0ooK+dgqE=",
+        "cv": "oTqqVu19/s/6trkisyAH4AilhgPcRtOIoPwfoxyw6Jw="
+       },
+       "d": {
+        "cu": "nIPcBgU1qSv+q8P+HK6uLFWaAUIEB1/3lbTlu2JP3Ow=",
+        "cv": "1nNIdZRkYNAK1k2Gb2nVQffSZh+iMIPMSziluHcpdII="
+       }
+      }
+     },
+     "B": {
+      "p0": {
+       "a": {
+        "cu": "Qk3c3sSKzIcin3jKUr0cZtz2y34iUQJjMjpdyHyd3Oo=",
+        "cv": "0M+xhwF9kkdSiBfflTjKYfQh8vL03Tjh9QNmhb1721s="
+       },
+       "b": {
+        "cu": "CJjc1ICPnvTSBfTwYe16l+S7RdiaSKFtoLjiG4nFT4E=",
+        "cv": "3yTQLz1V9CFetk/2Cf+ugwPs2b+KQnjxYGb1BPkHIs4="
+       },
+       "c": {
+        "cu": "X+d3nU7YsIgEWVPwYNNQB0RXgWcTw1SRtesEufv+Fh0=",
+        "cv": "twZNtee9KIVLZ7RxZn3t64+IqPbAkeWXM6BcEsL6XsM="
+       },
+       "d": {
+        "cu": "z2St3t9gN3GUmuG2ZDtDeKlNjj/AIRpwXb4UnKXBTFM=",
+        "cv": "6trQ7JIurv8nQvGEzzbMHggLIP3ZnxzQRFnp+4q79mU="
+       }
+      },
+      "p1": {
+       "a": {
+        "cu": "dxMSx+TTg1LCjttO3yXHwv1L0nK9yIsAbk3TC7NGZ5w=",
+        "cv": "OZM9u0YLUbso8iJI8MmzAImbhnm+eLgD+yHNsmtZM+0="
+       },
+       "b": {
+        "cu": "+tMeEglCL98pZlenLl3w3ernYEhdu/+0w3z8jJ+eFho=",
+        "cv": "YIpA+ho9F58qQZqpxPRoSQVaXA5LUg5ZSzKtoMFDZdM="
+       },
+       "c": {
+        "cu": "hiBECemz5VCKlw8lCx5BmpwFcmdrEq5ls7ZMObjXi7w=",
+        "cv": "FiELusqt7WeKA6bKrKGG/Vx5AH2239pFj9Tz7aLGLJw="
+       },
+       "d": {
+        "cu": "c8w6pOx+ZYtYV2pAnO+GDLmyo4+Pf7syLlnhc0iBQJ0=",
+        "cv": "QvaVq+YsI+7EXnUIhVv+GmjlBKnHNM8hlODc58DkY1k="
+       }
+      },
+      "p2": {
+       "a": {
+        "cu": "VmXSs+hshs4xStXnBa7N2d6+q7E1CDef63BUB//FdlQ=",
+        "cv": "8j2z7f6MeORJjAd6E3TNlyyNpt+dbQP0pKSZRKJLrWE="
+       },
+       "b": {
+        "cu": "2zOJVu7ZA5kjFowXwd33C1cZJVcy6AvTCTtB6HDBNWk=",
+        "cv": "grwKjhqmaEbi/S9dBwoG8SkqNbql/pAlBDb0rFLquWw="
+       },
+       "c": {
+        "cu": "N9nm0dB487+Fr3eMwzqZOcwqxtzV68OBqfPBOcuGCZ8=",
+        "cv": "rzE2ZAuO+tGkZ3WQTXHYj9kPjBEvrgha4jDZ+H4XHpg="
+       },
+       "d": {
+        "cu": "9Dw+e0tyfjpSoKtQTRpES3CytT5//on7S7QfPa/YxCg=",
+        "cv": "ri8zpgBstnut7mCmcSjuCXMNOKKRFMJ9KAYGYUHe+4E="
+       }
+      }
+     },
+     "C": {
+      "p0": {
+       "a": {
+        "cu": "QCvrVJrlDUlvJqB1qxZDwJcQ5RZeoPUgQRgaLh7Vm7Y=",
+        "cv": "O0OFLf9ousN6qfktDkHhBZjOxuwwKH1h770UdcyhKxY="
+       },
+       "b": {
+        "cu": "t6XNB7M8pfW2/h4qv8EW7rLFpaUl7P3dVo6bUwVsxAk=",
+        "cv": "hv56Un2ppMGCsXLQuPa1I2II+MFZU9h00yILn7HNcag="
+       },
+       "c": {
+        "cu": "K3BrOxwkohV8wgs9Y9NfeB+hRvo2tbGRWWWdgaVJD4o=",
+        "cv": "EET0YdWo3rrdRsMplIAs3HcuObRxdKii3Lf+0SEwyxQ="
+       },
+       "d": {
+        "cu": "RjIubxxxjbl7oWdseNDSDWKumFWH08uiBLdCdT53hUs=",
+        "cv": "oIJdvww8kylb3YvWI723IyzCdGMhq+ILpDcesRh0jXU="
+       }
+      },
+      "p1": {
+       "a": {
+        "cu": "uj30384+MjsjoOxPxk1aCSWZnqNHdD2RRdo1Mbcmmu0=",
+        "cv": "sjgwmiOqWIRBKCCJfW8eY8u1LQUOVOeBZPsa7b6aE+g="
+       },
+       "b": {
+        "cu": "0UMQLziZs+yQ8I+OiFsGxc2yOTAllaVzZfMRO3P1NFg=",
+        "cv": "vZD60xMuozyi1lKfd1sKfIv6MSY27Vklmu6UR7Btn+U="
+       },
+       "c": {
+        "cu": "cO64wLXmcNnxR3EXySGxujo7RGzQlhjgi2rV8B8B9Nc=",
+        "cv": "QBcKhS8WNSjAtr+J8p5JnMsPhmdgAED7vu0QJnxvUtk="
+       },
+       "d": {
+        "cu": "K7y935P1lFq4L4hcWUH6i6kDWLQ7Ju3/+fRXP+v7cfo=",
+        "cv": "Um9J2Md+L5P2nGzZXa92eUPyK9c/DSXtYx/JWiDKy/g="
+       }
+      },
+      "p2": {
+       "a": {
+        "cu": "c89yyHsytGKqP58oOiBl7Oz3OYBh8edNXROpLRMJ19A=",
+        "cv": "PjWTyyDteNYrccTEiojxOE74ETHXXOI6OstUGPvLqcY="
+       },
+       "b": {
+        "cu": "DqWjCscbgXpalGCaN3cGuhECCI1sVNOMxuERilx+CUg=",
+        "cv": "mFw5xssLNVwRHv5/ZPEJB5S4Pdq3p0+6nQTKBsNIEL8="
+       },
+       "c": {
+        "cu": "XkbU5irvXM8p48VsJGH0FgefBZUDZhpFoLgyR0lN290=",
+        "cv": "eVYfWvmiUgoLb8UCyOdm49tBc+TeuBCoyJIyBm37KXk="
+       },
+       "d": {
+        "cu": "D5OefCsrFHToBc7XVk7b1bOCpwLJtcIx/NK8fKfBgE4=",
+        "cv": "L3VoSmElfXcaxJLQGN8+/XgP4vwX17np4kxbN9zIYRo="
+       }
+      }
+     },
+     "D": {
+      "p0": {
+       "a": {
+        "cu": "Ln9ozfrl0tK15xQqaWO1Je3jdGz6XqX3jgM74eEUOZU=",
+        "cv": "7ZM2ZZj2cIAFOCqoZoneXMH3Hm6n0MDf6gOGSdIYCzY="
+       },
+       "b": {
+        "cu": "5DXOWueFBMkl7Vf6bXRe0CXnihx2yqjLcY2sfOs9bHo=",
+        "cv": "X5/0RQr2scKZBjYR1cBOrssDnBM26YuswSDw6ZD38M4="
+       },
+       "c": {
+        "cu": "DTzvAj9EOW0C2EBKfGXcg2BQXD54GON14kjafuYeYcs=",
+        "cv": "O57gs88qyJ4kvyZshQY27L37ZknODC9DHI5bafHcY5k="
+       },
+       "d": {
+        "cu": "B8TpCOshdqm+kOhEX1T3kb0p7JGcmSQdgO5VeGh+yD4=",
+        "cv": "UMlFLBWJvLNT1pi06dpN21fpzzpuWB8j14QRmAEg4i4="
+       }
+      },
+      "p1": {
+       "a": {
+        "cu": "CKk59g9puKooNcyRoUS7yYw41UbxRdcZzEISmY13qFk=",
+        "cv": "leRPqs4q3qHcSLvtJge/dAhMofteaYf5sSQAu/6/Ays="
+       },
+       "b": {
+        "cu": "brOGePaZqwwPDWJY4cH4ZrSdwZ4hBYDGEKAfnqmYHYw=",
+        "cv": "mJ/u6+sYhUK4JxXGHItHj9wgxBN2UbmkGeevoN4vKRo="
+       },
+       "c": {
+        "cu": "pVzz53CUTKSy5Ld9ob5gWWLQT0/Nkn7lJtfyCxm9Biw=",
+        "cv": "2cR0+JAuYtlkYAXtoA4snX8GSQMtDtmzxziOSmJapYo="
+       },
+       "d": {
+        "cu": "RDuD3jWGoT+Nxu2nJ66zk5WutSCOoS8mT8IPI2LT5xg=",
+        "cv": "Ix1UO5a1wanlNBNgKk+abrxpa1zKWTKmJXKbw6XxoYg="
+       }
+      },
+      "p2": {
+       "a": {
+        "cu": "+MeTynYpU+uBYMLXaugg/NOVXyfODzcLCp923hlwi6M=",
+        "cv": "PScjcNquz+lWSxhNsfmyn/ngoJXaQsXNjfquSakOGH8="
+       },
+       "b": {
+        "cu": "UX9e19Dz6RsaQ+NSBUH7r2zTubvA52uzuf2RNhu/r34=",
+        "cv": "mmGz1RTm2Vy5Dv5YMBJF5+7t2+FZLYIwdFO4ZdzxLr0="
+       },
+       "c": {
+        "cu": "Ac7pr/nwvS8tBEfSOUpo1aPeSU5t9/a2f4/Ke0h0Frk=",
+        "cv": "dsJyzPtv2loVtEpLGn5DmMRueJqaKqEWsrF9VF3kYgk="
+       },
+       "d": {
+        "cu": "Avl15U4nnZn9CEv1lSIleu6yNZPEsevpfrs4pPdlx3E=",
+        "cv": "NCcLEv857izg1h7GvWkDhjrGrEXb0PHQLWCm00t0NNw="
+       }
+      }
+     }
+    }
+   }
+  }
+ ],
+ [
+  "proof:output_commitment_t_values",
+  {
+   "t_values": {
+    "mayor": {
+     "A": {
+      "p0": {
+       "a": {
+        "tu": 258735590879863871109996777468248434961,
+        "tv": 192208302858771515248267942918700619779
+       },
+       "b": {
+        "tu": 285020823975946418534409678519953213896,
+        "tv": 332875997420680706486350352965834673553
+       },
+       "c": {
+        "tu": 30258272173165772955765522282591320425,
+        "tv": 130318143879870979568345803582156966195
+       },
+       "d": {
+        "tu": 329496414033679886207604728232712398644,
+        "tv": 110615731357938236514212305018190699637
+       }
+      },
+      "p1": {
+       "a": {
+        "tu": 196608435656468893430339087375069347692,
+        "tv": 110076385949382143435953277359802857943
+       },
+       "b": {
+        "tu": 227131789102922454954475290086019501628,
+        "tv": 141227242606656219181946048899523252349
+       },
+       "c": {
+        "tu": 284493255062257652880857332996114059974,
+        "tv": 240811742169863722392904197187665796559
+       },
+       "d": {
+        "tu": 69838436990224727460166787840539737613,
+        "tv": 27119547341377485891396935625507352676
+       }
+      },
+      "p2": {
+       "a": {
+        "tu": 292301494200392162017135393077443528644,
+        "tv": 277188358061494433162586770335489928412
+       },
+       "b": {
+        "tu": 19208175003227917413941013155074271361,
+        "tv": 228685756664692737293086941188732913057
+       },
+       "c": {
+        "tu": 71094109771913661294018511134961706212,
+        "tv": 325247596129942371141397291384732321902
+       },
+       "d": {
+        "tu": 290392545584490537492491268271996723422,
+        "tv": 43875895537325263945645224805060841708
+       }
+      }
+     },
+     "B": {
+      "p0": {
+       "a": {
+        "tu": 100511745005216248832652409483243635850,
+        "tv": 18220049949850381697169741153238814621
+       },
+       "b": {
+        "tu": 316229412746670227406181577518602030303,
+        "tv": 213340364674863550070155839206069064555
+       },
+       "c": {
+        "tu": 50594280700849871208819084438075255406,
+        "tv": 161072565935736179240602891531186043234
+       },
+       "d": {
+        "tu": 121512940071824445803051705824621575901,
+        "tv": 64357163291214394036147944840936120437
+       }
+      },
+      "p1": {
+       "a": {
+        "tu": 15239666859204816571053915634535466849,
+        "tv": 159079034698934172139060020698643896934
+       },
+       "b": {
+        "tu": 198828201100662981166298756942734264926,
+        "tv": 288435104212322433408234962605984207394
+       },
+       "c": {
+        "tu": 214052778751695840393297543416195711271,
+        "tv": 44216298670966510273212591366885191326
+       },
+       "d": {
+        "tu": 131139932326295155607560573159647614791,
+        "tv": 36760819402751568305231823740155462837
+       }
+      },
+      "p2": {
+       "a": {
+        "tu": 4367623883733620906551390900302938353,
+        "tv": 7261208247023526141654011433081834528
+       },
+       "b": {
+        "tu": 67740189024765316463841112219823830571,
+        "tv": 105818891443676325325433253093192660343
+       },
+       "c": {
+        "tu": 233200871274878913328073153784314900408,
+        "tv": 252589873738174570895133735154580253691
+       },
+       "d": {
+        "tu": 210089240342261917066980825279288005553,
+        "tv": 57669851580453830356272933068196333869
+       }
+      }
+     },
+     "C": {
+      "p0": {
+       "a": {
+        "tu": 153905527525809086894221360380369690942,
+        "tv": 226840938587929683967307751729633923854
+       },
+       "b": {
+        "tu": 269979281894109766613216127315931857172,
+        "tv": 113371000187733836844862585621542144021
+       },
+       "c": {
+        "tu": 35187159156876592845792739938091580353,
+        "tv": 312906655668376368407230669976087790345
+       },
+       "d": {
+        "tu": 176257593926394213802139026982144992831,
+        "tv": 98719470417572630444224176057974730480
+       }
+      },
+      "p1": {
+       "a": {
+        "tu": 142278784798222564447210807994274074287,
+        "tv": 108459151325505639941702045657068381650
+       },
+       "b": {
+        "tu": 258528885954905394324533236959800063781,
+        "tv": 245879658960418232544802558367326942142
+       },
+       "c": {
+        "tu": 181124754590364629039769998299212048828,
+        "tv": 239604704863483174938124219296373389623
+       },
+       "d": {
+        "tu": 200844496909007731655201195836493334365,
+        "tv": 139138549751231467522761532051992630663
+       }
+      },
+      "p2": {
+       "a": {
+        "tu": 90814375684941813132933619093257702323,
+        "tv": 152125541468283003120052583620189409184
+       },
+       "b": {
+        "tu": 133509075058049694228373293286385840680,
+        "tv": 972277591073935122226462895776679759
+       },
+       "c": {
+        "tu": 75935226608644186574863299495227749359,
+        "tv": 279253813720929179644726575774454900451
+       },
+       "d": {
+        "tu": 41213594374973732751671688872476047774,
+        "tv": 183284651977723367181535656239995028832
+       }
+      }
+     },
+     "D": {
+      "p0": {
+       "a": {
+        "tu": 138199230625344963014915493941839608303,
+        "tv": 106920690774291638815476983309475699905
+       },
+       "b": {
+        "tu": 157254734170400930236147817777587457058,
+        "tv": 300901421551508773642887839777811638126
+       },
+       "c": {
+        "tu": 217392169220084185755512556107084381325,
+        "tv": 81434166825796656927042377373398768096
+       },
+       "d": {
+        "tu": 239010018798838475687030393650648167795,
+        "tv": 208685177414588469480669126239455726138
+       }
+      },
+      "p1": {
+       "a": {
+        "tu": 324495808440601290739908404388114444496,
+        "tv": 132098817990586267267209067185642274703
+       },
+       "b": {
+        "tu": 12645799838647818043967914315870439601,
+        "tv": 46023272618725392859008769205136860726
+       },
+       "c": {
+        "tu": 100742635095261778124712482723576120832,
+        "tv": 66610170667049034416363582845248468580
+       },
+       "d": {
+        "tu": 18125069299581318606791698295266268320,
+        "tv": 83956023204542117387874704558405895120
+       }
+      },
+      "p2": {
+       "a": {
+        "tu": 338208145761903783512055275851862990246,
+        "tv": 96834442610873265443797492622466198848
+       },
+       "b": {
+        "tu": 294338071786356153855817370086335225385,
+        "tv": 66887825389413266101215955290953718286
+       },
+       "c": {
+        "tu": 3985694432114376919416159380166412587,
+        "tv": 114846598897801199547500118760481062651
+       },
+       "d": {
+        "tu": 337063395724478779492354371564045838185,
+        "tv": 51363114952613665919896470063895368624
+       }
+      }
+     }
+    },
+    "taxes": {
+     "A": {
+      "p0": {
+       "a": {
+        "tu": 4750303,
+        "tv": 1187733
+       },
+       "b": {
+        "tu": 3215509,
+        "tv": 5160120
+       },
+       "c": {
+        "tu": 14350067,
+        "tv": 9739971
+       },
+       "d": {
+        "tu": 10397675,
+        "tv": 9129070
+       }
+      },
+      "p1": {
+       "a": {
+        "tu": 6441286,
+        "tv": 15854563
+       },
+       "b": {
+        "tu": 7129754,
+        "tv": 6831635
+       },
+       "c": {
+        "tu": 3518534,
+        "tv": 5032604
+       },
+       "d": {
+        "tu": 12079074,
+        "tv": 10763281
+       }
+      },
+      "p2": {
+       "a": {
+        "tu": 12988879,
+        "tv": 8406141
+       },
+       "b": {
+        "tu": 8035670,
+        "tv": 14383311
+       },
+       "c": {
+        "tu": 785105,
+        "tv": 2286778
+       },
+       "d": {
+        "tu": 13603154,
+        "tv": 82349
+       }
+      }
+     },
+     "B": {
+      "p0": {
+       "a": {
+        "tu": 13968436,
+        "tv": 377475
+       },
+       "b": {
+        "tu": 11075465,
+        "tv": 8014665
+       },
+       "c": {
+        "tu": 15473993,
+        "tv": 15535923
+       },
+       "d": {
+        "tu": 6562616,
+        "tv": 9988135
+       }
+      },
+      "p1": {
+       "a": {
+        "tu": 11062185,
+        "tv": 9691598
+       },
+       "b": {
+        "tu": 7828561,
+        "tv": 11228067
+       },
+       "c": {
+        "tu": 5605184,
+        "tv": 6080610
+       },
+       "d": {
+        "tu": 11774511,
+        "tv": 3644029
+       }
+      },
+      "p2": {
+       "a": {
+        "tu": 6865152,
+        "tv": 13288406
+       },
+       "b": {
+        "tu": 5269321,
+        "tv": 5434692
+       },
+       "c": {
+        "tu": 13717246,
+        "tv": 8265896
+       },
+       "d": {
+        "tu": 8347732,
+        "tv": 12088695
+       }
+      }
+     },
+     "C": {
+      "p0": {
+       "a": {
+        "tu": 3724882,
+        "tv": 9007230
+       },
+       "b": {
+        "tu": 3191483,
+        "tv": 9473366
+       },
+       "c": {
+        "tu": 14627080,
+        "tv": 1948390
+       },
+       "d": {
+        "tu": 3012939,
+        "tv": 4673777
+       }
+      },
+      "p1": {
+       "a": {
+        "tu": 12120150,
+        "tv": 255937
+       },
+       "b": {
+        "tu": 720881,
+        "tv": 7586218
+       },
+       "c": {
+        "tu": 993017,
+        "tv": 3577278
+       },
+       "d": {
+        "tu": 4904802,
+        "tv": 13038132
+       }
+      },
+      "p2": {
+       "a": {
+        "tu": 13114282,
+        "tv": 12788466
+       },
+       "b": {
+        "tu": 5524545,
+        "tv": 13460911
+       },
+       "c": {
+        "tu": 16191278,
+        "tv": 13388623
+       },
+       "d": {
+        "tu": 1430013,
+        "tv": 5924293
+       }
+      }
+     },
+     "D": {
+      "p0": {
+       "a": {
+        "tu": 10307112,
+        "tv": 1593811
+       },
+       "b": {
+        "tu": 10981932,
+        "tv": 9979901
+       },
+       "c": {
+        "tu": 178890,
+        "tv": 10226581
+       },
+       "d": {
+        "tu": 5578954,
+        "tv": 8207401
+       }
+      },
+      "p1": {
+       "a": {
+        "tu": 3869905,
+        "tv": 951884
+       },
+       "b": {
+        "tu": 10495083,
+        "tv": 10254718
+       },
+       "c": {
+        "tu": 13460995,
+        "tv": 768523
+       },
+       "d": {
+        "tu": 4182445,
+        "tv": 14633013
+       }
+      },
+      "p2": {
+       "a": {
+        "tu": 7058579,
+        "tv": 6528040
+       },
+       "b": {
+        "tu": 11909262,
+        "tv": 8328346
+       },
+       "c": {
+        "tu": 11105909,
+        "tv": 8847058
+       },
+       "d": {
+        "tu": 16473262,
+        "tv": 13036693
+       }
+      }
+     }
+    }
+   }
+  }
+ ],
+ [
+  "proof:verifier_challenges",
+  {
+   "challenges": {
+    "cut": {
+     "icl": [
+      "B",
+      "C"
+     ],
+     "opl": [
+      "A",
+      "D"
+     ]
+    },
+    "leftright": {
+     "mayor": {
+      "p0": "right",
+      "p1": "right",
+      "p2": "left"
+     },
+     "taxes": {
+      "p0": "right",
+      "p1": "left",
+      "p2": "left"
+     }
+    }
+   },
+   "sbb_hash": "d13dcbbb127db513e31b27483d2ad059838c78effe8ebc61b58d190741f22f56"
+  }
+ ],
+ [
+  "proof:outcome_check",
+  {
+   "opened_output_commitments": {
+    "mayor": {
+     "A": {
+      "p0": {
+       "a": {
+        "ru": "NrYMyvJi76Y3RKHjNco0nZqOGIEulYgrWsf8GnPW0Mg=",
+        "rv": "8sv6Zycw/9+7c643Y3kUw0yinM2NmWHXW+EVNtA14xY=",
+        "u": 255213887598133749015197476370984722038,
+        "v": 181292686685832934388278758880136427686,
+        "y": 96224207363028219940101627819352938217
+       },
+       "b": {
+        "ru": "zrIx6iWehHtelBKZft4EEHOohN/OQYNWiMxLBNVi6Kk=",
+        "rv": "HA0WIyRdhlfz55f775y9Ug+FAGe2EY08B9xywhYt/P4=",
+        "u": 319481526384683462607790707522846960756,
+        "v": 327663076729352590476952813269713039817,
+        "y": 306862236193097589621368913360791789066
+       },
+       "c": {
+        "ru": "tAq4uUyAwdJIve8guuslNcrE5ynpN+55qh/JAZAYqiA=",
+        "rv": "vAxM3edLRCkTqW9LaeoOdZ9PiC2fJd5WcaY6kwGByYk=",
+        "u": 221572036270658207818729672482742659785,
+        "v": 70059683298611437761697576709812853211,
+        "y": 291631719569269645580427249192555512996
+       },
+       "d": {
+        "ru": "o5oiu4E134lPt0+jLa6MM0uEXLMYSdcQLEWhGmaZRaM=",
+        "rv": "AQZGlzM3pOpzJvRlUuTT5BXCXt7MsJpl/Zbd5vXnZGY=",
+        "u": 243355870549736918553004813056070891323,
+        "v": 147459153862745932727646429690341430191,
+        "y": 50532657491544387817276635314644110007
+       }
+      },
+      "p1": {
+       "a": {
+        "ru": "C9qFWg+JRmSHNd8CZSfVAUAHpVmmFuizoAZuZjwIH/k=",
+        "rv": "ykpk9jIl/UAW4FImijXjuKRMfbDFlIsftoCKKdyUm64=",
+        "u": 277357643145504325897465051985820725992,
+        "v": 91818734738728849232634124286447116083,
+        "y": 28894010963294711666724568840499630568
+       },
+       "b": {
+        "ru": "xvWg5zqDPcMgnLL2mzxHBskuC+k6+Qr0cUNgM/stFQ4=",
+        "rv": "4ax521Nh2XHLXo+DhGwnsGmFZViqHSF0VGEGIJRn8pI=",
+        "u": 27392204895345335192786135850617252275,
+        "v": 75675785413073882900175000776335711936,
+        "y": 103067990308419218092961136626952964211
+       },
+       "c": {
+        "ru": "08Qmp3p61o9un5ZTwHyK+8qDmzIWogqD7VUcb7LVO1E=",
+        "rv": "HDdueO+/pOSLeQ5A9S5HpQdy938qXCvgnUkDlhzCmUk=",
+        "u": 191746745082829441439675539208796394017,
+        "v": 30775192952544077839034164646454494962,
+        "y": 222521938035373519278709703855250888979
+       },
+       "d": {
+        "ru": "rUXRatNuFq04aVMGDP6Tuf6oKwVD/OpwrFNWDi4+PYE=",
+        "rv": "bfUtlai4nPB5zTgsb0B4UJDS/LlGp3Zcs6Tkbn9/9fY=",
+        "u": 120919277242945123472346904656260147724,
+        "v": 266336576901212491751623365869133257148,
+        "y": 46973487223219151760595663093625193365
+       }
+      },
+      "p2": {
+       "a": {
+        "ru": "WOH3Woz7bXsoMTE/umQpV6qIWw4uDudDeChWppctVjg=",
+        "rv": "EipU6VzPuM6AsBIaijUlOlLTx81R0MR1qjv8op1ugTw=",
+        "u": 187299256691746025756803748590264137073,
+        "v": 57595120689519188485777344053402886910,
+        "y": 244894377381265214242581092643667023983
+       },
+       "b": {
+        "ru": "Qfa+gXAjLmc+wmbhYIKWyvA7TPRMk8h5TyFob2vq5YY=",
+        "rv": "/drubm/0ez1/PFDTdUJx1mzLjOV/sK6joAdxvq3xH4Y=",
+        "u": 272212611051379112845351026254286206529,
+        "v": 50291502990394561888924264487379053208,
+        "y": 322504114041773674734275290741665259737
+       },
+       "c": {
+        "ru": "CIVIsHsyeCBTMqJGxF8LdoIQ/orkgSKSTQnbfXWmAmQ=",
+        "rv": "CTFP9FIfjRlYuq1Wb9QX8BkjCTz5W0eK5JPkjwVC2uk=",
+        "u": 128803845639166482383252261855405844199,
+        "v": 104025364342488723831988992489663832475,
+        "y": 232829209981655206215241254345069676674
+       },
+       "d": {
+        "ru": "ouHP8RVRatIME3m+4PqxTyrJXxJ3gUjFqlacMkNzEyc=",
+        "rv": "MOBIHVaQ8RVbl3bJn+qW27HtMf3NG3CNY1TtZ3vmS8A=",
+        "u": 84402468762604170225370536452639585400,
+        "v": 231749563359244101923483054433008900901,
+        "y": 316152032121848272148853590885648486301
+       }
+      }
+     },
+     "D": {
+      "p0": {
+       "a": {
+        "ru": "NJVudcKTCkjOPtdzHegK1t5itknvv+Jcd76Ame5nD4Y=",
+        "rv": "3xxF28aC1m5LGDjbUazYPOKvxyDc9p1KAeSed5KkJKI=",
+        "u": 134677527343614840920116192844575895380,
+        "v": 96005074601353057955487799270911507812,
+        "y": 230682601944967898875603992115487403192
+       },
+       "b": {
+        "ru": "7OUBbz1L71zTRsY6kHUBUmV2wrbu2NRXp0NJHFZbytQ=",
+        "rv": "8Zx4JMiCS0BQ4011HwA+6DtHBtWxXOuoLfXaOi7TYMo=",
+        "u": 191715436579137974309528846780481203918,
+        "v": 295688500860180657633490300081690004390,
+        "y": 147121570518380168479644539430402996801
+       },
+       "c": {
+        "ru": "yfKueUyIeKGCAFp0CXCqXNcPNviOmm0gUyi/5tXRpXM=",
+        "rv": "A4P6Ro6ev29i5NWzko4VknJ3vZwkAqncxQODRnDjyyM=",
+        "u": 68423566396638157155102098875467509178,
+        "v": 21175706244537115120394150501054655112,
+        "y": 89599272641175272275496249376522164290
+       },
+       "d": {
+        "ru": "bLubeefNb+h9zMucUCQHkThd1V7rXElVnd7ba259G00=",
+        "rv": "PizEKyEXZEcp3wbj5IB1Z4cEVHc++EbayYOsm8XI7CI=",
+        "u": 152869475314895508032430478474006660474,
+        "v": 245528599919396165694103250911606456692,
+        "y": 58115708313353210263159121953844905659
+       }
+      },
+      "p1": {
+       "a": {
+        "ru": "kCEb8+obaUbvpOPtezk52eOImsnSYMKHYydg2sAPugk=",
+        "rv": "1yMGKTWdECYjMV+obclVrODUGJcdMbyVpZOZP5pBq2A=",
+        "u": 323264294707015947392384934760240187594,
+        "v": 251747186209046144977219454005191598026,
+        "y": 234729113995123628906229781333663574113
+       },
+       "b": {
+        "ru": "Xg7bLMHnCgjX04rpbBkSnqzbIExNyBJQ6nfRgqjP9/0=",
+        "rv": "V0Q6j5VNiWAFEmYuSvZKIxCeMWNY6wpOOFs+4LRypCI=",
+        "u": 302522101678473571634662492781878206299,
+        "v": 254160221058732875171678622310324728672,
+        "y": 216399955816267983342966507660434723464
+       },
+       "c": {
+        "ru": "L5g28LAUvF/jRJsFBCh4/jjg6vou+zcmxtuGasx8En4=",
+        "rv": "NQtCpRFIidooCj0nmjGdyxrFS+xDT6QNfWIf1vTp/sw=",
+        "u": 124638329743030157065073187454001100392,
+        "v": 160656562641341369708511599453971447218,
+        "y": 285294892384371526773584786907972547610
+       },
+       "d": {
+        "ru": "0DPlG0Wc9o2KsCVy0dqfliJWOwcgo4aXu/a6PnbmKX4=",
+        "rv": "OxCSiQwXICmVm2TQ6zZwXn5CsIns51ofufWTCzA/dTA=",
+        "u": 167590127382933365472210007948309262487,
+        "v": 273823796316500893725874611127967784064,
+        "y": 101131556778495795734710011644508835044
+       }
+      },
+      "p2": {
+       "a": {
+        "ru": "HeFjFPGXPOdZv8IgbiiYe5PNsyNrDAPUICvC/Ej8Hkc=",
+        "rv": "0DjMF359+EUQ+Hf5UOFLdhkeCzcwF3b3+jDUZ7llob4=",
+        "u": 315186629475878423066373065603309233877,
+        "v": 79617552730723312317033133879242303670,
+        "y": 54521815285663271920031592050783326040
+       },
+       "b": {
+        "ru": "IsG4HHEH6CPdcvfGLzte/2vDmt8x06u4kJhSVU903zY=",
+        "rv": "dpf4xV05rrvRwJA0eSv+UOCPYZUittaJQelD6a7ah0E=",
+        "u": 57726621787104475934843650484137144502,
+        "v": 295369899923402199029361592224760873092,
+        "y": 12814154789568211500830635277129806087
+       },
+       "c": {
+        "ru": "ccOOlToQMyJB2AdOH7cZjvd3UG3IoC5+iVDnA3312tQ=",
+        "rv": "sm10kzWB64tacSnlbsfJIQNfpKjjIZQ2kaSnJljGIo4=",
+        "u": 285335592593109071090482019014636116564,
+        "v": 270106159760612499318822985579014716003,
+        "y": 215159385432783106945930397161882621060
+       },
+       "d": {
+        "ru": "a0zmgFxw3vlhTuc/6b6j5fPbqnssdHAk2SUA7kFyPHQ=",
+        "rv": "seMswwXaSIzySiA33BIIhGAiicoppFQKv9oxZlaFwrQ=",
+        "u": 32689101071960761371995446907366116107,
+        "v": 288586039222408733419960823365907443345,
+        "y": 321275140294369494791956270273273559452
+       }
+      }
+     }
+    },
+    "taxes": {
+     "A": {
+      "p0": {
+       "a": {
+        "ru": "+/YbpzgYO4frM8AJajA4O7eIPv2fW45w4i4PUR/T7Uc=",
+        "rv": "/a7o/Q/IC5edtGDsaNWSBRDiU4Cb5TjZ/tkNQ2jEldU=",
+        "u": 3191709,
+        "v": 5645042,
+        "y": 8836751
+       },
+       "b": {
+        "ru": "ZOiquax5FVn7O/bSAhrpVH3vWpldrbZIlsGbgzAB1jQ=",
+        "rv": "rkBTUhSMRv+9ZZolKObKMtlmuwsNNsjYEp3kzCE13eM=",
+        "u": 9629953,
+        "v": 14854088,
+        "y": 7706782
+       },
+       "c": {
+        "ru": "uqeTPypsoIK9L5SvRSst9ahdkZS1BFY5iWoHuFmC4BA=",
+        "rv": "jO8UR1XzVk7MXamZFT085DSGUsQTMIiofWb6E85MfJ0=",
+        "u": 8121914,
+        "v": 12828055,
+        "y": 4172710
+       },
+       "d": {
+        "ru": "HUbtTtq29GFjvkwiT23CLGR9b+tRrtUzh8VQdihwE28=",
+        "rv": "LCls41qwhqnvDhxu2LkQd4alhUMUI4mQiSVTV/4GtkU=",
+        "u": 2971415,
+        "v": 12040379,
+        "y": 15011794
+       }
+      },
+      "p1": {
+       "a": {
+        "ru": "CEO0w621JV9reTswCkm6myjaztnAnY6WE6WJi2bUurM=",
+        "rv": "MU4eulVYrMXRzwm0u8jNidR0+od/jyTHQewwBFlQ54k=",
+        "u": 3540307,
+        "v": 705246,
+        "y": 4245553
+       },
+       "b": {
+        "ru": "brshr+fNAqTtL9/WHa8wt2FuarSa/KqD/OWHjL7mm8c=",
+        "rv": "2YP2RAWICGj+5g8+hjZP9HU5IX3XhtO/hDRzZSajDxI=",
+        "u": 2318252,
+        "v": 7591455,
+        "y": 9909707
+       },
+       "c": {
+        "ru": "XOogXZXV3zDTtXqbZCHGPqh1OIdA3d0lKw1kLchQLvQ=",
+        "rv": "wQHbSH+r4MJbF7OfbO72nU7Ry1bOnyxeqHcvt8AT+zE=",
+        "u": 13539547,
+        "v": 3481441,
+        "y": 243729
+       },
+       "d": {
+        "ru": "AxZKW/SZUjvA+iRfRl6UGngxO1lT5TqeQzfcTYgwFhM=",
+        "rv": "Ud9T+4Tse6L/V4j8zl3rF7/sFEz7rW9P0N33VmZU8oI=",
+        "u": 12674296,
+        "v": 12905100,
+        "y": 8802137
+       }
+      },
+      "p2": {
+       "a": {
+        "ru": "Vvut8Hu43L1Bf/S1sNvngEd4JWfAjglr7D/lXu6KPBQ=",
+        "rv": "0WLPGz/FQGctZJgnTfWXBDTef+Ww1QHtRcXz1SIXbok=",
+        "u": 5064395,
+        "v": 8639292,
+        "y": 13703687
+       },
+       "b": {
+        "ru": "SJ1GwG16Jbdgf48AAHf2ktfXyGa3UfzERA3iN3eVBMs=",
+        "rv": "JLfglL/0YE30tUWHgqioQIQijw7Z8eDNQvdKJrNtN4w=",
+        "u": 15888260,
+        "v": 14589574,
+        "y": 13700575
+       },
+       "c": {
+        "ru": "+sMgCeqiQY1uh+D/8mr1m27Tqdv6Ky7/5QiKNl8DP9I=",
+        "rv": "sJkcOZRU2Ph5QpgCmgMeTPCuVp52/QD5znT5vspdOYA=",
+        "u": 9915047,
+        "v": 6881402,
+        "y": 19190
+       },
+       "d": {
+        "ru": "4A+gZaLTZSNQzkuDPTrUBWatz+PYABs2dEuAcUki7kg=",
+        "rv": "JAW58KWdWDIW7OV+1g2blXosEB2FHVjYWcUZ7sqLdoU=",
+        "u": 11978193,
+        "v": 11013116,
+        "y": 6214050
+       }
+      }
+     },
+     "D": {
+      "p0": {
+       "a": {
+        "ru": "GASQGizG2JTJQ7G0aQO/BGL5MCSHwRJoL83lQwiOxX4=",
+        "rv": "j0RCvIOC/CAXbfUGkZFZh1fFLTGtF1nrbjPTHkOj4xE=",
+        "u": 14387266,
+        "v": 15604404,
+        "y": 13214411
+       },
+       "b": {
+        "ru": "5Tl0qMorBCEG4tM60n3NuHsX6iIJ1qkujfD1OintH7Y=",
+        "rv": "LdAZLmCOBDry81PFke2bsFEgNk5daZdt9IliI0Td0Ag=",
+        "u": 6191844,
+        "v": 1536490,
+        "y": 7728334
+       },
+       "c": {
+        "ru": "RC3TdvZxsDL0VL1dRgch5KQ1+MX3JZ272vSVAWNXn9o=",
+        "rv": "EWOE45pk3f2G4BHeel1APqZkcUom59U/S2I2eYImnoA=",
+        "u": 7083092,
+        "v": 10041721,
+        "y": 347554
+       },
+       "d": {
+        "ru": "HX7IllNucs5dcm4Og0selsAVbHNCzdadfxngqhaj9Ec=",
+        "rv": "/CHS++bf3YGCjdj45bZysISAaxIoMkWrXa11uyAFrP8=",
+        "u": 15544404,
+        "v": 9082185,
+        "y": 7849330
+       }
+      },
+      "p1": {
+       "a": {
+        "ru": "ZyVaZs89twjY92UMZd/ArJsLB7tnI25Eg0nPnkk/pCg=",
+        "rv": "pW9pUXymo/owy9iFD2Mm1ETsRWxda0RHqsOsK6Q3VLs=",
+        "u": 10621204,
+        "v": 9045370,
+        "y": 2889315
+       },
+       "b": {
+        "ru": "9cgefpyqgxu4iGE7ZobB2DZ/GlvbCousFjTYg12z3WI=",
+        "rv": "KfNtg4SyepX2PGExkjRydl6RsztMMahqqHMR3jJ7I6E=",
+        "u": 6877424,
+        "v": 2632096,
+        "y": 9509520
+       },
+       "c": {
+        "ru": "AdlBSTDIYiclxTPaek4gsnzS6H/AJ6yE8ZJnqJTqKek=",
+        "rv": "oVHK7Q6yR+sZzLJ2A0uhzh+DNGU445lxLaqPnw9cg8w=",
+        "u": 12521129,
+        "v": 7368012,
+        "y": 3111882
+       },
+       "d": {
+        "ru": "3/yatDl4EClTwjqk+yDNMDpVlqH7BEf6HIbDb3LajHE=",
+        "rv": "8TzhQv5G/K/spjER6CqwXUeyvirekgDBo/CfpQle8rU=",
+        "u": 7159472,
+        "v": 10091447,
+        "y": 473660
+       }
+      },
+      "p2": {
+       "a": {
+        "ru": "J9vZ/Vt4VnTn0PEfU86TbAr8Hq6BdLK9f3vy8d4AeC8=",
+        "rv": "NkFPDKiNpMtbX5iD5sQIAT6r4NFQjKX7/xKauvuD09c=",
+        "u": 620328,
+        "v": 7519622,
+        "y": 8139950
+       },
+       "b": {
+        "ru": "8d2QIcTZ0ht+kAykzh2WwrRNNrhwraZs6e6Lx33ziAc=",
+        "rv": "WTMWMZbEKyJ91cXMzy7gRCM/nxKoIPZCdNUUWIZli28=",
+        "u": 12995282,
+        "v": 1499912,
+        "y": 14495194
+       },
+       "c": {
+        "ru": "/OV5G0pRT1IVaEa0DzeXznCgQ7JHKKSEjnA9l7yRmTE=",
+        "rv": "nOBTxoZgB0m9hYTVAn2hUbq4Zen2lDNskahcUTIlMq4=",
+        "u": 1287116,
+        "v": 8563974,
+        "y": 9851090
+       },
+       "d": {
+        "ru": "ktLj6kf9JaHv/ggckjnB03uRdNguukBRqKgKvckhqfQ=",
+        "rv": "iS2UPMyV7N6YxAGJTOxx50pMFIRyOx6K7HOIGMJ5K+8=",
+        "u": 11852045,
+        "v": 15910111,
+        "y": 10984897
+       }
+      }
+     }
+    }
+   }
+  }
+ ],
+ [
+  "proof:input_consistency:input_openings",
+  {
+   "opened_commitments": {
+    "mayor": {
+     "p0": {
+      "a": {
+       "rv": "cAEi/8veJSMIlo28OjssWflIJU4DeXxWvWKAAHFxsAs=",
+       "v": 329366750747999882603385423393204019414
+      },
+      "b": {
+       "rv": "93pWkaKAdbfi7bofUCOvMcPQWRNjI6x1fHGNdeZxMw8=",
+       "v": 335069446229610347453977067735646577771
+      },
+      "c": {
+       "rv": "cVTMg+tQZMEiS67T0+mFvUliKIu+WNL9cGz8XlSFXRY=",
+       "v": 280023906339678921656726380559424098523
+      },
+      "d": {
+       "rv": "v860rmur+MdcY0W6ye0i3J6rrKnCn+fXGJ6iPvzSO+I=",
+       "v": 36843422504807696213434124672150730554
+      }
+     },
+     "p1": {
+      "a": {
+       "rv": "B+bhfoC04rydjAVXScrhRL8Ypl34FknknHPhJVeiYKU=",
+       "v": 287801101661075508513198674125368240474
+      },
+      "b": {
+       "rv": "7etmXFXkHp1cTu2eqaLjHGAQSAy4hzdG+TaFZYh+uFI=",
+       "v": 249346627304676806170352823019624012366
+      },
+      "c": {
+       "rv": "DMVTg9ibGctiM8jSIoL2zrVdBmNrBIc7Cn/g1/dJzDE=",
+       "v": 203495989093563464902459402733766247423
+      },
+      "d": {
+       "rv": "+igi8Zj7yW6sezaY1vC2UeAaLNrITRE9o/J31Eu7Q0s=",
+       "v": 204630016017866616032086118807501548225
+      }
+     },
+     "p2": {
+      "a": {
+       "ru": "s/KON63G1n2+CYDSYotZSIqFpdyMXMWCANmGoaiWeiw=",
+       "u": 325338515866050627343704266340145408855
+      },
+      "b": {
+       "ru": "J6yiExbEZIku4OVpar2kfTtyBoYeaKWJqj54QuSHn3Q=",
+       "u": 8184029892117417778845122695542980914
+      },
+      "c": {
+       "ru": "1mnJyAyX+CkNZFRZS0gbJ78xXqdrJ2G4q8GdKChWzro=",
+       "u": 120652635310915780145657028073834687805
+      },
+      "d": {
+       "ru": "69GYcUNV58N5H35p//yE8vxxiFkn5jsgB6Al2xWbGME=",
+       "u": 170809098579393049443230243816031635809
+      }
+     }
+    },
+    "taxes": {
+     "p0": {
+      "a": {
+       "rv": "ixYQ0ylDKQ3zRP3sqKdPX4SpzkRHxWYlW7NNM8jIDC4=",
+       "v": 7451559
+      },
+      "b": {
+       "rv": "xd3rZ9C81Hom7ea1WAfT6cc/HX4SHMLu+u7BZSTqBMM=",
+       "v": 9429454
+      },
+      "c": {
+       "rv": "jG2b7piXHn1+ax1Ryf50HrBC4MqenEDK5r0UlarqWxk=",
+       "v": 13918690
+      },
+      "d": {
+       "rv": "XFq1JsVDGK8M8lNj/qZsvyBAHeKx2wP0gEgbG7PV0qQ=",
+       "v": 1884046
+      }
+     },
+     "p1": {
+      "a": {
+       "ru": "8437l89e0mheaEzvY/WuauQvdUiIRxAfYSoGUdbd7Gc=",
+       "u": 13527682
+      },
+      "b": {
+       "ru": "+jvqsWTZ2XfU7yYOCyK5uM+DY7haL+trc+GWzFlkDMM=",
+       "u": 2500199
+      },
+      "c": {
+       "ru": "xCF0ODZGoRr/M5HFupNqwrAhUy/ecpFeVnVCTHe8U68=",
+       "u": 4603380
+      },
+      "d": {
+       "ru": "D9gKE6Mehv+zqdOYiW9jfPF08YU10Ru/M4TJ2Acjdoo=",
+       "u": 7669600
+      }
+     },
+     "p2": {
+      "a": {
+       "ru": "RJcRe1s37R4tYCcehSMV2n7vwZVrTSG1zur0f1nIRkw=",
+       "u": 7328687
+      },
+      "b": {
+       "ru": "DCCmB+grKSiT8f4H634PJqsZE11iDXe0RI107+CcYAc=",
+       "u": 11059841
+      },
+      "c": {
+       "ru": "iaim1OSzllTaCvuuUW287J8nmFWvASJnYBqsQh9dIxY=",
+       "u": 12754442
+      },
+      "d": {
+       "ru": "0Ciyk+LuztvRxpttYvVRBWzY3KsvQl0yEHeYV6ls+M4=",
+       "u": 15848401
+      }
+     }
+    }
+   }
+  }
+ ],
+ [
+  "proof:input_consistency:output_openings",
+  {
+   "opened_commitments": {
+    "mayor": {
+     "B": {
+      "p0": {
+       "a": {
+        "rv": "WbhJ/CXjtKuBRJSnpI6qy70FCKnHtSQKHiEUN4ZjCpc=",
+        "v": 7304433776911800837180557114674622528
+       },
+       "b": {
+        "rv": "LsSpwBIKApuMUr9LHUrVN6jUC0S9J0OLT8q0/FMX504=",
+        "v": 208127443983535434060758299509947430819
+       },
+       "c": {
+        "rv": "grHhQ9s+miST2cXMLyCeWIWND8nz902U0yMgH5WgX2A=",
+        "v": 100814105354476637433954664658841930250
+       },
+       "d": {
+        "rv": "c48P+ArjRI1HcdfFizAtf8MrRb25xiyJTH08BgKtv+k=",
+        "v": 101200585796022090249582069513086850991
+       }
+      },
+      "p1": {
+       "a": {
+        "ru": "Sy+BgzcS/L5e4LCuikmOKuYfy6kZR/iAx34eprlM/lE=",
+        "u": 329706139749784248250255657240448347208
+       },
+       "b": {
+        "ru": "VQrmAi673q48rqDCAD0vmKeBp3/UZ+ICrGfJWbL1RPo=",
+        "u": 75924218916882734242686234915366811485
+       },
+       "c": {
+        "ru": "SckAfNMeQJgPcldrtiDFlASpqhZqkFAB5mJiQ8nHco4=",
+        "u": 13571139664856230010355574426381376706
+       },
+       "d": {
+        "ru": "V18ZPJ2vuvroyzGwFjY7WyUGR5uCmb/ZEywcNvrFLPg=",
+        "u": 40615972000716503046836461663551429855
+       }
+      },
+      "p2": {
+       "a": {
+        "rv": "Mu0EaquCNwapI+WGL5JS/qArLGPydpB2obZrK3vQFvk=",
+        "v": 106597769439071217188884087392243925901
+       },
+       "b": {
+        "rv": "PYxcGoaAGKINE2+ax17Em0yBCQDtu20W2uhL8xrOGx4=",
+        "v": 197499364596060776115213178193840008253
+       },
+       "c": {
+        "rv": "BcC6BLtL0A0u8RJRgthQWwOEvD0d3vPs0FSuPSQvAOk=",
+        "v": 247712287764529975175671994100651438749
+       },
+       "d": {
+        "rv": "Gk4oysUp1sIV+0itjMqcHoDx2Kb9uwdak09jlIL2H2o=",
+        "v": 241390835420618184337317942547657011062
+       }
+      }
+     },
+     "C": {
+      "p0": {
+       "a": {
+        "rv": "rCqZL/XRpOPg9vWRGK/G1hpF8w3btsBH1dITGpB67GU=",
+        "v": 55977886065642684991526112350668410617
+       },
+       "b": {
+        "rv": "Zu4FtuDahFgAixOLOJujR0q/3q2G7nDcPLH+F7WYRew=",
+        "v": 154943919344156575251780773955182743001
+       },
+       "c": {
+        "rv": "JasgR9SgVcNljsCs3FPzx1r/hlgkdPSM82VNj1v9Zu0=",
+        "v": 102818327036108176377209014598371425539
+       },
+       "d": {
+        "rv": "4O5VRpsujqw+9qslmTguSnRaVYg6qoczQgWhwc7VFQM=",
+        "v": 3486198848159620091473043427725967381
+       }
+      },
+      "p1": {
+       "a": {
+        "ru": "Wt4ikW9lFF2HcgU7BB/NmcXCUwgLIScBdps7Vetzsas=",
+        "u": 75870524630053977013263278001634899671
+       },
+       "b": {
+        "ru": "H2f9SKauNBbRuV7lWTRE1oKAdpwwri5RqM2Q0F6jnu0=",
+        "u": 141693104950167112007218415981928821594
+       },
+       "c": {
+        "ru": "a/Hpq8sifktFWU71JHJWiC9Zb1sDf+Dl1m+Rlgs4vY4=",
+        "u": 196587861919559966720520327569062437164
+       },
+       "d": {
+        "ru": "A9GuB1/X21pp9hpaOkYb1ImuYfaQSAHW/8OFHSKRcDs=",
+        "u": 212022692954366782194901932688507683583
+       }
+      },
+      "p2": {
+       "a": {
+        "rv": "tlNx2vgsRXicCTMliuXpBPw5VeuomIQuaiLDfzTuCDk=",
+        "v": 215925322414991103107318567691069731761
+       },
+       "b": {
+        "rv": "IC/0JxjK5t73KGYrq/uTqizYjy5CfxaB50UEHNwfoHc=",
+        "v": 108158079496405720835465045925420510285
+       },
+       "c": {
+        "rv": "h0ojwUW2cNyOOoTiq3F1/TbxeC/5vWAcX/81LwC6fxY=",
+        "v": 252648195087116826600582443103743677361
+       },
+       "d": {
+        "rv": "/9N1zkg6hkcr82GpvstZP56sGfOw4oV0Tz1NEl6VcmE=",
+        "v": 135562892922380326657658300730125461034
+       }
+      }
+     }
+    },
+    "taxes": {
+     "B": {
+      "p0": {
+       "a": {
+        "ru": "Uk340wKoVslZECRyI/Rd4/f/4Fj24t+kVT/YBnejEJ0=",
+        "u": 14193839
+       },
+       "b": {
+        "ru": "7UzUeIy8IgsWWGjfSv9Dpsuhlw3tOE+uToTGB/tgU+8=",
+        "u": 16329162
+       },
+       "c": {
+        "ru": "LLSUGCE8mlG4fkIwgWhMvP0vgNWYyirrQ+OpPJW89/w=",
+        "u": 9694429
+       },
+       "d": {
+        "ru": "u1Hy/310qTN06E8ES09ds9f56zeJuNtIAf8La7MgwqU=",
+        "u": 7418874
+       }
+      },
+      "p1": {
+       "a": {
+        "rv": "/tuJjvVks9QVt/p2wf6CUIWD5ck/uiRMqeugRFk3NL4=",
+        "v": 7829034
+       },
+       "b": {
+        "rv": "XnYVyyb44J9+VlyQuFOGtYmS9tiaJ/yqVIcRMRyP2xY=",
+        "v": 666860
+       },
+       "c": {
+        "rv": "1WCSXxCJ89Vk1B7YYwPBHZH/NOHRwj+pXaiuh+uhYEA=",
+        "v": 12677354
+       },
+       "d": {
+        "rv": "EGaLaEp6cAS1YDAxUycEzUSV1U0TMGASRMPrAL0S/2A=",
+        "v": 11872181
+       }
+      },
+      "p2": {
+       "a": {
+        "ru": "k3gQ+REumw+jFfbsjSsgp9Gv377W1vSpOzq+CBZUP6U=",
+        "u": 7812608
+       },
+       "b": {
+        "ru": "FEo1k3URmYc4iIzZEWoY0RRxxedr9zKfnSVUIX3YvMo=",
+        "u": 10328760
+       },
+       "c": {
+        "ru": "UyY/VFFwqyL1zHXKwj2UR0hFcHwbXFDEyuDyRkwV20o=",
+        "u": 10208564
+       },
+       "d": {
+        "ru": "gG3OhuAxCxidn922U9Cg5+vvKPV6Eqta3VKJnzSH2dc=",
+        "u": 2666852
+       }
+      }
+     },
+     "C": {
+      "p0": {
+       "a": {
+        "ru": "vyElFSh+EtXSID11of1PWxPFIYL/+eTF9tmIXJDAA9U=",
+        "u": 3665710
+       },
+       "b": {
+        "ru": "8tOJRU4++lqx7fNh1MOXVFhSp6rZtm/6DlPhmYU9qTg=",
+        "u": 16584386
+       },
+       "c": {
+        "ru": "g+BREk1qLbyaVY4/tYrvtfSQG9hR6PjMplW1HDDQlt8=",
+        "u": 12168461
+       },
+       "d": {
+        "ru": "7qqM7fLLOuXl+7GvTefIYRIQyaKv3/CdtjHdnC8qbbI=",
+        "u": 501155
+       }
+      },
+      "p1": {
+       "a": {
+        "ru": "KGxxEBD36u3lrF/iykRQGpBbyVaHnS9GbN2afB98BbQ=",
+        "u": 8870573
+       },
+       "b": {
+        "ru": "bczOCDGMUbq7/c1aj15Tna8poS+NUbbvM6JNzYKbiQE=",
+        "u": 3221080
+       },
+       "c": {
+        "ru": "mcNcUH/KFydJkfYJpac9/ohyqvfJHfPKsA7c5AESDyk=",
+        "u": 5596397
+       },
+       "d": {
+        "ru": "Uq8Zcqma5SZ9ZyEuHfXMEBr7YVjrRa0VlTRxYJE+3Y4=",
+        "u": 12574402
+       }
+      },
+      "p2": {
+       "a": {
+        "rv": "D2HAetgQZMoKS6qNsMfVVR273hPc5F1GghFYzH7g3Ds=",
+        "v": 16458789
+       },
+       "b": {
+        "rv": "BsRrUfnJ3qFJDAmtkttjfqdOfAZpRXcSweMyw/3AbYQ=",
+        "v": 2125561
+       },
+       "c": {
+        "rv": "fzXlYrCLTgFhQqhVrEhjF3PEPVDpAQdUQ3lBUevwSig=",
+        "v": 15867080
+       },
+       "d": {
+        "rv": "cIFeywPHPQQW3C3gLkTaFh13PSr/iYwFV0d6kmFOpdE=",
+        "v": 6557823
+       }
+      }
+     }
+    }
+   }
+  }
+ ],
+ [
+  "proof:input_consistency:pik_for_k_in_icl",
+  {
+   "pik_dict": {
+    "mayor": {
+     "B": {
+      "p0": "p0",
+      "p1": "p2",
+      "p2": "p1"
+     },
+     "C": {
+      "p0": "p1",
+      "p1": "p2",
+      "p2": "p0"
+     }
+    },
+    "taxes": {
+     "B": {
+      "p0": "p2",
+      "p1": "p0",
+      "p2": "p1"
+     },
+     "C": {
+      "p0": "p2",
+      "p1": "p1",
+      "p2": "p0"
+     }
+    }
+   }
+  }
+ ],
+ [
+  "election:done.",
+  {
+   "election_id": "default_election",
+   "time": "2014-06-25T00:15:38-0400"
+  }
+ ],
+ [
+  "sbb:close",
+  {
+   "time": "2014-06-25T00:15:38-0400"
+  }
+ ]
+]
