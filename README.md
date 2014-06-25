@@ -1,7 +1,9 @@
 Python3 code for Rabin/Rivest end-to-end split-value voting method(s).
 
-This code is UNDER DEVELOPMENT and is currently seems to be working
+This code is under development.  It appears to be working
 correctly as intended, but could use a bit of cleanup in details.
+It is for simulating an election (not for actually running an election),
+in order to demonstrate the overall split-value method.
 
 The relevant paper: http://people.csail.mit.edu/rivest/pubs.html#RR14a
 
@@ -37,5 +39,4 @@ Modules:
   * sv_tally.py           -- computes election outcome
   * sv_prover.py          -- produces proof of correctness of outcome
   * sv_sbb.py             -- simulates secure bulletin board  
-
   * default_election.sbb.txt  -- SBB output for a small "default election"
