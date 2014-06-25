@@ -535,7 +535,7 @@ def check_input_consistency_pik(sbb_dict, db):
             for p in db['p_list']:
                 assert pd[race_id][k][p] in p_list
                 p_list.remove(pd[race_id][k][p])
-    print('check_inputs_pik: passed.')
+    print('check_input_consistency_pik: passed.')
 
 def check_input_consistency_input_openings(sbb_dict, db):
     """ Check that input openings are correct, for those halves that are opened. """
@@ -554,6 +554,7 @@ def check_input_consistency_input_openings(sbb_dict, db):
                     assert cvrpi['cu'] == sv.com(ocrpi['u'],ocrpi['ru'])
                 else:
                     assert cvrpi['cv'] == sv.com(ocrpi['v'],ocrpi['rv'])
+    print('check_input_consistency_input_openings: passed.')
 
 def check_input_consistency_output_openings(sbb_dict, db):
     """ Check that output openings are correct, for those halves that are opened. """
@@ -575,6 +576,7 @@ def check_input_consistency_output_openings(sbb_dict, db):
                         assert occrkpi['cu'] == sv.com(ooocrkpi['u'],ooocrkpi['ru'])
                     else:
                         assert occrkpi['cv'] == sv.com(ooocrkpi['v'],ooocrkpi['rv'])
+    print('check_input_consistency_output_openings: passed.')
 
 def check_input_consistency_t_values(sbb_dict, db):
     """ Check that t-values are correct for halfs that are opened. """
@@ -625,6 +627,7 @@ def check_input_consistency_t_values(sbb_dict, db):
                 tv_list = list(enumerate(tv_list,1))
                 tv0 = sv.lagrange(tv_list, db['rows'], db['threshold'], race_modulus)
                 assert ((tu0 + tv0) % race_modulus) == 0
+    print('check_input_consistency_t_values: passed.')
                                    
 
 if __name__ == "__main__":
