@@ -87,6 +87,35 @@ ATTRIBUTES = {'sbb:open': ['election_id', 'time'],
               'sbb:close': ['time']
              }
 
+# 'cheat sheet' on sbb formats:
+# casting:votes['cast_vote_dict'][p][i]['ballot_id']
+# casting:votes['cast_vote_dict'][p][i]['cu']
+# casting:votes['cast_vote_dict'][p][i]['cv']
+# tally:results['election_id']
+# tally:results['tally'][race_id]{choice: cnt}
+# proof:output_commitments['commitments'][race_id][k][p][i]['cu']
+# proof:output_commitments['commitments'][race_id][k][p][i]['cv']
+# proof:output_commitment_t_values['t-values'][race_id][p][i]['tu']
+# proof:output_commitment_t_values['t-values'][race_id][p][i]['tv']
+# proof:verifier_challenges['challenges']['cut']['icl'][...]
+# proof:verifier_challenges['challenges']['cut']['opl'][...]
+# proof:verifier_challenges['leftright'][race_id]{ px: left or right }
+# proof:verifier_challenges['sbb_hash']
+# proof:outcome_check['opened_output_commitments][race_id][k][p][i]['ru']
+# proof:outcome_check['opened_output_commitments][race_id][k][p][i]['rv']
+# proof:outcome_check['opened_output_commitments][race_id][k][p][i]['u']
+# proof:outcome_check['opened_output_commitments][race_id][k][p][i]['v']
+# proof:outcome_check['opened_output_commitments][race_id][k][p][i]['y']
+# proof:input_consistency:input_openings['opened_commitments'][race_id][p][i]['ru']
+# proof:input_consistency:input_openings['opened_commitments'][race_id][p][i]['u'] or
+# proof:input_consistency:input_openings['opened_commitments'][race_id][p][i]['rv']
+# proof:input_consistency:input_openings['opened_commitments'][race_id][p][i]['v']
+# proof:input_consistency:output_openings['opened_commitments'][race_id][p][i]['ru']
+# proof:input_consistency:output_openings['opened_commitments'][race_id][p][i]['u'] or
+# proof:input_consistency:output_openings['opened_commitments'][race_id][p][i]['rv']
+# proof:input_consistency:output_openings['opened_commitments'][race_id][p][i]['v'] or
+# proof:input_consistency:pik_for_k_in_icl['pik_dict'][race_id][k]{px: py}
+
 def has_keys(d, keys):
     """ Return True if dict d has given set of keys.
 
