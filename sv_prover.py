@@ -289,15 +289,15 @@ def prove_input_consistent(election, challenges):
         race_id = race.race_id
         leftright = leftright_dict[race_id]
         coms[race_id] = dict()
-        for p in election.p_list:
-            coms[race_id][p] = dict()
+        for px in election.p_list:
+            coms[race_id][px] = dict()
             for i in election.server.row_list:
-                vote = election.cast_votes[race_id][p][i]
-                if leftright[p] == "left":
+                vote = election.cast_votes[race_id][px][i]
+                if leftright[px] == "left":
                     com = {"u": vote['u'], "ru": vote['ru']}
                 else:
                     com = {"v": vote['v'], "rv": vote['rv']}
-                coms[race_id][p][i] = com
+                coms[race_id][px][i] = com
     election.sbb.post("proof:input_consistency:input_openings",
                       {"opened_commitments": coms},
                       time_stamp=False)
@@ -312,24 +312,21 @@ def prove_input_consistent(election, challenges):
             coms[race_id][k] = dict()
             for py in election.p_list:
                 coms[race_id][k][py] = dict()
+            for py in election.p_list:
                 for i in election.server.row_list:
-                    # first make dict in unpermuted order
                     cols = election.server.cols
                     sdbp = election.server.sdb
-                    # next is to permute it back into same order as input lists
                     px = py
                     for j in range(cols-1, -1, -1):
-                        pi_inv = sdbp[race_id][i][j][k]['pi_inv']
-                        px = pi_inv[px]
-                    # TODO: double-check if next line is py or px !
+                        pi = sdbp[race_id][i][j][k]['pi']
+                        px = pi[px]
                     if leftright[px] == "left":
                         com = {"u": sdbp[race_id][i][cols-1][k]['u'][py],
                                "ru": sdbp[race_id][i][cols-1][k]['ru'][py]}
                     else:
                         com = {"v": sdbp[race_id][i][cols-1][k]['v'][py],
                                "rv": sdbp[race_id][i][cols-1][k]['rv'][py]}
-                # TODO: double-check if next line is py or px !
-                coms[race_id][k][py][i] = com
+                    coms[race_id][k][py][i] = com
     election.sbb.post("proof:input_consistency:output_openings",
                       {"opened_commitments": coms},
                       time_stamp=False)
@@ -354,7 +351,7 @@ def compute_and_post_pik_dict(election, challenges):
             pik_dict[race_id][k] = dict()
             for py in election.p_list:
                 px = py
-                for j in range(cols):
+                for j in range(cols-1, -1, -1):
                     pi = server.sdb[race_id]['a'][j][k]['pi']
                     px = pi[px]
                 pik_dict[race_id][k][py] = px

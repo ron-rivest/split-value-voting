@@ -5,9 +5,9 @@
 """
 Top-level routine for running simulated election using split-value method.
 
-Usage: 
+Usage:
         python3 sv_main.py
-  or    
+  or
         python3 sv_main.py election_id
         where election description is given in election_id.parameters.txt
 """
@@ -57,7 +57,7 @@ default_election_parameters = {
      ("mayor", ("tom",
                 "rufus",
                 "****************"))],  # 16-char write-ins allowed
-    "n_voters": 3,    # voters
+    "n_voters": 11,    # voters
     "n_reps": 4,         # (# of replicas aka 2m)
     "n_fail": 1,         # how many servers may fail
     "n_leak": 1,         # how many servers may leak
@@ -74,7 +74,7 @@ default_election_parameters = {
 }
 
 def get_election_parameters():
-    """ Get election parameters if available, from a file. 
+    """ Get election parameters if available, from a file.
         Else use default.
     """
     election_parameters = default_election_parameters

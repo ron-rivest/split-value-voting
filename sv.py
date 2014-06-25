@@ -792,7 +792,6 @@ def load(filename):
     if SERIALIZER == "json":
         fp = open(filename, "r")
         return json.load(fp)
-        fp.close()
     elif SERIALIZER == "pickle":
         return pickle.load(fp, protocol=pickle_protocol)
     else:

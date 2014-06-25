@@ -32,7 +32,6 @@ THE SOFTWARE.
 # end of standard MIT open-source license
 ##############################################################################
 
-import sys
 import time
 
 import sv

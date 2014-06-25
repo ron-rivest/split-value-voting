@@ -156,9 +156,9 @@ def verify(sbb_filename):
     read_output_commitments(sbb_dict, db)
     read_t_values(sbb_dict, db)
     read_verifier_challenges(sbb_dict, sbb, db)
-    check_inputs(sbb_dict, db)
     check_opened_output_commitments(sbb_dict, db)
     check_opened_output_commitment_tallies(sbb_dict, db)
+    check_input_consistency(sbb_dict, db)
     print('all verifications (as implemented so far) passed!!')
 
 def check_headers(sbb):
@@ -512,16 +512,16 @@ def check_opened_output_commitment_tallies(sbb_dict, db):
         assert tally_k == db['tally']
     print('check_opened_output_commitment_tallies: passed.')
 
-def check_inputs(sbb_dict, db):
+def check_input_consistency(sbb_dict, db):
     """ Do all input checks.
         Check that t-values are consistent with opened inputs and
         opened outputs, for k in icl.  Also check that lagrange
         of t-value pairs for a given voter yields (t,-t).
     """
-    check_inputs_pik(sbb_dict, db)
-    # need to check t values and outputs corresponding to inputs
+    check_input_consistency_pik(sbb_dict, db)
+    check_input_consistency_main(sbb_dict, db)
 
-def check_inputs_pik(sbb_dict, db):
+def check_input_consistency_pik(sbb_dict, db):
     """ Check that piks look OK. """
     pd = sbb_dict['proof:input_consistency:pik_for_k_in_icl']['pik_dict']
     assert isdict(pd, db['race_ids'])
@@ -535,43 +535,36 @@ def check_inputs_pik(sbb_dict, db):
                 p_list.remove(pd[race_id][k][p])
     print('check_inputs_pik: passed.')
 
-def check_inputs_outputs_openings(sbb_dict, db):
-    """ Check input openings for testing consistency with output openings. """
-    coms = sbb_dict['proof:input_consistency:input_openings']['opened_commitments']
-    for race_id in db['race_ids']:
-        for k in db['icl']:
-            # check correspondence
-            pass
-
-def check_inputs_output_openings(sbb_dict, db):
-    """ Check output openings used for consistency with input openings. """
-
-def check_inputs_t_value(sbb_dict, db):
+def check_input_consistency_main(sbb_dict, db):
     """ Check that t-values are correct for halfs that are opened. """
     for race_id in db['races']:
         # leftright maps p-list elements to 'left' or 'right'
         leftright = sbb_dict['proof:verifier_challenges']\
                     ['challenges']['leftright'][race_id] # same for all i
 
-        # pik_dict maps k to mapping from p_list elements to p_list elts.
+        # pik_dict maps race_id, k to mapping from p_list elements to p_list elts.
         # this is py back to px
-        pik_dict = sbb_dict['proof:pik_for_k_in_icl']['pik_dict']
+        pik_dict = sbb_dict['proof:input_consistency:pik_for_k_in_icl']['pik_dict']
         for k in db['icl']:
-            pik = pik_dict[k]
-            # icom maps i, p, to
-            #  {ballot_id,"com(u,ru)","i","race_id","ru","u"} or
-            #  {ballot_id,"com(v,rv)","i","race_id","rv","v"} or
+            pik = pik_dict[race_id][k]  # {py: px}
+
             icom = sbb_dict['proof:input_consistency:input_openings']\
                    ['opened_commitments'][race_id]
-
-            # t_value_dict maps p and i to {"tu":value, "tv":value}
-            t_value_dict = sbb_dict['t_values'][race_id][k]
+            ocom = sbb_dict['proof:input_consistency:output_openings']\
+                   ['opened_commitments'][race_id][k]
+            #  icom maps p, i to {"ru":.., "u":..} or {"rv":.., "v":..}
+            #  ocom maps p, i to {"ru":.., "u":..} or {"rv":.., "v":..}
             for py in db['p_list']:
                 px = pik[py]
-                lr = leftright[px]        # and not py
-                assert lr == 'left' or lr == 'right'
-                # find input commitment
-                icom = db['cast_votes'][ix]
+                for i in db['row_list']:
+                    icompi = icom[px][i]
+                    ocompi = ocom[py][i]
+                    assert set(icompi.keys()) == set(ocompi.keys())
+                    # t_value_dict gives {"tu":value, "tv":value}
+                    t_value_dict = sbb_dict['proof:output_commitment_t_values']\
+                            ['t_values'][race_id][k][px][i]
+                    lr = leftright[px]        # and not py
+                    assert lr == 'left' or lr == 'right'
 
 
 if __name__ == "__main__":
