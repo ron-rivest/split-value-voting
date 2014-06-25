@@ -209,13 +209,8 @@ class Server():
                         # then obfuscate by adding "fuzz"
                         fuzz_dict = self.sdb[race_id][i][j][k]['fuzz_dict']
                         xpo = dict()
-                        # TODO: remove this debugging switch
-                        fuzzing_wanted = False
-                        if fuzzing_wanted:
-                            for v in election.p_list:
-                                xpo[v] = (xp[v] + fuzz_dict[v]) % race_modulus
-                        else:
-                            xpo = xp
+                        for v in election.p_list:
+                            xpo[v] = (xp[v] + fuzz_dict[v]) % race_modulus
                         y = xpo
                         self.sdb[race_id][i][j][k]['y'] = y
                         # this column's y's become next column's x's.
