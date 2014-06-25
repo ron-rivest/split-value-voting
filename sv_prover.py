@@ -114,7 +114,7 @@ def post_output_commitments(election):
                         {'cu': full_output[race_id][k][py][i]['cu'],
                          'cv': full_output[race_id][k][py][i]['cv']}
     election.output_commitments = coms
-    election.sbb.post("proof:all_output_commitments",
+    election.sbb.post("proof:output_commitments",
                       {"commitments": coms},
                       time_stamp=False)
 
@@ -161,7 +161,7 @@ def compute_and_post_t_values(election):
                     tv = (vy-vx) % race.race_modulus
                     ts[race_id][k][px][i]["tu"] = tu
                     ts[race_id][k][px][i]["tv"] = tv
-    election.sbb.post("proof:t_values_for_all_output_commitments",
+    election.sbb.post("proof:output_commitment_t_values",
                       {"t_values": ts},
                       time_stamp=False)
 
@@ -298,7 +298,7 @@ def prove_input_consistent(election, challenges):
                 else:
                     com = {"v": vote['v'], "rv": vote['rv']}
                 coms[race_id][p][i] = com
-    election.sbb.post("proof:input_check:input_openings",
+    election.sbb.post("proof:input_consistency:input_openings",
                       {"opened_commitments": coms},
                       time_stamp=False)
 
@@ -330,7 +330,7 @@ def prove_input_consistent(election, challenges):
                                "rv": sdbp[race_id][i][cols-1][k]['rv'][py]}
                 # TODO: double-check if next line is py or px !
                 coms[race_id][k][py][i] = com
-    election.sbb.post("proof:input_check:output_openings",
+    election.sbb.post("proof:input_consistency:output_openings",
                       {"opened_commitments": coms},
                       time_stamp=False)
 
@@ -359,7 +359,7 @@ def compute_and_post_pik_dict(election, challenges):
                     px = pi[px]
                 pik_dict[race_id][k][py] = px
             # now pik maps py's to their original px's
-    election.sbb.post("proof:input_check:pik_for_k_in_icl",
+    election.sbb.post("proof:input_consistency:pik_for_k_in_icl",
                       {'pik_dict': pik_dict},
                       time_stamp=False)
 

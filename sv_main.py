@@ -57,7 +57,7 @@ default_election_parameters = {
      ("mayor", ("tom",
                 "rufus",
                 "****************"))],  # 16-char write-ins allowed
-    "n_voters": 1000,    # voters
+    "n_voters": 3,    # voters
     "n_reps": 4,         # (# of replicas aka 2m)
     "n_fail": 1,         # how many servers may fail
     "n_leak": 1,         # how many servers may leak

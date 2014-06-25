@@ -54,37 +54,37 @@ HEADER_LIST = ['sbb:open',
                'setup:finished',
                'casting:votes',
                'tally:results',
-               'proof:all_output_commitments',
-               'proof:t_values_for_all_output_commitments',
+               'proof:output_commitments',
+               'proof:output_commitment_t_values',
                'proof:verifier_challenges',
                'proof:outcome_check',
-               'proof:input_check:input_openings',
-               'proof:input_check:output_openings',
-               'proof:input_check:pik_for_k_in_icl',
+               'proof:input_consistency:input_openings',
+               'proof:input_consistency:output_openings',
+               'proof:input_consistency:pik_for_k_in_icl',
                'election:done.',
                'sbb:close']
 
 # attributes expected for each header
-ATTRIBUTES = {'sbb:open': ['election_id', 'time_iso8601'],
-              'setup:start': ['election_id', 'time_iso8601',
+ATTRIBUTES = {'sbb:open': ['election_id', 'time'],
+              'setup:start': ['election_id', 'time',
                               'about', 'legend'],
               'setup:races': ['ballot_style_race_dict'],
               'setup:voters': ['n_voters', 'ballot_id_len'],
               'setup:server-array':
                   ['cols', 'rows', 'n_reps', 'threshold', 'json_indent'],
-              'setup:finished': ['time_iso8601'],
+              'setup:finished': ['time'],
               'casting:votes': ['cast_vote_dict'],
-              'tally:results': ['election_id', 'tally', 'time_iso8601'],
-              'proof:all_output_commitments': ['commitments'],
-              'proof:t_values_for_all_output_commitments': ['t_values'],
+              'tally:results': ['election_id', 'tally', 'time'],
+              'proof:output_commitments': ['commitments'],
+              'proof:output_commitment_t_values': ['t_values'],
               'proof:verifier_challenges': ['challenges', 'sbb_hash'],
               'proof:outcome_check':
                   ['opened_output_commitments'],
-              'proof:input_check:input_openings': ['opened_commitments'],
-              'proof:input_check:output_openings': ['opened_commitments'],
-              'proof:input_check:pik_for_k_in_icl': ['pik_dict'],
-              'election:done.': ['time_iso8601', 'election_id'],
-              'sbb:close': ['time_iso8601']
+              'proof:input_consistency:input_openings': ['opened_commitments'],
+              'proof:input_consistency:output_openings': ['opened_commitments'],
+              'proof:input_consistency:pik_for_k_in_icl': ['pik_dict'],
+              'election:done.': ['time', 'election_id'],
+              'sbb:close': ['time']
              }
 
 def has_keys(d, keys):
@@ -170,8 +170,8 @@ def check_monotonic_time(sbb):
     last_item_time = None
     for item in sbb:
         item_dict = item[1]
-        if 'time_iso8601' in item_dict:
-            item_time = item_dict['time_iso8601']
+        if 'time' in item_dict:
+            item_time = item_dict['time']
             assert last_item_time == None or \
                 item_time >= last_item_time
             last_item_time = item_time
@@ -286,10 +286,10 @@ def read_tally(sbb_dict, db):
     print('read_tally: successful.')
 
 def read_output_commitments(sbb_dict, db):
-    """ Read output commitments from proof:all_output_commitments
+    """ Read output commitments from proof:output_commitments
     and put results into db.
     """
-    coms = sbb_dict['proof:all_output_commitments']['commitments']
+    coms = sbb_dict['proof:output_commitments']['commitments']
     assert isdict(coms, db['race_ids'])
     for race_id in db['race_ids']:
         assert isdict(coms[race_id], db['k_list'])
@@ -307,10 +307,10 @@ def read_output_commitments(sbb_dict, db):
     print('read_output_commitments: successful.')
 
 def read_t_values(sbb_dict, db):
-    """ Read t values from proof:t_values_for_all_output_commitments, and
+    """ Read t values from proof:output_commitment_t_values, and
         save them in db.
     """
-    ts = sbb_dict['proof:t_values_for_all_output_commitments']['t_values']
+    ts = sbb_dict['proof:output_commitment_t_values']['t_values']
     assert isdict(ts, db['race_ids'])
     for race_id in db['race_ids']:
         assert isdict(ts[race_id], db['k_list'])
@@ -411,8 +411,6 @@ def hash_sbb(sbb, stop_before_header):
 
 def check_opened_output_commitments(sbb_dict, db):
     """ Check that opened output commitments open correctly.
-    TODO: ensure that all such necessary checks are done, not just for ones
-          that are posted.
     """
     coms = \
         sbb_dict['proof:outcome_check']\
@@ -441,9 +439,9 @@ def check_opened_output_commitments(sbb_dict, db):
                     assert isinstance(y, int) and \
                         0 <= y < db['races'][race_id]['race_modulus']
                     assert y == (u+v) % db['races'][race_id]['race_modulus']
-                    cu = sbb_dict['proof:all_output_commitments']\
+                    cu = sbb_dict['proof:output_commitments']\
                          ['commitments'][race_id][k][p][i]['cu']
-                    cv = sbb_dict['proof:all_output_commitments']\
+                    cv = sbb_dict['proof:output_commitments']\
                          ['commitments'][race_id][k][p][i]['cv']
                     assert cu == sv.com(u, ru)
                     assert cv == sv.com(v, rv)
@@ -496,7 +494,7 @@ def check_inputs(sbb_dict, db):
 
 def check_inputs_pik(sbb_dict, db):
     """ Check that piks look OK. """
-    pd = sbb_dict['proof:input_check:pik_for_k_in_icl']['pik_dict']
+    pd = sbb_dict['proof:input_consistency:pik_for_k_in_icl']['pik_dict']
     assert isdict(pd, db['race_ids'])
     for race_id in db['race_ids']:
         assert isdict(pd[race_id], db['icl'])
@@ -510,8 +508,7 @@ def check_inputs_pik(sbb_dict, db):
 
 def check_inputs_outputs_openings(sbb_dict, db):
     """ Check input openings for testing consistency with output openings. """
-
-    coms = sbb_dict['proof:input_check:input_openings']['opened_commitments']
+    coms = sbb_dict['proof:input_consistency:input_openings']['opened_commitments']
     for race_id in db['race_ids']:
         for k in db['icl']:
             # check correspondence
@@ -535,7 +532,7 @@ def check_inputs_t_value(sbb_dict, db):
             # icom maps i, p, to
             #  {ballot_id,"com(u,ru)","i","race_id","ru","u"} or
             #  {ballot_id,"com(v,rv)","i","race_id","rv","v"} or
-            icom = sbb_dict['proof:input_check:input_openings']\
+            icom = sbb_dict['proof:input_consistency:input_openings']\
                    ['opened_commitments'][race_id]
 
             # t_value_dict maps p and i to {"tu":value, "tv":value}

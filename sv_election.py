@@ -138,7 +138,8 @@ class Election:
          "'icl' stands for 'input comparison list',",
          "'opl' for 'output production list';",
          "      these are the 'cut-and-choose' results",
-         "      dividing up the lists into two sub-lists."
+         "      dividing up the lists into two sub-lists.",
+         "'time' is time in ISO 8601 format."
         ]
         # start secure bulletin board
         self.sbb = sv_sbb.SBB(election_id)

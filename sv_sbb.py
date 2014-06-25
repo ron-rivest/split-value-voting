@@ -81,7 +81,7 @@ class SBB:
         assert "time_str" not in msg_dict
         if time_stamp:
             # msg_dict['time_seconds'] = time.time()
-            msg_dict['time_iso8601'] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
+            msg_dict['time'] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
 
         if msg_dict:
             msg = [msg_header, msg_dict]
