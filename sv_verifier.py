@@ -106,15 +106,16 @@ ATTRIBUTES = {'sbb:open': ['election_id', 'time'],
 # proof:outcome_check['opened_output_commitments][race_id][k][p][i]['u']
 # proof:outcome_check['opened_output_commitments][race_id][k][p][i]['v']
 # proof:outcome_check['opened_output_commitments][race_id][k][p][i]['y']
-# proof:input_consistency:input_openings['opened_commitments'][race_id][p][i]['ru']
-# proof:input_consistency:input_openings['opened_commitments'][race_id][p][i]['u'] or
-# proof:input_consistency:input_openings['opened_commitments'][race_id][p][i]['rv']
-# proof:input_consistency:input_openings['opened_commitments'][race_id][p][i]['v']
-# proof:input_consistency:output_openings['opened_commitments'][race_id][k][p][i]['ru']
-# proof:input_consistency:output_openings['opened_commitments'][race_id][k][p][i]['u'] or
-# proof:input_consistency:output_openings['opened_commitments'][race_id][k][p][i]['rv']
-# proof:input_consistency:output_openings['opened_commitments'][race_id][k][p][i]['v'] or
-# proof:input_consistency:pik_for_k_in_icl['pik_dict'][race_id][k]{px: py}
+# in following lines let PIC stand for "proof:input_consistency"
+# PIC:input_openings['opened_commitments'][race_id][p][i]['ru']
+# PIC:input_openings['opened_commitments'][race_id][p][i]['u'] or
+# PIC:input_openings['opened_commitments'][race_id][p][i]['rv']
+# PIC:input_openings['opened_commitments'][race_id][p][i]['v']
+# PIC:output_openings['opened_commitments'][race_id][k][p][i]['ru']
+# PIC:output_openings['opened_commitments'][race_id][k][p][i]['u'] or
+# PIC:output_openings['opened_commitments'][race_id][k][p][i]['rv']
+# PIC:output_openings['opened_commitments'][race_id][k][p][i]['v'] or
+# PIC:pik_for_k_in_icl['pik_dict'][race_id][k]{px: py}
 
 def has_keys(d, keys):
     """ Return True if dict d has given set of keys.
@@ -538,8 +539,11 @@ def check_input_consistency_pik(sbb_dict, db):
     print('check_input_consistency_pik: passed.')
 
 def check_input_consistency_input_openings(sbb_dict, db):
-    """ Check that input openings are correct, for those halves that are opened. """
-    oc = sbb_dict['proof:input_consistency:input_openings']['opened_commitments']
+    """ Check that input openings are correct,
+        for those halves that are opened.
+    """
+    oc = sbb_dict['proof:input_consistency:input_openings']\
+                 ['opened_commitments']
     cv = sbb_dict['casting:votes']['cast_vote_dict']
     for race_id in db['races']:
         ocr = oc[race_id]
@@ -551,14 +555,19 @@ def check_input_consistency_input_openings(sbb_dict, db):
                 ocrpi = ocrp[i]
                 cvrpi = cvrp[i]
                 if 'u' in ocrpi:
-                    assert cvrpi['cu'] == sv.com(ocrpi['u'],ocrpi['ru'])
+                    assert cvrpi['cu'] == sv.com(ocrpi['u'],
+                                                 ocrpi['ru'])
                 else:
-                    assert cvrpi['cv'] == sv.com(ocrpi['v'],ocrpi['rv'])
+                    assert cvrpi['cv'] == sv.com(ocrpi['v'],
+                                                 ocrpi['rv'])
     print('check_input_consistency_input_openings: passed.')
 
 def check_input_consistency_output_openings(sbb_dict, db):
-    """ Check that output openings are correct, for those halves that are opened. """
-    oooc = sbb_dict['proof:input_consistency:output_openings']['opened_commitments']
+    """ Check that output openings are correct,
+        for those halves that are opened.
+    """
+    oooc = sbb_dict['proof:input_consistency:output_openings']\
+                   ['opened_commitments']
     occ = sbb_dict['proof:output_commitments']['commitments']
     for race_id in db['races']:
         ooocr = oooc[race_id]
@@ -573,9 +582,11 @@ def check_input_consistency_output_openings(sbb_dict, db):
                     ooocrkpi = ooocrkp[i]
                     occrkpi = occrkp[i]
                     if 'u' in ooocrkpi:
-                        assert occrkpi['cu'] == sv.com(ooocrkpi['u'],ooocrkpi['ru'])
+                        assert occrkpi['cu'] == sv.com(ooocrkpi['u'],
+                                                       ooocrkpi['ru'])
                     else:
-                        assert occrkpi['cv'] == sv.com(ooocrkpi['v'],ooocrkpi['rv'])
+                        assert occrkpi['cv'] == sv.com(ooocrkpi['v'],
+                                                       ooocrkpi['rv'])
     print('check_input_consistency_output_openings: passed.')
 
 def check_input_consistency_t_values(sbb_dict, db):
@@ -586,9 +597,11 @@ def check_input_consistency_t_values(sbb_dict, db):
                     ['challenges']['leftright'][race_id] # same for all i
         race_modulus = sbb_dict['setup:races']['ballot_style_race_dict']\
                        [race_id]['race_modulus']
-        # pik_dict maps race_id, k to mapping from p_list elements to p_list elts.
-        # this is py back to px
-        pik_dict = sbb_dict['proof:input_consistency:pik_for_k_in_icl']['pik_dict']
+        # pik_dict maps race_id, k to
+        #   mapping from p_list elements to p_list elts.
+        # (mapping py back to px)
+        pik_dict = sbb_dict['proof:input_consistency:pik_for_k_in_icl']\
+                           ['pik_dict']
         for k in db['icl']:
             pik = pik_dict[race_id][k]  # {py: px}
             icom = sbb_dict['proof:input_consistency:input_openings']\
@@ -622,13 +635,15 @@ def check_input_consistency_t_values(sbb_dict, db):
                     tu_list.append(t_value_dict['tu'])
                     tv_list.append(t_value_dict['tv'])
                 # check that tu_list and tv_list lagrange to (t, -t)
-                tu_list = list(enumerate(tu_list,1))
-                tu0 = sv.lagrange(tu_list, db['rows'], db['threshold'], race_modulus)
-                tv_list = list(enumerate(tv_list,1))
-                tv0 = sv.lagrange(tv_list, db['rows'], db['threshold'], race_modulus)
+                tu_list = list(enumerate(tu_list, 1))
+                tu0 = sv.lagrange(tu_list, db['rows'], db['threshold'],
+                                  race_modulus)
+                tv_list = list(enumerate(tv_list, 1))
+                tv0 = sv.lagrange(tv_list, db['rows'], db['threshold'],
+                                  race_modulus)
                 assert ((tu0 + tv0) % race_modulus) == 0
     print('check_input_consistency_t_values: passed.')
-                                   
+
 
 if __name__ == "__main__":
     filename = sys.argv[1]
