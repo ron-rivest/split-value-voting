@@ -1,8 +1,6 @@
-##############################################################################
-# standard MIT open-source license
-##############################################################################
-# for code at https://github.com/ron-rivest/split-value-voting.git
-"""
+Standard MIT open-source license
+For code at https://github.com/ron-rivest/split-value-voting.git
+
 The MIT License
 
 Copyright (c) 2014 Michael O. Rabin and Ronald L. Rivest
@@ -24,7 +22,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-"""
-##############################################################################
-# end of standard MIT open-source license
-##############################################################################
+
+
