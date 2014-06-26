@@ -1,4 +1,4 @@
-Standard MIT open-source license
+Standard MIT open-source license.<p>
 For code at https://github.com/ron-rivest/split-value-voting.git
 
 The MIT License
