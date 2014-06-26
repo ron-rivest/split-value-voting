@@ -15,7 +15,7 @@ def make_proof(election):
     """ Prove that the outcome is correct. (Make it verifiable.) """
 
     # write out commitments for outputs of last column
-    make_full_output(election)
+    compute_output_commitments(election)
     post_output_commitments(election)
     compute_and_post_t_values(election)
 
@@ -34,14 +34,15 @@ def make_proof(election):
 # output section
 ##############################################################################
 
-def make_full_output(election):
-    """ Make commitments to output values and save them.
+def compute_output_commitments(election):
+    """ Make commitments to all output values and save them in sdbp.
 
     For each race,
     for each of n_reps copies (indexed by k),
     for each row (indexed by i)
     for each of the n vote shares (call them y)
-    output two commitments.
+    compute two commitments (cu and cv) to split-value rep (u,v) of y.
+    using randomization values ru and rv.
     """
     cols = election.server.cols
     full_output = dict()

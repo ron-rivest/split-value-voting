@@ -414,7 +414,10 @@ def hash_sbb(sbb, stop_before_header):
             sbb_trunc.append(item)
     sbb_trunc_str = sv.dumps(sbb_trunc)
     hash_tweak = 2
-    return sv.secure_hash(sbb_trunc_str, hash_tweak)
+    # use iterated hashing to slow down adversarial attack
+    return sv.secure_hash(sbb_trunc_str,
+                          hash_tweak,
+                          iterate=True)
 
 def check_opened_output_commitments(sbb_dict, db):
     """ Check that opened output commitments open correctly.

@@ -100,7 +100,7 @@ class SBB:
                 board = [item for item in board if item[0][0] != "("]
         board_str = sv.dumps(board)
         hash_tweak = 2
-        return sv.secure_hash(board_str, hash_tweak)
+        return sv.secure_hash(board_str, hash_tweak, iterate=True)
 
 
 

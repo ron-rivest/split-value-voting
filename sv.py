@@ -39,15 +39,23 @@ assert SECPARAM_RAND_SEED == SECPARAM_HASH_OUTPUT
 # HASH FUNCTION (SHA256)
 ##############################################################################
 
-def secure_hash(x, tweak=0):
-    """ Return SHA256 hash of (tweaked) x, as bytes value.
-    x may be string or bytes.
+HASH_ITERATE_COUNT = 10000     # number of extra iterations when requested
+
+def secure_hash(x, tweak=0, iterate=False):
+    """ Return SHA256 hash of (tweaked) x, as bytes value of length 32.
+    Input x to be hashed may be of type string or of type bytes.
 
     (Note that python already has a "hash" function, which is not
     cryptographic, but used for dictionaries. This is different.)
 
-    The value "tweak" (which is in range 0 to 255), allows one to
-    "tweak" the (non-empty) input x.
+    The input value "tweak" (which is in range 0 to 255), allows one to
+    use a "tweaked" (variant) version of the hash function on (non-empty)
+    input x.
+
+    If the input "iterate" is True, then the hash function will
+    iterate on the output an extra HASH_ITERATE_COUNT number of times.
+    This gives a slowerversion of the hash function, to slow down an 
+    adversarial attack.  See sv_verifier.py (hash_sbb) for an example use.
 
     Note: this is not the only place where dependency on choice
     of hash function is evidenced; also see commitment use of hmac.
@@ -57,12 +65,18 @@ def secure_hash(x, tweak=0):
         x = x.encode()
     assert isinstance(x, (bytes, bytearray))
     assert isinstance(tweak, int) and 0 <= tweak < 256
-    if tweak == 0:
-        return hashlib.sha256(x).digest()
-    else:
-        x = bytearray(x)
-        x[0] = (x[0] + tweak) % 256
-        return hashlib.sha256(x).digest()
+    assert tweak == 0 or len(x) > 0
+    assert HASH_ITERATE_COUNT > 0
+    extra_iterations = 0
+    if iterate:
+        extra_iterations = HASH_ITERATE_COUNT
+    for _ in range(1+extra_iterations):
+        if tweak > 0:
+            x = bytearray(x)                # make x mutable
+            x[0] = (x[0] + tweak) % 256
+        x = hashlib.sha256(x).digest()
+    return x
+
 
 ##############################################################################
 # UTILITY FUNCTIONS
