@@ -9,7 +9,6 @@
 # MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
 
 import sv
-# import sv_election
 
 class Voter:
     """ Implement a voter. """
