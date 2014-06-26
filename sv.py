@@ -39,7 +39,8 @@ assert SECPARAM_RAND_SEED == SECPARAM_HASH_OUTPUT
 # HASH FUNCTION (SHA256)
 ##############################################################################
 
-HASH_ITERATE_COUNT = 10000     # number of extra iterations when requested
+HASH_ITERATE_COUNT = 1000000   # number of extra iterations when requested
+                               # takes an extra second or two...
 
 def secure_hash(x, tweak=0, iterate=False):
     """ Return SHA256 hash of (tweaked) x, as bytes value of length 32.

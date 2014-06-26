@@ -137,7 +137,7 @@ def verify(sbb_filename):
     check_opened_output_commitments(sbb_dict, db)
     check_opened_output_commitment_tallies(sbb_dict, db)
     check_input_consistency(sbb_dict, db)
-    print('all verifications passed!!')
+    print('all verifications passed; election outcome verified!!')
 
 def check_headers(sbb):
     """ Check that expected headers are present, and return sbb_dict
