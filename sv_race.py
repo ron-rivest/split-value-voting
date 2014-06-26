@@ -1,19 +1,17 @@
 # race.py
 # python3
-# Prototype code implementing a race in split-value voting method
-# This code is meant to be pedagogic and illustrative of main concepts;
-# many details would need adjustment or filling in for a final implementation.
-# This code only considers a one race election.
 # Ronald L. Rivest
 # 2014-06-13
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+""" Prototype code implementing a race in split-value voting method
+    This code is meant to be pedagogic and illustrative of main concepts;
+    many details would need adjustment or filling in for a final implementation.
+"""
 
-# import sv_election
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
+
 import sv
-# import sv_voter
-# import sv_server
-# import sv_sbb
 
 # Standard list of write-in candidates to use (max 13 char)
 WRITE_INS = ["Donald Duck",

@@ -1,16 +1,17 @@
 # sv_server.py
 # python3
-# Code for server portion of simulated election
-# Simulates array of servers for mix
-#  but not SBB or proof servers
+# Ronald L. Rivest
+# 2014-06-26
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+""" Code for server portion of simulated election
+    Simulates array of servers for mix
+    but not SBB or proof servers.
+"""
 
-# import sys
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
 
 import sv
-# import sv_sbb
-# import sv_election
 
 class Server():
 

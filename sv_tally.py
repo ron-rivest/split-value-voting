@@ -1,13 +1,17 @@
 # sv_tally.py
 # python3
-# Code for tally portion of simulated election
+# Ronald L. Rivest
+# 2014-06-23
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+""" Code for tally portion of simulated split-value election.
+"""
+
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
 
 import sys
 
 import sv
-
 
 def compute_tally(election):
     """ Compute tallies for this election.

@@ -1,8 +1,13 @@
 # sv_sbb.py
 # python3
-# Code for simulating proof and tally servers for split-vote election.
+# Ronald L. Rivest
+# 2014-06-26
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+""" Code for simulating proof and tally servers for split-vote election.
+"""
+
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
 
 import time
 

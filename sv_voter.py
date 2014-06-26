@@ -1,12 +1,15 @@
 # sv_voter.py
 # python3
-# Prototype code implementing voter portion of split-value voting method
-# This code is meant to be pedagogic and illustrative of main concepts;
-# many details would need adjustment or filling in for a final implementation.
 # Ronald L. Rivest
-# 2014-06-14
+# 2014-06-26
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+""" Prototype code implementing voter portion of split-value voting method
+    This code is meant to be pedagogic and illustrative of main concepts;
+    many details would need adjustment or filling in for a final implementation.
+"""
+
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
 
 import sv
 

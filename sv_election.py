@@ -1,8 +1,11 @@
 # sv_election.py
 # python3
-# Top-level code for running election with split-value method
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+""" Defines election class, and can run simulated election.
+"""
+
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
 
 import sv
 import sv_prover

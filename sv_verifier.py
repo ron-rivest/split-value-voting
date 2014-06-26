@@ -1,15 +1,21 @@
 # sv_verifier.py
 # python3
-# Code for verifier portion of an election
-# This should work for simulated election, or a real election.
+# Ronald L. Rivest
+# 2014-06-26
 
-""" Usage: python3 sv_verifier.py election_id.sbb.txt
+""" Code for verifier portion of an election
+    This should work for simulated election, or a real election.
+
+    For stand-alone mode:
+
+    Usage: python3 sv_verifier.py election_id.sbb.txt
 
            where election_id.sbb.txt is the file having
            the contents of the secure bulletin board (json format).
 """
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
 
 import json
 

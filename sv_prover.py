@@ -1,8 +1,13 @@
 # sv_prover.py
 # python3
-# Code for prover portion of simulated election
+# Ronald L. Rivest
+# 2014-06-26
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+""" Code for prover portion of simulated election.
+"""
+
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
 
 import sv
 

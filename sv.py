@@ -1,13 +1,15 @@
 # sv.py
 # python3
-# Prototype code implementing split-value voting method
-# This code is meant to be pedagogic and illustrative of main concepts;
-# many details would need adjustment or filling in for a final implementation.
-# This code only considers a one race election.
 # Ronald L. Rivest
-# 2014-06-13
+# 2014-06-26
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+""" Common utility routines and definitions for split-value voting method.
+    This code is meant to be pedagogic and illustrative of main concepts;
+    many details would need adjustment or filling in for a final implementation.
+"""
+
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
 
 import base64
 import hmac

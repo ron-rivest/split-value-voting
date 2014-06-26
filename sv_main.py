@@ -1,6 +1,7 @@
 # sv_main.py
 # python3
 # Ronald L. Rivest and Michael O. Rabin
+# 2014-06-26
 
 """
 Top-level routine for running simulated election using split-value method.
@@ -12,7 +13,8 @@ Usage:
         where election description is given in election_id.parameters.txt
 """
 
-# MIT open-source license. (See https://github.com/ron-rivest/split-value-voting.git)
+# MIT open-source license.
+# (See https://github.com/ron-rivest/split-value-voting.git)
 
 import sys
 assert sys.version_info[0] == 3
