@@ -55,7 +55,7 @@ def secure_hash(x, tweak=0, iterate=False):
 
     If the input "iterate" is True, then the hash function will
     iterate on the output an extra HASH_ITERATE_COUNT number of times.
-    This gives a slowerversion of the hash function, to slow down an 
+    This gives a slowerversion of the hash function, to slow down an
     adversarial attack.  See sv_verifier.py (hash_sbb) for an example use.
 
     Note: this is not the only place where dependency on choice
@@ -731,18 +731,17 @@ def k_list(n_reps):
 
 ######
 import json
-json_sort_keys = True
-json_indent = 0
+json_parameters = {'json_sort_keys': True,
+                   'json_indent': 0}
 
 def set_json_sort_keys(new_value):
     """ Assign new value to json_sort_keys. """
-    global json_sort_keys
-    json_sort_keys = new_value
+    json_parameters['json_sort_keys'] = new_value
 
 def set_json_indent(new_value):
     """ Assign new value to json_indent. """
-    global json_indent
-    json_indent = new_value
+    assert isinstance(new_value, int)
+    json_parameters['json_indent'] = new_value
 
 ######
 import pickle
@@ -758,7 +757,9 @@ def dump(x, filename):
             fp = sys.stdout
         else:
             fp = open(filename, "w")
-        json.dump(x, fp, sort_keys=json_sort_keys, indent=json_indent)
+        json.dump(x, fp,
+                  sort_keys=json_parameters['json_sort_keys'],
+                  indent=json_parameters['json_indent'])
         fp.close()
     elif SERIALIZER == "pickle":
         fp = open(filename, "w")
@@ -770,7 +771,9 @@ def dump(x, filename):
 def dumps(x):
     """ Dump python data structure x to string and return string. """
     if SERIALIZER == "json":
-        return json.dumps(x, sort_keys=json_sort_keys, indent=json_indent)
+        return json.dumps(x,
+                          sort_keys=json_parameters['json_sort_keys'],
+                          indent=json_parameters['json_indent'])
     elif SERIALIZER == "pickle":
         return pickle.dumps(x, protocol=pickle_protocol)
     else:
