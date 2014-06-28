@@ -299,7 +299,7 @@ def read_receipts(sbb_dict, db):
         for ballot_id in db['ballot_id_dict'][race_id]:
             assert ballot_id in db['receipts']
     print('read_receipts: successful.')
-       
+
 def check_receipts(sbb_dict, db):
     """ Check that receipts are consistent with cast vote commitments. """
     receipt_ballot_ids = set(db['receipts'].keys())

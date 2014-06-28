@@ -232,7 +232,7 @@ class Election:
                               time_stamp=False)
 
     def initialize_cast_votes(self):
-        """ Initialize the election data structure to receive the cast votes. 
+        """ Initialize the election data structure to receive the cast votes.
 
             This data structure is updated by voter.cast_vote in sv_voter.py
         """
@@ -287,8 +287,8 @@ class Election:
                     cvcs[race_id][px][i]['cv'] = \
                         cvs[race_id][px][i]['cv']
         self.sbb.post("casting:votes",
-                          {"cast_vote_dict": cvcs},
-                          time_stamp=False)
+                      {"cast_vote_dict": cvcs},
+                      time_stamp=False)
 
     def post_voter_receipts(self):
         """ Post all voter receipts on the SBB. """
@@ -297,7 +297,7 @@ class Election:
             for ballot_id in voter.receipts:
                 receipts[ballot_id] = voter.receipts[ballot_id]
         self.sbb.post("casting:receipts",
-                          {"receipt_dict": receipts},
-                          time_stamp=False)
+                      {"receipt_dict": receipts},
+                      time_stamp=False)
 
 

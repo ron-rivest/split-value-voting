@@ -88,12 +88,12 @@ class Voter:
         for i in election.server.row_list:
             cu = cvs[race_id][px][i]['cu']
             cv = cvs[race_id][px][i]['cv']
-            d[i] ={'cu': cu, 'cv': cv}
+            d[i] = {'cu': cu, 'cv': cv}
         receipt_data.append(d)
         receipt_data_str = sv.dumps(receipt_data)
-        hash = sv.bytes2base64(sv.secure_hash(receipt_data_str))
+        receipt_hash = sv.bytes2base64(sv.secure_hash(receipt_data_str))
         self.receipts[ballot_id] = {'race_id': race_id,
-                                    'hash': hash}
+                                    'hash': receipt_hash}
 
 
 
