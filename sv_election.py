@@ -153,6 +153,9 @@ class Election:
         # post vote commitments on SBB
         self.post_cast_vote_commitments()
 
+        # post voter receipts on SBB
+        self.post_voter_receipts()
+
         # Mix !
         self.server.mix()
 
@@ -248,7 +251,7 @@ class Election:
         pass
 
     def distribute_cast_votes(self):
-        """ Distribute (sorted) cast votes to server data structure. """
+        """ Distribute cast votes to server data structure. """
         for race_id in self.race_ids:
             for px in self.p_list:
                 for i in self.server.row_list:
@@ -286,4 +289,15 @@ class Election:
         self.sbb.post("casting:votes",
                           {"cast_vote_dict": cvcs},
                           time_stamp=False)
+
+    def post_voter_receipts(self):
+        """ Post all voter receipts on the SBB. """
+        receipts = dict()
+        for voter in self.voters:
+            for ballot_id in voter.receipts:
+                receipts[ballot_id] = voter.receipts[ballot_id]
+        self.sbb.post("casting:receipts",
+                          {"receipt_dict": receipts},
+                          time_stamp=False)
+
 

@@ -32,6 +32,8 @@ class Voter:
         self.rand_name = "voter:"+voter_id
         sv.init_randomness_source(self.rand_name)
 
+        self.receipts = dict()  # maps ballot_id to hash value of receipt
+
     def cast_vote(self, race):
         """ Cast random vote for this voter for this race in simulated election.
 
@@ -78,5 +80,20 @@ class Voter:
             vote = {"ballot_id": ballot_id, "x": x, "u": u, "v": v,
                     "ru": ru, "rv": rv, "cu": cu, "cv": cv}
             cvs[race_id][px][i] = vote
+
+        # compute voter receipt as hash of her ballot_id and commitments
+        # note that voter gets a receipt for each race she votes in
+        receipt_data = [ballot_id]
+        d = dict()
+        for i in election.server.row_list:
+            cu = cvs[race_id][px][i]['cu']
+            cv = cvs[race_id][px][i]['cv']
+            d[i] ={'cu': cu, 'cv': cv}
+        receipt_data.append(d)
+        receipt_data_str = sv.dumps(receipt_data)
+        hash = sv.bytes2base64(sv.secure_hash(receipt_data_str))
+        self.receipts[ballot_id] = {'race_id': race_id,
+                                    'hash': hash}
+
 
 

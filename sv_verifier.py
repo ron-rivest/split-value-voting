@@ -30,6 +30,7 @@ HEADER_LIST = ['sbb:open',
                'setup:server-array',
                'setup:finished',
                'casting:votes',
+               'casting:receipts',
                'tally:results',
                'proof:output_commitments',
                'proof:output_commitment_t_values',
@@ -51,6 +52,7 @@ ATTRIBUTES = {'sbb:open': ['election_id', 'time'],
                   ['cols', 'rows', 'n_reps', 'threshold', 'json_indent'],
               'setup:finished': ['time'],
               'casting:votes': ['cast_vote_dict'],
+              'casting:receipts': ['receipt_dict'],
               'tally:results': ['election_id', 'tally', 'time'],
               'proof:output_commitments': ['commitments'],
               'proof:output_commitment_t_values': ['t_values'],
@@ -130,10 +132,12 @@ def verify(sbb_filename):
     read_n_voters(sbb_dict, db)
     read_rows_cols_n_reps_threshold_indent(sbb_dict, db)
     read_cast_votes(sbb_dict, db)
+    read_receipts(sbb_dict, db)
     read_tally(sbb_dict, db)
     read_output_commitments(sbb_dict, db)
     read_t_values(sbb_dict, db)
     read_verifier_challenges(sbb_dict, sbb, db)
+    check_receipts(sbb_dict, db)
     check_opened_output_commitments(sbb_dict, db)
     check_opened_output_commitment_tallies(sbb_dict, db)
     check_input_consistency(sbb_dict, db)
@@ -253,7 +257,7 @@ def read_cast_votes(sbb_dict, db):
     assert isdict(db['races'], cast_vote_dict.keys())
     ballot_id_dict = dict()
     ballot_id_list = list()
-    for race_id in db['races'].keys():
+    for race_id in db['race_ids']:
         ballot_id_dict[race_id] = []
         cast_vote_race = cast_vote_dict[race_id]
         assert isdict(cast_vote_race)
@@ -279,6 +283,42 @@ def read_cast_votes(sbb_dict, db):
     db['ballot_id_dict'] = ballot_id_dict
     db['cast_vote_dict'] = cast_vote_dict
     print('read_cast_votes: successful.')
+
+def read_receipts(sbb_dict, db):
+    """ Read receipts from casting:receipts. """
+    db['receipts'] = sbb_dict['casting:receipts']['receipt_dict']
+    for ballot_id in db['receipts']:
+        race_id = db['receipts'][ballot_id]['race_id']
+        assert ballot_id in db['ballot_id_dict'][race_id]
+        keys = set(db['receipts'][ballot_id].keys())
+        assert keys == set(['hash', 'race_id'])
+        assert isinstance(db['receipts'][ballot_id]['hash'], str)
+        assert isinstance(race_id, str)
+        assert race_id in db['race_ids']
+    for race_id in db['race_ids']:
+        for ballot_id in db['ballot_id_dict'][race_id]:
+            assert ballot_id in db['receipts']
+    print('read_receipts: successful.')
+       
+def check_receipts(sbb_dict, db):
+    """ Check that receipts are consistent with cast vote commitments. """
+    receipt_ballot_ids = set(db['receipts'].keys())
+    cast_vote_dict = sbb_dict['casting:votes']['cast_vote_dict']
+    for race_id in cast_vote_dict:
+        for p in cast_vote_dict[race_id]:
+            d = dict()
+            for i in cast_vote_dict[race_id][p]:
+                ballot_id = cast_vote_dict[race_id][p][i]['ballot_id']
+                cu = cast_vote_dict[race_id][p][i]['cu']
+                cv = cast_vote_dict[race_id][p][i]['cv']
+                d[i] = {'cu': cu, 'cv': cv}
+            cv_receipt_data = [ballot_id, d]
+            cv_receipt_data_str = sv.dumps(cv_receipt_data)
+            cv_hash = sv.bytes2base64(sv.secure_hash(cv_receipt_data_str))
+            assert cv_hash == db['receipts'][ballot_id]['hash']
+            receipt_ballot_ids.remove(ballot_id)
+    assert len(receipt_ballot_ids) == 0
+    print("check_receipts: passed.")
 
 def read_tally(sbb_dict, db):
     """ Read tally from tally:results and save into db. """
