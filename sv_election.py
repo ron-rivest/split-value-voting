@@ -140,10 +140,17 @@ class Election:
     def run_election(self):
         """ Run a (simulated) election. """
 
+        sv_voter.initialize_cast_votes(self)
+
         # Vote !
-        sv_voter.cast_votes(self)
-        # sv_voter.sort_cast_votes(self)
+        for voter in self.voters:
+            for race in self.races:
+                voter.cast_vote(race)
+
+        # send votes to mix-net
         sv_voter.distribute_cast_votes(self)
+
+        # post vote commitments on SBB
         sv_voter.post_cast_vote_commitments(self)
 
         # Mix !
@@ -201,7 +208,9 @@ class Election:
         for i in range(n_voters):
             vid = "voter:" + str(i)
             self.voter_ids.append(vid)
-            self.voters.append(sv_voter.Voter(self, vid))
+            px = election.p_list[i]
+            voter = sv_voter.Voter(self, vid, px)
+            self.voters.append(voter)
 
         self.sbb.post("setup:voters",
                       {"n_voters": n_voters,
