@@ -140,7 +140,7 @@ class Election:
     def run_election(self):
         """ Run a (simulated) election. """
 
-        sv_voter.initialize_cast_votes(self)
+        self.initialize_cast_votes()
 
         # Vote !
         for voter in self.voters:
@@ -148,10 +148,10 @@ class Election:
                 voter.cast_vote(race)
 
         # send votes to mix-net
-        sv_voter.distribute_cast_votes(self)
+        self.distribute_cast_votes()
 
         # post vote commitments on SBB
-        sv_voter.post_cast_vote_commitments(self)
+        self.post_cast_vote_commitments()
 
         # Mix !
         self.server.mix()
@@ -228,9 +228,62 @@ class Election:
                                         self.voter_ids[-1])},
                               time_stamp=False)
 
+    def initialize_cast_votes(self):
+        """ Initialize the election data structure to receive the cast votes. 
+
+            This data structure is updated by voter.cast_vote in sv_voter.py
+        """
+        cvs = dict()
+        for race_id in self.race_ids:
+            cvs[race_id] = dict()
+            for px in self.p_list:
+                cvs[race_id][px] = dict()    # maps row i to vote share
+        self.cast_votes = cvs
+
     def setup_keys(self):
         """ Set up cryptographic keys for this election simulation.
 
         Not done here in this simulation for simplicity.
         """
         pass
+
+    def distribute_cast_votes(self):
+        """ Distribute (sorted) cast votes to server data structure. """
+        for race_id in self.race_ids:
+            for px in self.p_list:
+                for i in self.server.row_list:
+                    vote = self.cast_votes[race_id][px][i]
+                    # save these values in our server data structures
+                    # in a non-simulated real election, this would be done
+                    # by communicating securely from voter (or tablet) to the
+                    # first column of servers.
+                    sdbp = self.server.sdb[race_id][i][0]
+                    sdbp['ballot_id'][px] = vote['ballot_id']
+                    sdbp['x'][px] = vote['x']
+                    sdbp['u'][px] = vote['u']
+                    sdbp['v'][px] = vote['v']
+                    sdbp['ru'][px] = vote['ru']
+                    sdbp['rv'][px] = vote['rv']
+                    sdbp['cu'][px] = vote['cu']
+                    sdbp['cv'][px] = vote['cv']
+
+    def post_cast_vote_commitments(self):
+        """ Post cast vote commitments onto SBB. """
+        cvs = self.cast_votes
+        cvcs = dict()
+        for race_id in self.race_ids:
+            cvcs[race_id] = dict()
+            for px in self.p_list:
+                cvcs[race_id][px] = dict()
+                for i in self.server.row_list:
+                    cvcs[race_id][px][i] = dict()
+                    cvcs[race_id][px][i]['ballot_id'] = \
+                        cvs[race_id][px][i]['ballot_id']
+                    cvcs[race_id][px][i]['cu'] = \
+                        cvs[race_id][px][i]['cu']
+                    cvcs[race_id][px][i]['cv'] = \
+                        cvs[race_id][px][i]['cv']
+        self.sbb.post("casting:votes",
+                          {"cast_vote_dict": cvcs},
+                          time_stamp=False)
+

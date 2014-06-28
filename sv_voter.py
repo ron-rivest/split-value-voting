@@ -3,7 +3,8 @@
 # Ronald L. Rivest
 # 2014-06-26
 
-""" Prototype code implementing voter portion of split-value voting method.
+""" Prototype code implementing voter portion of split-value voting method,
+    including the casting of votes.
 """
 
 # MIT open-source license.
@@ -66,7 +67,7 @@ class Voter:
         # then strip off indices, since they are equal to row number + 1
         share_list = [share[1] for share in share_list]
 
-        # save ballots on election cast vote list
+        # save ballots on election data structure
         for row, x in enumerate(share_list):
             (u, v) = sv.get_sv_pair(x, rand_name, race_modulus)
             ru = sv.bytes2base64(sv.get_random_from_source(rand_name))
@@ -77,54 +78,5 @@ class Voter:
             vote = {"ballot_id": ballot_id, "x": x, "u": u, "v": v,
                     "ru": ru, "rv": rv, "cu": cu, "cv": cv}
             cvs[race_id][px][i] = vote
-
-def initialize_cast_votes(election):
-    """ Initialize the election data structure to receive the cast votes. """
-    cvs = dict()
-    for race_id in election.race_ids:
-        cvs[race_id] = dict()
-        for px in election.p_list:
-            cvs[race_id][px] = dict()    # maps i to vote share
-    election.cast_votes = cvs
-
-def distribute_cast_votes(election):
-    """ Distribute (sorted) cast votes to server data structure. """
-    for race_id in election.race_ids:
-        for px in election.p_list:
-            for i in election.server.row_list:
-                vote = election.cast_votes[race_id][px][i]
-                # save these values in our server data structures
-                # in a non-simulated real election, this would be done
-                # by communicating securely from voter (or tablet) to the
-                # first column of servers.
-                sdbp = election.server.sdb[race_id][i][0]
-                sdbp['ballot_id'][px] = vote['ballot_id']
-                sdbp['x'][px] = vote['x']
-                sdbp['u'][px] = vote['u']
-                sdbp['v'][px] = vote['v']
-                sdbp['ru'][px] = vote['ru']
-                sdbp['rv'][px] = vote['rv']
-                sdbp['cu'][px] = vote['cu']
-                sdbp['cv'][px] = vote['cv']
-
-def post_cast_vote_commitments(election):
-    """ Post cast vote commitments onto SBB. """
-    cvs = election.cast_votes
-    cvcs = dict()
-    for race_id in election.race_ids:
-        cvcs[race_id] = dict()
-        for px in election.p_list:
-            cvcs[race_id][px] = dict()
-            for i in election.server.row_list:
-                cvcs[race_id][px][i] = dict()
-                cvcs[race_id][px][i]['ballot_id'] = \
-                    cvs[race_id][px][i]['ballot_id']
-                cvcs[race_id][px][i]['cu'] = \
-                    cvs[race_id][px][i]['cu']
-                cvcs[race_id][px][i]['cv'] = \
-                    cvs[race_id][px][i]['cv']
-    election.sbb.post("casting:votes",
-                      {"cast_vote_dict": cvcs},
-                      time_stamp=False)
 
 
