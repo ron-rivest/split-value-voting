@@ -42,16 +42,16 @@ assert SECPARAM_RAND_SEED == SECPARAM_HASH_OUTPUT
 HASH_ITERATE_COUNT = 1000000   # number of extra iterations when requested
                                # takes an extra second or two...
 
-def secure_hash(x, tweak=0, iterate=False):
+def secure_hash(x, tweak="", iterate=False):
     """ Return SHA256 hash of (tweaked) x, as bytes value of length 32.
     Input x to be hashed may be of type string or of type bytes.
 
     (Note that python already has a "hash" function, which is not
     cryptographic, but used for dictionaries. This is different.)
 
-    The input value "tweak" (which is in range 0 to 255), allows one to
-    use a "tweaked" (variant) version of the hash function on (non-empty)
-    input x.
+    The input value "tweak" (which is a string), allows one to
+    use a "tweaked" (variant) version of the hash function.
+    Tweaking adds one extra hash call.
 
     If the input "iterate" is True, then the hash function will
     iterate on the output an extra HASH_ITERATE_COUNT number of times.
@@ -65,17 +65,15 @@ def secure_hash(x, tweak=0, iterate=False):
     if isinstance(x, str):
         x = x.encode()
     assert isinstance(x, (bytes, bytearray))
-    assert isinstance(tweak, int) and 0 <= tweak < 256
-    assert tweak == 0 or len(x) > 0
+    assert isinstance(tweak, str)
     assert HASH_ITERATE_COUNT > 0
     extra_iterations = 0
     if iterate:
         extra_iterations = HASH_ITERATE_COUNT
     for _ in range(1+extra_iterations):
-        if tweak > 0:
-            x = bytearray(x)                # make x mutable
-            x[0] = (x[0] + tweak) % 256
         x = hashlib.sha256(x).digest()
+    if tweak:
+        x = hashlib.sha256((tweak + bytes2hex(x)).encode()).digest()
     return x
 
 
@@ -198,7 +196,7 @@ def get_random_from_source(rand_name, modulus=None):
     randomness_sources[rand_name] = new_seed
     # use tweaked hash in the following line, so that
     # output-producing hash and next-new-seed hash are different
-    random_output = secure_hash(new_seed, 1)
+    random_output = secure_hash(new_seed, "get_random")
     if modulus == None:
         return random_output
     return bytes2int(random_output) % modulus
@@ -214,12 +212,12 @@ def test_random():
         ans.append(bytes2hex(rand_bytes[:6]))
     # print(ans)
     assert ans == \
-        ['spam', '1236c6cea5b6', 'spam', '25f602072d77',
-         'eggs', '1d52f6c167a8', 'spam', 'e1bfc9553da5',
-         'eggs', '90dd63f64db6']
+        ['spam', '8489808b0e14', 'spam', 'ee34ffeca97a',
+         'eggs', '75c56facac5e', 'spam', '00a3626f07e8',
+         'eggs', '057fd952e66d']
     ans = get_random_from_source("spam", 100)
     # print(ans)
-    assert ans == 21
+    assert ans == 74
 
 test_random()
 
@@ -435,8 +433,9 @@ def test_sv_pair():
     for x in [0, 1, 5, 23, 79, 88]:
         ans.append([x, get_sv_pair(x, "test_sv_pair_source", M)])
     # print(ans)
-    assert ans == [[0, (29, 72)], [1, (1, 0)], [5, (34, 72)], [23, (93, 31)],
-                   [79, (55, 24)], [88, (54, 34)]]
+    assert ans == \
+        [[0, (75, 26)], [1, (13, 89)], [5, (53, 53)], [23, (34, 90)], 
+         [79, (51, 28)], [88, (89, 100)]]
 
 test_sv_pair()
 
@@ -511,7 +510,7 @@ def test_share():
     M = 11
     # print(share(3,5,3,"test_share",M))
     assert share(3, 5, 3, "test_share", M) == \
-        [(1, 1), (2, 9), (3, 5), (4, 0), (5, 5)]
+        [(1, 4), (2, 10), (3, 10), (4, 4), (5, 3)]
 
 test_share()
 

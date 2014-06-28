@@ -453,7 +453,7 @@ def hash_sbb(sbb, stop_before_header):
         else:
             sbb_trunc.append(item)
     sbb_trunc_str = sv.dumps(sbb_trunc)
-    hash_tweak = 2
+    hash_tweak = "hash_sbb"
     # use iterated hashing to slow down adversarial attack
     return sv.secure_hash(sbb_trunc_str,
                           hash_tweak,
